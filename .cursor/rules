@@ -1,0 +1,235 @@
+module.exports = {
+  project: {
+    name: "Portfolio Website",
+    description: "Personal portfolio website with 3D elements and smooth animations",
+    framework: "react",
+    typescript: true,
+    bundler: "vite",
+    structure: "single-page",
+  },
+  
+  style: {
+    colors: {
+      primary: "#000000",
+      secondary: "#9d4edd",
+      gradient: "linear-gradient(135deg, #2b0f54, #000000)",
+      text: "#ffffff",
+      accent: "#9d4edd",
+    },
+    typography: {
+      headings: "font-family: 'Space Grotesk', sans-serif; font-weight: 700;",
+      body: "font-family: 'Inter', sans-serif; font-weight: 400;",
+      monospace: "font-family: 'Space Mono', monospace;",
+    },
+    spacing: {
+      base: "1rem",
+      sections: "6rem",
+    },
+  },
+  
+  technical: {
+    libraries: [
+      { name: "react", version: "latest", required: true },
+      { name: "react-dom", version: "latest", required: true },
+      { name: "three", version: "latest", required: true },
+      { name: "@react-three/fiber", version: "latest", required: true },
+      { name: "@react-three/drei", version: "latest", required: true },
+      { name: "gsap", version: "latest", required: true },
+      { name: "framer-motion", version: "latest" },
+      { name: "@types/three", version: "latest", required: true },
+      { name: "@types/react", version: "latest", required: true },
+      { name: "@types/react-dom", version: "latest", required: true },
+      { name: "typescript", version: "latest", required: true },
+      { name: "vite", version: "latest", required: true },
+    ],
+    markup: {
+      jsx: true,
+      semantics: true,
+      accessibility: true,
+    },
+    styling: {
+      approach: "styled-components",
+      cssInJs: true,
+      cssVariables: true,
+    },
+    responsiveness: {
+      mobile: true,
+      tablet: true,
+      desktop: true,
+      approach: "mobile-first",
+    },
+  },
+  
+  structure: {
+    directories: [
+      "src/",
+      "src/components/",
+      "src/sections/",
+      "src/hooks/",
+      "src/contexts/",
+      "src/models/",
+      "src/styles/",
+      "src/utils/",
+      "src/assets/",
+      "src/assets/models/",
+      "src/assets/images/",
+      "src/assets/fonts/",
+      "public/",
+    ],
+    files: {
+      config: [
+        "tsconfig.json",
+        "vite.config.ts",
+        "package.json",
+      ],
+      core: [
+        "src/main.tsx",
+        "src/App.tsx",
+        "src/vite-env.d.ts",
+      ],
+      components: [
+        "src/components/Layout.tsx",
+        "src/components/Navigation.tsx",
+        "src/components/CharacterModel.tsx",
+        "src/components/TechSpheres.tsx",
+        "src/components/Timeline.tsx",
+        "src/components/ProjectCard.tsx",
+        "src/components/SmoothScroll.tsx",
+      ],
+      sections: [
+        "src/sections/Hero.tsx",
+        "src/sections/About.tsx",
+        "src/sections/WhatIDo.tsx",
+        "src/sections/Career.tsx",
+        "src/sections/Work.tsx",
+        "src/sections/Techstack.tsx",
+        "src/sections/Contact.tsx",
+      ],
+    },
+  },
+  
+  threejs: {
+    models: {
+      character: {
+        description: "Main character 3D model with glasses",
+        format: "glb",
+        animations: ["idle", "typing"],
+        library: "@react-three/fiber and @react-three/drei",
+      },
+      tech_spheres: {
+        description: "Floating technology spheres",
+        format: "custom",
+        library: "@react-three/fiber",
+      },
+    },
+    rendering: {
+      antialias: true,
+      pixelRatio: "window.devicePixelRatio",
+      shadows: true,
+      background: "transparent",
+    },
+    performance: {
+      optimizeMeshes: true,
+      lowPowerMode: "auto",
+    },
+  },
+  
+  animations: {
+    preferences: {
+      smooth: true,
+      easing: "power2.out",
+      duration: 0.8,
+    },
+    library: "gsap",
+    sections: {
+      hero: [
+        { element: "character", animation: "fadeIn", delay: 0 },
+        { element: "title", animation: "splitTextReveal", delay: 0.3 },
+      ],
+      about: [
+        { element: "character", animation: "moveLeft", delay: 0 },
+        { element: "text", animation: "fadeInRight", delay: 0.2 },
+      ],
+      whatIDo: [
+        { element: "character", animation: "computerTyping", delay: 0 },
+        { element: "blocks", animation: "staggerReveal", delay: 0.3 },
+      ],
+      career: [
+        { element: "timeline", animation: "drawLine", delay: 0 },
+        { element: "jobs", animation: "staggerFadeIn", delay: 0.2 },
+      ],
+      work: [
+        { element: "projects", animation: "gridReveal", delay: 0 },
+      ],
+      techstack: [
+        { element: "spheres", animation: "float", delay: 0, continuous: true },
+      ],
+      contact: [
+        { element: "form", animation: "fadeInUp", delay: 0 },
+        { element: "social", animation: "staggerFadeIn", delay: 0.2 },
+      ],
+    },
+    transitions: {
+      duration: 1.2,
+      easing: "power3.inOut",
+    },
+  },
+  
+  deployment: {
+    platform: "vercel",
+    config: {
+      framework: "vite",
+      buildCommand: "npm run build",
+      outputDirectory: "dist",
+    },
+  },
+  
+  code: {
+    quality: {
+      bestPractices: true,
+      optimization: true,
+    },
+    typescript: {
+      strict: true,
+      interfaces: true,
+      typeChecking: true,
+    },
+    react: {
+      hooks: true,
+      functional: true,
+      contextApi: true,
+      suspense: true,
+    },
+  },
+  
+  content: {
+    sections: [
+      "hero",
+      "about",
+      "whatIDo",
+      "career",
+      "work",
+      "techstack",
+      "contact",
+    ],
+    navigation: {
+      style: "minimal",
+      position: "top",
+      social: ["github", "linkedin", "twitter", "instagram"],
+    },
+    avatar: {
+      type: "3d",
+      features: ["glasses"],
+      animations: true,
+      source: "blender",
+    },
+    workflow: {
+      design: "Adobe XD",
+      modeling: "Blender",
+      development: "Vite + React + TypeScript",
+      "3d": "Three.js + React Three Fiber",
+      animation: "GSAP",
+      deployment: "Vercel",
+    },
+  },
+};
