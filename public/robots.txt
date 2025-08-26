@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Disallow development files
+Disallow: /*.map$
+Disallow: /assets/
+
+# Sitemap location (update with your actual domain)
+Sitemap: https://sv-mitska.netlify.app/sitemap.xml
