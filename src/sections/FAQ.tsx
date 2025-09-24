@@ -8,7 +8,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const FAQSection = styled.section`
   padding: 8rem 0;
-  background-color: #000;
+  background: var(--gradient-background), #000;
   position: relative;
   overflow: hidden;
 `;
@@ -25,7 +25,7 @@ const SectionHeader = styled.div`
 `;
 
 const SectionTitle = styled.h2`
-  background: linear-gradient(90deg, #8E2DE2, #4A00E0, #FF7D54);
+  background: var(--gradient-text);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -43,7 +43,7 @@ const SectionTitle = styled.h2`
     bottom: -10px;
     width: 80px;
     height: 4px;
-    background: linear-gradient(90deg, #8E2DE2, #4A00E0);
+    background: var(--gradient-secondary);
   }
 `;
 
@@ -86,7 +86,7 @@ const FAQQuestion = styled.div<{ isOpen: boolean }>`
   svg {
     transition: transform 0.3s ease;
     transform: ${props => props.isOpen ? 'rotate(180deg)' : 'rotate(0)'};
-    color: ${props => props.isOpen ? '#8E2DE2' : '#a0a0a0'};
+    color: ${props => props.isOpen ? '#D76D77' : '#a0a0a0'};
   }
 `;
 
@@ -128,20 +128,31 @@ const CTADescription = styled.p`
 
 const CTAButton = styled.a`
   display: inline-block;
-  background: linear-gradient(90deg, #8E2DE2, #4A00E0);
-  color: white;
+  background: var(--gradient-button);
+  color: white !important;
   padding: 0.9rem 2.5rem;
   border-radius: 5px;
   font-weight: 700;
   font-size: 1rem;
   letter-spacing: 0.05em;
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 4px 10px rgba(142, 45, 226, 0.25);
-  
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  text-decoration: none;
+
+  span {
+    color: white !important;
+
+    svg {
+      color: white !important;
+    }
+  }
+
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(142, 45, 226, 0.3);
+    color: white !important;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    filter: brightness(1.1);
   }
 `;
 

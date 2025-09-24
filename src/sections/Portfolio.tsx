@@ -7,7 +7,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const PortfolioSection = styled.section`
   padding: 8rem 0;
-  background-color: #0a0a0a;
+  background: var(--gradient-background), #0a0a0a;
   position: relative;
   overflow: hidden;
 `;
@@ -24,7 +24,7 @@ const SectionHeader = styled.div`
 `;
 
 const SectionTitle = styled.h2`
-  background: linear-gradient(90deg, #8E2DE2, #4A00E0, #FF7D54);
+  background: var(--gradient-text);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -42,7 +42,7 @@ const SectionTitle = styled.h2`
     bottom: -10px;
     width: 80px;
     height: 4px;
-    background: linear-gradient(90deg, #8E2DE2, #4A00E0);
+    background: var(--gradient-secondary);
   }
 `;
 
@@ -63,18 +63,31 @@ const FilterContainer = styled.div`
 `;
 
 const FilterButton = styled.button<{ active: boolean }>`
-  background: ${props => props.active ? 'linear-gradient(90deg, #8E2DE2, #4A00E0)' : 'transparent'};
-  color: ${props => props.active ? '#fff' : '#a0a0a0'};
+  background: ${props => props.active ? 'var(--gradient-button)' : 'transparent'};
+  color: ${props => props.active ? 'white !important' : '#a0a0a0'};
   border: ${props => props.active ? 'none' : '1px solid #333'};
   padding: 0.6rem 1.2rem;
   border-radius: 5px;
   font-weight: 600;
   cursor: pointer;
+  box-shadow: ${props => props.active ? '0 4px 12px rgba(0, 0, 0, 0.15)' : 'none'};
   transition: all 0.3s ease;
-  
+
+  span {
+    color: ${props => props.active ? 'white !important' : 'inherit'};
+
+    svg {
+      color: ${props => props.active ? 'white !important' : 'inherit'};
+    }
+  }
+
   &:hover {
-    background: ${props => props.active ? 'linear-gradient(90deg, #8E2DE2, #4A00E0)' : 'rgba(142, 45, 226, 0.1)'};
-    border-color: ${props => props.active ? 'transparent' : '#8E2DE2'};
+    color: ${props => props.active ? 'white !important' : '#a0a0a0'};
+    transform: ${props => props.active ? 'translateY(-2px) scale(1.02)' : 'translateY(-1px)'};
+    box-shadow: ${props => props.active ? '0 8px 20px rgba(0, 0, 0, 0.2)' : '0 4px 12px rgba(0, 0, 0, 0.15)'};
+    filter: ${props => props.active ? 'brightness(1.1)' : 'brightness(1.2)'};
+    background: ${props => props.active ? 'var(--gradient-button)' : 'var(--gradient-subtle)'};
+    border-color: ${props => props.active ? 'transparent' : '#D76D77'};
   }
 `;
 
@@ -82,11 +95,12 @@ const ProjectsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(1, 1fr);
   gap: 2rem;
-  
+  position: relative;
+
   @media (min-width: 576px) {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   @media (min-width: 992px) {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -97,16 +111,29 @@ const ProjectCard = styled.div`
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 1;
+  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   &:hover {
     transform: translateY(-10px);
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-    
+
     .project-image {
       transform: scale(1.05);
     }
-    
+
     .overlay {
       opacity: 1;
     }
@@ -151,7 +178,7 @@ const ProjectInfo = styled.div`
 const ProjectCategory = styled.p`
   font-size: 0.8rem;
   text-transform: uppercase;
-  color: #8E2DE2;
+  color: #D76D77;
   margin-bottom: 0.5rem;
   font-weight: 600;
 `;
@@ -173,13 +200,13 @@ const ProjectLink = styled.a`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: #8E2DE2;
+  color: #D76D77;
   font-weight: 600;
   font-size: 0.9rem;
   transition: color 0.3s ease;
   
   &:hover {
-    color: #4A00E0;
+    color: #FFAF7B;
   }
   
   &::after {
@@ -200,20 +227,32 @@ const ViewAllContainer = styled.div`
 
 const ViewAllButton = styled.a`
   display: inline-block;
-  background: transparent;
-  border: 2px solid #8E2DE2;
-  color: white;
+  background: var(--gradient-button);
+  border: none;
+  color: white !important;
   padding: 0.9rem 2.5rem;
   border-radius: 5px;
   font-weight: 700;
   font-size: 1rem;
   letter-spacing: 0.05em;
   cursor: pointer;
-  transition: transform 0.3s ease, background-color 0.3s ease;
-  
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  text-decoration: none;
+
+  span {
+    color: white !important;
+
+    svg {
+      color: white !important;
+    }
+  }
+
   &:hover {
-    transform: translateY(-5px);
-    background-color: rgba(142, 45, 226, 0.1);
+    color: white !important;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    filter: brightness(1.1);
   }
 `;
 
@@ -242,7 +281,7 @@ const Portfolio: React.FC = () => {
     const cta = ctaRef.current;
 
     if (section && header && filter && projects && cta) {
-      // Анимация заголовка
+      // Анимация заголовка (только при первой загрузке)
       gsap.fromTo(
         header,
         { opacity: 0, y: 50 },
@@ -258,7 +297,7 @@ const Portfolio: React.FC = () => {
         }
       );
 
-      // Анимация фильтров
+      // Анимация фильтров (только при первой загрузке)
       gsap.fromTo(
         filter,
         { opacity: 0, y: 30 },
@@ -275,7 +314,7 @@ const Portfolio: React.FC = () => {
         }
       );
 
-      // Анимация проектов
+      // Анимация проектов (только при первой загрузке)
       gsap.fromTo(
         projects.children,
         { opacity: 0, y: 50 },
@@ -292,7 +331,7 @@ const Portfolio: React.FC = () => {
         }
       );
 
-      // Анимация кнопки "Все проекты"
+      // Анимация кнопки "Все проекты" (только при первой загрузке)
       gsap.fromTo(
         cta,
         { opacity: 0, y: 30 },
@@ -308,7 +347,7 @@ const Portfolio: React.FC = () => {
         }
       );
     }
-  }, [activeFilter]);
+  }, []); // Убираем зависимость от activeFilter
 
   const projects: Project[] = [
     {
@@ -396,7 +435,7 @@ const Portfolio: React.FC = () => {
           </FilterButton>
         </FilterContainer>
 
-        <ProjectsGrid ref={projectsRef}>
+        <ProjectsGrid ref={projectsRef} key={activeFilter}>
           {filteredProjects.map(project => (
             <ProjectCard key={project.id}>
               <ProjectImageContainer>

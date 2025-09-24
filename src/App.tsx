@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import Navigation from './components/Navigation';
 import Hero from './sections/Hero';
 import AIChatWidget from './components/AIChatWidget';
+import SectionDivider from './components/SectionDivider';
 
 // Определяем производительность устройства при загрузке
 const isMobile = window.innerWidth < 768;
@@ -33,7 +34,7 @@ const MainLoader = styled.div`
     content: '';
     width: 40px;
     height: 40px;
-    border: 3px solid rgba(142, 45, 226, 0.2);
+    border: 3px solid rgba(215, 109, 119, 0.2);
     border-radius: 50%;
     border-top-color: var(--color-primary);
     animation: spin 1s linear infinite;
@@ -102,40 +103,49 @@ function App() {
           <AIChatWidget />
           <Layout>
             <Hero />
-          
+            <SectionDivider variant="thin" />
+
             {/* Остальные секции загружаются лениво при скролле */}
             <LazyLoadSection threshold={isLowEndDevice ? 0.01 : 0.05} rootMargin={isLowEndDevice ? '100px' : '300px'}>
               <Services />
             </LazyLoadSection>
-            
+            <SectionDivider variant="thin" />
+
             <LazyLoadSection threshold={isLowEndDevice ? 0.01 : 0.05} rootMargin={isLowEndDevice ? '100px' : '300px'}>
               <Benefits />
             </LazyLoadSection>
-            
+            <SectionDivider variant="dot" />
+
             <LazyLoadSection threshold={isLowEndDevice ? 0.01 : 0.05} rootMargin={isLowEndDevice ? '100px' : '300px'}>
               <WorkProcess />
             </LazyLoadSection>
-            
+            <SectionDivider variant="thin" />
+
             <LazyLoadSection threshold={isLowEndDevice ? 0.01 : 0.05} rootMargin={isLowEndDevice ? '100px' : '300px'}>
               <Pricing />
             </LazyLoadSection>
-            
+            <SectionDivider variant="default" />
+
             <LazyLoadSection threshold={isLowEndDevice ? 0.01 : 0.05} rootMargin={isLowEndDevice ? '100px' : '300px'}>
               <LiveCodeDemo />
             </LazyLoadSection>
-            
+            <SectionDivider variant="thin" />
+
             <LazyLoadSection threshold={0.01} rootMargin={isLowEndDevice ? '50px' : '200px'}>
               <Portfolio />
             </LazyLoadSection>
-            
+            <SectionDivider variant="dot" />
+
             <LazyLoadSection threshold={0.01} rootMargin={isLowEndDevice ? '50px' : '200px'}>
               <TelegramBot />
             </LazyLoadSection>
-            
+            <SectionDivider variant="thin" />
+
             <LazyLoadSection threshold={0.01} rootMargin={isLowEndDevice ? '50px' : '200px'}>
               <FAQ />
             </LazyLoadSection>
-            
+            <SectionDivider variant="default" />
+
             <LazyLoadSection threshold={0.01} rootMargin={isLowEndDevice ? '50px' : '200px'}>
               <Contact />
             </LazyLoadSection>

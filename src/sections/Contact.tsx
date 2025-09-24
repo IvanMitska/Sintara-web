@@ -8,7 +8,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const ContactSection = styled.section`
   padding: 8rem 0;
-  background-color: #0a0a0a;
+  background: var(--gradient-background), #0a0a0a;
   position: relative;
   overflow: hidden;
 `;
@@ -25,7 +25,7 @@ const SectionHeader = styled.div`
 `;
 
 const SectionTitle = styled.h2`
-  background: linear-gradient(90deg, #8E2DE2, #4A00E0, #FF7D54);
+  background: var(--gradient-text);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -43,7 +43,7 @@ const SectionTitle = styled.h2`
     bottom: -10px;
     width: 80px;
     height: 4px;
-    background: linear-gradient(90deg, #8E2DE2, #4A00E0);
+    background: var(--gradient-primary);
   }
 `;
 
@@ -112,17 +112,17 @@ const Input = styled.input`
   
   &:focus {
     outline: none;
-    border-color: #8E2DE2;
-    box-shadow: 0 0 10px rgba(142, 45, 226, 0.2);
+    border-color: #D76D77;
+    box-shadow: 0 0 10px rgba(215, 109, 119, 0.2);
   }
   
   /* Создаем фоновый технологичный паттерн как в селекте */
   background-image: linear-gradient(90deg, 
-    rgba(142, 45, 226, 0.03) 25%, 
+    rgba(215, 109, 119, 0.03) 25%, 
     transparent 25%, 
     transparent 50%, 
-    rgba(142, 45, 226, 0.03) 50%, 
-    rgba(142, 45, 226, 0.03) 75%, 
+    rgba(215, 109, 119, 0.03) 50%, 
+    rgba(215, 109, 119, 0.03) 75%, 
     transparent 75%);
   background-size: 10px 100%;
 `;
@@ -140,17 +140,17 @@ const Textarea = styled.textarea`
   
   &:focus {
     outline: none;
-    border-color: #8E2DE2;
-    box-shadow: 0 0 10px rgba(142, 45, 226, 0.2);
+    border-color: #D76D77;
+    box-shadow: 0 0 10px rgba(215, 109, 119, 0.2);
   }
   
   /* Создаем фоновый технологичный паттерн как в селекте */
   background-image: linear-gradient(90deg, 
-    rgba(142, 45, 226, 0.03) 25%, 
+    rgba(215, 109, 119, 0.03) 25%, 
     transparent 25%, 
     transparent 50%, 
-    rgba(142, 45, 226, 0.03) 50%, 
-    rgba(142, 45, 226, 0.03) 75%, 
+    rgba(215, 109, 119, 0.03) 50%, 
+    rgba(215, 109, 119, 0.03) 75%, 
     transparent 75%);
   background-size: 10px 100%;
 `;
@@ -166,7 +166,7 @@ const Select = styled.select`
   
   &:focus {
     outline: none;
-    border-color: #8E2DE2;
+    border-color: #D76D77;
   }
   
   option {
@@ -175,8 +175,8 @@ const Select = styled.select`
 `;
 
 const SubmitButton = styled.button`
-  background: linear-gradient(90deg, #8E2DE2, #4A00E0);
-  color: white;
+  background: var(--gradient-button);
+  color: white !important;
   padding: 1rem;
   border: none;
   border-radius: 5px;
@@ -184,72 +184,30 @@ const SubmitButton = styled.button`
   font-size: 1rem;
   letter-spacing: 0.05em;
   cursor: pointer;
-  transition: all var(--transition-normal);
-  box-shadow: 0 4px 10px rgba(142, 45, 226, 0.25);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   margin-top: 1rem;
   position: relative;
   overflow: hidden;
-  
-  /* Анимация пульсации */
-  animation: submitPulse 3s infinite;
-  
-  @keyframes submitPulse {
-    0% { box-shadow: 0 4px 10px rgba(142, 45, 226, 0.25); }
-    50% { box-shadow: 0 4px 15px rgba(142, 45, 226, 0.4); }
-    100% { box-shadow: 0 4px 10px rgba(142, 45, 226, 0.25); }
-  }
-  
-  /* Эффект свечения при наведении */
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(142, 45, 226, 0.3);
-    
-    &::before {
-      left: 100%;
+  transition: all 0.3s ease;
+
+  span {
+    color: white !important;
+
+    svg {
+      color: white !important;
     }
   }
-  
-  /* Эффект блика при наведении */
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.2),
-      transparent
-    );
-    transition: left 0.8s ease;
+
+  &:hover {
+    color: white !important;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    filter: brightness(1.1);
   }
-  
-  /* Технологичная рамка */
-  &::after {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    background: linear-gradient(90deg, #8E2DE2, #4A00E0);
-    border-radius: 7px;
-    z-index: -1;
-    opacity: 0;
-    transition: opacity var(--transition-normal);
-  }
-  
-  &:hover::after {
-    opacity: 0.4;
-  }
-  
-  /* Эффект при клике */
+
   &:active {
-    transform: translateY(-1px);
-    box-shadow: 0 5px 10px rgba(142, 45, 226, 0.2);
-    background: linear-gradient(90deg, #7B27C1, #3900B5);
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   }
 `;
 
@@ -281,7 +239,7 @@ const ContactItem = styled.li`
   gap: 1rem;
   
   svg {
-    color: #8E2DE2;
+    color: #D76D77;
     font-size: 1.5rem;
     margin-top: 0.2rem;
   }
@@ -311,7 +269,7 @@ const ContactLink = styled.a`
   transition: color 0.3s ease;
   
   &:hover {
-    color: #8E2DE2;
+    color: #D76D77;
   }
 `;
 
@@ -341,10 +299,11 @@ const SocialIconLink = styled.a`
   color: #fff;
   font-size: 1.2rem;
   transition: all 0.3s ease;
-  
+
   &:hover {
-    background-color: #8E2DE2;
-    transform: translateY(-3px);
+    background-color: #D76D77;
+    transform: translateY(-1px);
+    filter: brightness(1.2);
   }
 `;
 
@@ -371,21 +330,21 @@ const SelectTrigger = styled.div<{ isOpen: boolean }>`
   
   /* Технологичная подсветка при фокусе */
   &:hover {
-    border-color: #8E2DE2;
+    border-color: #D76D77;
     background-color: #0f0f0f;
   }
   
   /* Стили активного состояния */
   ${props => props.isOpen && `
-    border-color: #8E2DE2;
-    box-shadow: 0 0 10px rgba(142, 45, 226, 0.2);
+    border-color: #D76D77;
+    box-shadow: 0 0 10px rgba(215, 109, 119, 0.2);
   `}
   
   /* Анимация иконки */
   svg {
     transition: transform var(--transition-normal), color var(--transition-normal);
     transform: ${props => props.isOpen ? 'rotate(180deg)' : 'rotate(0)'};
-    color: ${props => props.isOpen ? '#8E2DE2' : '#555'};
+    color: ${props => props.isOpen ? '#D76D77' : '#555'};
     margin-left: 8px;
     font-size: 0.8rem;
   }
@@ -400,11 +359,11 @@ const SelectTrigger = styled.div<{ isOpen: boolean }>`
     height: 100%;
     background-image: 
       linear-gradient(90deg, 
-        rgba(142, 45, 226, 0.03) 25%, 
+        rgba(215, 109, 119, 0.03) 25%, 
         transparent 25%, 
         transparent 50%, 
-        rgba(142, 45, 226, 0.03) 50%, 
-        rgba(142, 45, 226, 0.03) 75%, 
+        rgba(215, 109, 119, 0.03) 50%, 
+        rgba(215, 109, 119, 0.03) 75%, 
         transparent 75%);
     background-size: 10px 100%;
     opacity: 0.5;
@@ -421,7 +380,7 @@ const SelectTrigger = styled.div<{ isOpen: boolean }>`
     left: -2px;
     right: -2px;
     bottom: -2px;
-    background: linear-gradient(90deg, #8E2DE2, #4A00E0);
+    background: var(--gradient-primary);
     border-radius: 7px;
     z-index: -2;
     opacity: 0;
@@ -468,7 +427,7 @@ const SelectDropdown = styled.div<{ isOpen: boolean }>`
     height: 100%;
     pointer-events: none;
     border-radius: inherit;
-    box-shadow: 0 0 0 1px rgba(142, 45, 226, 0.2);
+    box-shadow: 0 0 0 1px rgba(215, 109, 119, 0.2);
     opacity: ${props => props.isOpen ? 1 : 0};
     transition: opacity var(--transition-normal);
   }
@@ -481,7 +440,7 @@ const SelectDropdown = styled.div<{ isOpen: boolean }>`
     left: 0;
     width: 100%;
     height: 2px;
-    background: linear-gradient(90deg, transparent, #8E2DE2, transparent);
+    background: linear-gradient(90deg, transparent, #D76D77, transparent);
     transform: translateY(-10px);
     opacity: 0;
     
@@ -500,9 +459,9 @@ const SelectDropdown = styled.div<{ isOpen: boolean }>`
   
   /* Технологичный фоновый узор */
   background-image: 
-    radial-gradient(circle at 10% 10%, rgba(142, 45, 226, 0.03) 0%, transparent 30%),
-    linear-gradient(rgba(142, 45, 226, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(142, 45, 226, 0.02) 1px, transparent 1px);
+    radial-gradient(circle at 10% 10%, rgba(215, 109, 119, 0.03) 0%, transparent 30%),
+    linear-gradient(rgba(215, 109, 119, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(215, 109, 119, 0.02) 1px, transparent 1px);
   background-size: 100% 100%, 20px 20px, 20px 20px;
   background-position: 0 0, center center, center center;
 `;
@@ -531,7 +490,7 @@ const SelectOption = styled.div<{ $isActive: boolean }>`
     top: 0;
     height: 100%;
     width: 3px;
-    background: linear-gradient(to bottom, #8E2DE2, #4A00E0);
+    background: linear-gradient(to bottom, #D76D77, #FFAF7B);
     transform: scaleY(0);
     transition: transform 0.25s ease;
     transform-origin: top;
@@ -543,8 +502,8 @@ const SelectOption = styled.div<{ $isActive: boolean }>`
   
   /* Стили для активного элемента */
   ${props => props.$isActive && `
-    background: linear-gradient(90deg, rgba(142, 45, 226, 0.1), transparent);
-    border-left: 3px solid #8E2DE2;
+    background: linear-gradient(90deg, rgba(215, 109, 119, 0.1), transparent);
+    border-left: 3px solid #D76D77;
     
     &::after {
       content: '';
@@ -553,7 +512,7 @@ const SelectOption = styled.div<{ $isActive: boolean }>`
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(142, 45, 226, 0.05), transparent);
+      background: linear-gradient(90deg, transparent, rgba(215, 109, 119, 0.05), transparent);
       pointer-events: none;
     }
   `}
@@ -603,17 +562,17 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
       // Пульсирующая анимация
       gsap.timeline()
         .to(triggerRef.current, { 
-          borderColor: '#8E2DE2', 
-          boxShadow: '0 0 10px rgba(142, 45, 226, 0.4)', 
+          borderColor: '#D76D77', 
+          boxShadow: '0 0 10px rgba(215, 109, 119, 0.4)', 
           duration: 0.2 
         })
         .to(triggerRef.current, { 
-          boxShadow: '0 0 15px rgba(142, 45, 226, 0.6)', 
+          boxShadow: '0 0 15px rgba(215, 109, 119, 0.6)', 
           scale: 1.01, 
           duration: 0.2 
         })
         .to(triggerRef.current, { 
-          boxShadow: '0 0 5px rgba(142, 45, 226, 0.2)', 
+          boxShadow: '0 0 5px rgba(215, 109, 119, 0.2)', 
           scale: 1, 
           duration: 0.3 
         })
@@ -669,7 +628,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
             aria-selected={option.value === value}
           >
             {option.label}
-            {option.value === value && <FaCheck color="#8E2DE2" />}
+            {option.value === value && <FaCheck color="#D76D77" />}
           </SelectOption>
         ))}
       </SelectDropdown>

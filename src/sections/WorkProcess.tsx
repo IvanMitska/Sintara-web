@@ -20,7 +20,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const ProcessSection = styled.section`
   padding: 8rem 0;
-  background-color: #0a0a0a;
+  background: var(--gradient-background), #0a0a0a;
   position: relative;
   overflow: hidden;
   
@@ -31,7 +31,7 @@ const ProcessSection = styled.section`
     left: 0;
     width: 30%;
     height: 40%;
-    background: radial-gradient(ellipse at center, rgba(142, 45, 226, 0.08), transparent 70%);
+    background: radial-gradient(ellipse at center, rgba(215, 109, 119, 0.08), transparent 70%);
     filter: blur(100px);
     z-index: 0;
     pointer-events: none;
@@ -65,7 +65,7 @@ const SectionTitle = styled.h2`
     bottom: -10px;
     width: 80px;
     height: 4px;
-    background: linear-gradient(90deg, #8E2DE2, #4A00E0);
+    background: var(--gradient-secondary);
   }
 `;
 
@@ -94,10 +94,17 @@ const ProcessLine = styled.div`
   left: 35px;
   top: 0;
   bottom: 0;
-  width: 4px;
-  background: linear-gradient(to bottom, #8E2DE2, #4A00E0);
+  width: 2px;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    rgba(215, 109, 119, 0.3) 10%,
+    rgba(215, 109, 119, 0.5) 50%,
+    rgba(58, 28, 113, 0.3) 90%,
+    transparent 100%
+  );
   z-index: 0;
   transform-origin: top;
+  opacity: 0.6;
   
   @media (max-width: 768px) {
     left: 25px;
@@ -120,16 +127,18 @@ const StepCircle = styled(motion.div)`
   width: 70px;
   height: 70px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%);
+  background: var(--gradient-button);
   color: white;
   font-size: 1.5rem;
   font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 20px rgba(142, 45, 226, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   position: relative;
   will-change: transform;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
   
   @media (max-width: 768px) {
     width: 50px;
@@ -140,19 +149,22 @@ const StepCircle = styled(motion.div)`
 
 const StepContent = styled(motion.div)`
   flex: 1;
-  padding: 2.5rem;
-  background-color: rgba(17, 17, 17, 0.7);
-  border-radius: 15px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(142, 45, 226, 0.15);
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(15, 15, 25, 0.6), rgba(25, 25, 35, 0.6));
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(215, 109, 119, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   will-change: transform;
-  
+  overflow: hidden;
+
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(142, 45, 226, 0.2);
-    border-color: rgba(142, 45, 226, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    border-color: rgba(215, 109, 119, 0.2);
+    background: linear-gradient(135deg, rgba(15, 15, 25, 0.7), rgba(25, 25, 35, 0.7));
   }
   
   @media (max-width: 768px) {
@@ -173,10 +185,12 @@ const StepTitle = styled.h3`
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  
+  font-weight: 600;
+
   svg {
-    color: #8E2DE2;
+    color: #D76D77;
     font-size: 1.2rem;
+    opacity: 0.8;
   }
 `;
 
@@ -189,7 +203,7 @@ const StepDescription = styled.p`
 
 const StepTimeframe = styled.p`
   font-size: 0.9rem;
-  color: #8E2DE2;
+  color: #D76D77;
   font-weight: 600;
   margin-top: 1rem;
   display: flex;
@@ -197,29 +211,37 @@ const StepTimeframe = styled.p`
   gap: 0.5rem;
 `;
 
-const ToggleButton = styled.button`
+const ToggleButton = styled(motion.button)`
   background: transparent;
   border: none;
-  color: #8E2DE2;
+  color: #D76D77;
   font-size: 1.2rem;
   cursor: pointer;
-  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   padding: 0;
-  
+  transition: all 0.3s ease;
+  border-radius: 50%;
+
   &:hover {
-    color: #4A00E0;
+    transform: scale(1.1);
+    background: rgba(215, 109, 119, 0.1);
+    color: #FFAF7B;
+  }
+
+  svg {
+    transition: transform 0.3s ease;
   }
 `;
 
 const StepDetailContent = styled(motion.div)`
   margin-top: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 1px dashed rgba(142, 45, 226, 0.3);
+  border-top: 1px solid rgba(215, 109, 119, 0.15);
+  overflow: hidden;
 `;
 
 const DetailsList = styled.ul`
@@ -228,20 +250,21 @@ const DetailsList = styled.ul`
   margin: 0;
 `;
 
-const DetailItem = styled.li`
+const DetailItem = styled(motion.li)`
   margin-bottom: 0.75rem;
   color: #a0a0a0;
   display: flex;
   align-items: center;
   gap: 0.75rem;
   font-size: 0.95rem;
-  
+
   svg {
-    color: #8E2DE2;
+    color: #D76D77;
     font-size: 0.8rem;
     flex-shrink: 0;
+    opacity: 0.7;
   }
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -258,16 +281,24 @@ const TechUsed = styled.div`
   }
 `;
 
-const TechTag = styled.span`
+const TechTag = styled(motion.span)`
   display: inline-block;
-  padding: 0.25rem 0.75rem;
-  background: rgba(142, 45, 226, 0.1);
-  color: #8E2DE2;
+  padding: 0.3rem 0.8rem;
+  background: rgba(215, 109, 119, 0.08);
+  color: #D76D77;
   border-radius: 20px;
   font-size: 0.8rem;
   margin-right: 0.5rem;
   margin-bottom: 0.5rem;
-  border: 1px solid rgba(142, 45, 226, 0.2);
+  border: 1px solid rgba(215, 109, 119, 0.15);
+  transition: all 0.3s ease;
+  cursor: default;
+
+  &:hover {
+    background: rgba(215, 109, 119, 0.15);
+    border-color: rgba(215, 109, 119, 0.3);
+    transform: translateY(-1px);
+  }
 `;
 
 // Расширенная информация о каждом шаге
@@ -450,14 +481,14 @@ const WorkProcess: React.FC = () => {
 
   // Варианты анимации для Framer Motion (оптимизированные)
   const stepVariants = {
-    hidden: { opacity: 0, x: -20 },
+    hidden: { opacity: 0, x: -30 },
     visible: (i: number) => ({
       opacity: 1,
       x: 0,
       transition: {
-        delay: i * 0.1,
-        duration: 0.3,
-        ease: "easeOut"
+        delay: i * 0.15,
+        duration: 0.5,
+        ease: [0.4, 0, 0.2, 1]
       }
     })
   };
@@ -484,18 +515,24 @@ const WorkProcess: React.FC = () => {
               animate={isVisible ? "visible" : "hidden"}
               variants={stepVariants}
             >
-              <StepCircle>
+              <StepCircle
+                whileHover={{ scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 400 }}
+              >
                 {step.number}
               </StepCircle>
               <StepContent onClick={() => toggleDetails(step.number)}>
                 <StepHeader>
                   <StepTitle>{step.icon} {step.title}</StepTitle>
-                  <ToggleButton>
-                    <FaAngleDown 
-                      style={{ 
-                        transform: expandedStep === step.number ? 'rotate(180deg)' : 'rotate(0)', 
-                        transition: 'transform 0.3s ease' 
-                      }} 
+                  <ToggleButton
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <FaAngleDown
+                      style={{
+                        transform: expandedStep === step.number ? 'rotate(180deg)' : 'rotate(0)',
+                        transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+                      }}
                     />
                   </ToggleButton>
                 </StepHeader>
@@ -505,17 +542,30 @@ const WorkProcess: React.FC = () => {
                   <FaRegClock /> {step.timeframe}
                 </StepTimeframe>
                 
-                <AnimatePresence>
+                <AnimatePresence mode="wait">
                   {expandedStep === step.number && (
                     <StepDetailContent
+                      key={`detail-${step.number}`}
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
+                      transition={{
+                        height: { duration: 0.4, ease: [0.4, 0, 0.2, 1] },
+                        opacity: { duration: 0.3, delay: 0.1 }
+                      }}
                     >
                       <DetailsList>
                         {step.details.map((detail, index) => (
-                          <DetailItem key={index}>
+                          <DetailItem
+                            key={index}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{
+                              delay: index * 0.05,
+                              duration: 0.3,
+                              ease: [0.4, 0, 0.2, 1]
+                            }}
+                          >
                             <FaListUl />
                             {detail}
                           </DetailItem>
@@ -530,7 +580,19 @@ const WorkProcess: React.FC = () => {
                           </h4>
                           <div>
                             {step.technologies.map((tech, index) => (
-                              <TechTag key={index}>{tech}</TechTag>
+                              <TechTag
+                                key={index}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{
+                                  delay: 0.2 + index * 0.05,
+                                  duration: 0.3,
+                                  ease: [0.4, 0, 0.2, 1]
+                                }}
+                                whileHover={{ scale: 1.05 }}
+                              >
+                                {tech}
+                              </TechTag>
                             ))}
                           </div>
                         </TechUsed>

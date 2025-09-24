@@ -19,7 +19,7 @@ const blink = keyframes`
 
 const LiveCodeSection = styled.section`
   padding: 8rem 0;
-  background: #000;
+  background: var(--gradient-background), #000;
   position: relative;
   overflow: hidden;
   
@@ -31,8 +31,8 @@ const LiveCodeSection = styled.section`
     width: 100%;
     height: 100%;
     background: 
-      radial-gradient(circle at 20% 20%, rgba(142, 45, 226, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(74, 0, 224, 0.1) 0%, transparent 50%);
+      radial-gradient(circle at 20% 20%, rgba(215, 109, 119, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(58, 28, 113, 0.1) 0%, transparent 50%);
     pointer-events: none;
   }
 `;
@@ -53,7 +53,7 @@ const SectionHeader = styled.div`
 const SectionTitle = styled.h2`
   font-size: clamp(2.5rem, 5vw, 3.5rem);
   margin-bottom: 1.5rem;
-  background: linear-gradient(90deg, #8E2DE2, #4A00E0, #FF7D54);
+  background: var(--gradient-text);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -115,7 +115,7 @@ const EditorTabs = styled.div`
 
 const EditorTab = styled.div<{ active?: boolean }>`
   padding: 0.5rem 1rem;
-  background: ${props => props.active ? 'rgba(142, 45, 226, 0.2)' : 'transparent'};
+  background: ${props => props.active ? 'var(--gradient-subtle)' : 'transparent'};
   color: ${props => props.active ? '#fff' : '#7d8590'};
   border-radius: 5px;
   font-size: 0.85rem;
@@ -127,7 +127,7 @@ const EditorTab = styled.div<{ active?: boolean }>`
   
   &:hover {
     color: #fff;
-    background: rgba(142, 45, 226, 0.1);
+    background: var(--gradient-subtle);
   }
 `;
 
@@ -149,21 +149,34 @@ const ActionButton = styled.button`
   align-items: center;
   gap: 0.3rem;
   transition: all 0.3s ease;
-  
+
   &:hover {
     color: #fff;
     border-color: var(--color-primary);
-    background: rgba(142, 45, 226, 0.1);
+    background: var(--gradient-subtle);
+    transform: translateY(-1px);
+    filter: brightness(1.2);
   }
-  
+
   &.primary {
-    background: var(--color-primary-gradient);
-    color: white;
+    background: var(--gradient-button);
+    color: white !important;
     border: none;
-    
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+    span {
+      color: white !important;
+
+      svg {
+        color: white !important;
+      }
+    }
+
     &:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 5px 15px rgba(142, 45, 226, 0.3);
+      color: white !important;
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      filter: brightness(1.1);
     }
   }
 `;
@@ -202,7 +215,7 @@ const CodeLine = styled.div<{ highlight?: boolean }>`
   align-items: center;
   min-height: 1.5rem;
   padding: 0.1rem 0;
-  background: ${props => props.highlight ? 'rgba(142, 45, 226, 0.1)' : 'transparent'};
+  background: ${props => props.highlight ? 'var(--gradient-subtle)' : 'transparent'};
   margin: 0 -1.5rem;
   padding-left: 1.5rem;
   padding-right: 1.5rem;
@@ -267,7 +280,7 @@ const AnimatedCard = styled.div<{ $isActive?: boolean }>`
   width: 100%;
   max-width: 320px;
   height: 200px;
-  background: linear-gradient(135deg, #8E2DE2, #4A00E0);
+  background: var(--gradient-primary);
   border-radius: 20px;
   display: flex;
   align-items: center;
@@ -279,7 +292,7 @@ const AnimatedCard = styled.div<{ $isActive?: boolean }>`
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   transform: ${props => props.$isActive ? 'scale(1.05) rotateY(5deg)' : 'scale(1)'};
   box-shadow: ${props => props.$isActive ? 
-    '0 20px 40px rgba(142, 45, 226, 0.4)' : 
+    '0 20px 40px rgba(215, 109, 119, 0.4)' : 
     '0 10px 20px rgba(0, 0, 0, 0.3)'
   };
   position: relative;
@@ -301,7 +314,7 @@ const AnimatedCard = styled.div<{ $isActive?: boolean }>`
   
   &:hover {
     transform: scale(1.05) rotateY(10deg);
-    box-shadow: 0 25px 50px rgba(142, 45, 226, 0.5);
+    box-shadow: 0 25px 50px rgba(215, 109, 119, 0.5);
   }
 `;
 
@@ -310,7 +323,7 @@ const codeExamples = {
 import styled from 'styled-components';
 
 const AnimatedCard = styled.div\`
-  background: linear-gradient(135deg, #8E2DE2, #4A00E0);
+  background: var(--gradient-primary);
   border-radius: 20px;
   padding: 2rem;
   color: white;
@@ -319,7 +332,7 @@ const AnimatedCard = styled.div\`
   
   &:hover {
     transform: scale(1.05) rotateY(10deg);
-    box-shadow: 0 25px 50px rgba(142, 45, 226, 0.5);
+    box-shadow: 0 25px 50px rgba(215, 109, 119, 0.5);
   }
 \`;
 
@@ -339,7 +352,7 @@ const InteractiveDemo = () => {
 export default InteractiveDemo;`,
   
   css: `.animated-card {
-  background: linear-gradient(135deg, #8E2DE2, #4A00E0);
+  background: var(--gradient-primary);
   border-radius: 20px;
   padding: 2rem;
   color: white;

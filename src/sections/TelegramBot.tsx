@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 
 const TelegramBotSection = styled.section`
-  background-color: var(--color-background);
+  background: var(--gradient-background), var(--color-background);
   padding: 8rem 2rem;
   display: flex;
   flex-direction: column;
@@ -121,23 +121,33 @@ const FeatureItem = styled.li`
 const TryButton = styled.a`
   display: inline-flex;
   align-items: center;
-  background: var(--color-primary-gradient);
-  color: white;
+  background: var(--gradient-button);
+  color: white !important;
   font-weight: 600;
   padding: 0.75rem 1.5rem;
   border-radius: var(--radius-sm);
   text-decoration: none;
-  transition: all var(--transition-normal);
-  box-shadow: 0 4px 10px rgba(142, 45, 226, 0.3);
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 7px 15px rgba(142, 45, 226, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+
+  span {
+    color: white !important;
+
+    svg {
+      color: white !important;
+    }
   }
-  
+
+  &:hover {
+    color: white !important;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    filter: brightness(1.1);
+  }
+
   &:active {
-    transform: translateY(0);
-    box-shadow: 0 4px 8px rgba(142, 45, 226, 0.3);
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   }
 `;
 
@@ -336,6 +346,12 @@ const BotCommand = styled.button`
   border-radius: 4px;
   font-size: 0.8rem;
   cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.2);
+  }
 `;
 
 const BotInputBar = styled.div`

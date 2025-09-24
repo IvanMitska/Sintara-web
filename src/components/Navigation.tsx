@@ -41,7 +41,7 @@ const Logo = styled.a`
   display: flex;
   align-items: center;
   position: relative;
-  background: var(--color-primary-gradient);
+  background: var(--gradient-text);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -54,8 +54,8 @@ const Logo = styled.a`
   
   &:hover {
     span {
-      color: var(--color-accent);
-      -webkit-text-fill-color: var(--color-accent);
+      color: #D76D77;
+      -webkit-text-fill-color: #D76D77;
     }
   }
   
@@ -65,7 +65,7 @@ const Logo = styled.a`
     display: inline-block;
     width: 6px;
     height: 6px;
-    background: var(--color-accent);
+    background: #D76D77;
     border-radius: 50%;
     margin-left: 5px;
     animation: pulse 2s infinite;
@@ -95,9 +95,9 @@ const NavLinks = styled.div<{ $isOpen: boolean }>`
     top: 100%;
     left: 0;
     width: 100%;
-    background: rgba(0, 0, 0, 0.95);
+    background: var(--gradient-background), rgba(0, 0, 0, 0.95);
     padding: 1rem 0;
-    border-top: 1px solid rgba(142, 45, 226, 0.2);
+    border-top: 1px solid rgba(215, 109, 119, 0.2);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
     gap: 0.5rem;
   }
@@ -126,18 +126,18 @@ const NavLink = styled.a<{ $active: boolean }>`
     left: 0;
     width: 100%;
     height: 2px;
-    background: ${props => props.$active ? 'var(--color-primary-gradient)' : 'transparent'};
+    background: ${props => props.$active ? 'var(--gradient-primary)' : 'transparent'};
     transform: ${props => props.$active ? 'translateX(0)' : 'translateX(-100%)'};
     transition: transform var(--transition-normal), background var(--transition-normal);
   }
 
   &:hover {
     color: var(--color-text);
-    background: rgba(142, 45, 226, 0.1);
+    background: var(--gradient-subtle);
     
     &::before {
       transform: translateX(0);
-      background: ${props => props.$active ? 'var(--color-primary-gradient)' : 'var(--color-accent-gradient)'};
+      background: ${props => props.$active ? 'var(--gradient-primary)' : 'var(--gradient-secondary)'};
     }
   }
 
@@ -155,33 +155,39 @@ const ActionButton = styled.a`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-primary-gradient);
-  color: white;
+  background: var(--gradient-button);
+  color: white !important;
   padding: 0.5rem 1rem;
   margin-left: 1rem;
   border-radius: var(--radius-sm);
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: all var(--transition-normal);
   position: relative;
   text-decoration: none;
-  box-shadow: 0 4px 10px rgba(142, 45, 226, 0.2);
-  
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+
+  span {
+    color: white !important;
+
+    svg {
+      color: white !important;
+    }
+  }
+
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 7px 15px rgba(142, 45, 226, 0.3);
+    color: white !important;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    filter: brightness(1.1);
   }
-  
+
   &:active {
-    transform: translateY(0);
-    box-shadow: 0 4px 8px rgba(142, 45, 226, 0.2);
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   }
-  
-  @media (min-width: 768px) {
-    /* Удалили анимацию пульсации для более строгого стиля Discord */
-  }
-  
+
   @media (max-width: 768px) {
     margin-left: 0;
     margin-top: 0.5rem;

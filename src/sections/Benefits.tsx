@@ -8,9 +8,21 @@ gsap.registerPlugin(ScrollTrigger);
 
 const BenefitsSection = styled.section`
   padding: 8rem 0;
-  background-color: #000;
+  background: var(--gradient-background), var(--color-background);
   position: relative;
   overflow: hidden;
+
+  /* Добавляем разделитель сверху */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--gradient-section-divider);
+    z-index: 1;
+  }
 `;
 
 const Container = styled.div`
@@ -29,7 +41,7 @@ const SectionTitle = styled.h2`
   margin-bottom: 1.5rem;
   position: relative;
   display: inline-block;
-  background: linear-gradient(90deg, #8E2DE2, #4A00E0, #FF7D54);
+  background: var(--gradient-text);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -43,7 +55,7 @@ const SectionTitle = styled.h2`
     bottom: -10px;
     width: 80px;
     height: 4px;
-    background: linear-gradient(90deg, #8E2DE2, #4A00E0);
+    background: var(--gradient-secondary);
   }
 `;
 
@@ -70,19 +82,40 @@ const BenefitsGrid = styled.div`
 `;
 
 const BenefitCard = styled.div`
-  padding: 2rem;
-  background-color: #0a0a0a;
-  border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  padding: 2.5rem 2rem;
+  background: linear-gradient(135deg, rgba(15, 15, 25, 0.8), rgba(25, 25, 35, 0.8));
+  border-radius: 16px;
+  border: 1px solid rgba(215, 109, 119, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+
+  /* Тонкий верхний бордер */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--gradient-primary);
+    opacity: 0.6;
+  }
+
   &:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    transform: translateY(-5px);
+    border-color: rgba(215, 109, 119, 0.25);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+
+    &::before {
+      opacity: 1;
+    }
   }
 `;
 
@@ -90,28 +123,69 @@ const IconContainer = styled.div`
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%);
+  background: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.5rem;
-  
+  margin-bottom: 2rem;
+  position: relative;
+  transition: all 0.3s ease;
+
+  /* Тонкий светящийся ободок */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    background: var(--gradient-card);
+    -webkit-mask: radial-gradient(circle, transparent 38px, black 40px);
+    mask: radial-gradient(circle, transparent 38px, black 40px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  ${BenefitCard}:hover & {
+    transform: scale(1.05);
+    background: var(--gradient-button-hover);
+
+    &::before {
+      opacity: 1;
+    }
+  }
+
   svg {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     color: white;
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.2));
   }
 `;
 
 const BenefitTitle = styled.h3`
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   margin-bottom: 1rem;
   color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+
+  ${BenefitCard}:hover & {
+    background: var(--gradient-text);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+  }
 `;
 
 const BenefitDescription = styled.p`
   font-size: 1rem;
   color: #a0a0a0;
-  line-height: 1.6;
+  line-height: 1.7;
+  transition: color 0.3s ease;
+
+  ${BenefitCard}:hover & {
+    color: #b8b8b8;
+  }
 `;
 
 const Benefits: React.FC = () => {

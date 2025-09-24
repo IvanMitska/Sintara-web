@@ -9,37 +9,35 @@ gsap.registerPlugin(ScrollTrigger);
 
 const ServicesSection = styled.section`
   padding: 8rem 0;
-  background-color: #0a0a0a;
+  background: var(--gradient-background), var(--color-background);
   position: relative;
   overflow: hidden;
-  
-  /* Упрощаем градиенты фона для лучшей производительности */
+
+  /* Упрощенные фоновые градиенты */
   &::before {
     content: '';
     position: absolute;
     top: 0;
     right: 0;
-    width: 30%;
-    height: 40%;
-    background: radial-gradient(ellipse at center, rgba(142, 45, 226, 0.05), transparent 70%);
-    filter: blur(60px);
+    width: 25%;
+    height: 30%;
+    background: radial-gradient(ellipse at center, rgba(215, 109, 119, 0.03), transparent 70%);
+    filter: blur(40px);
     z-index: 0;
     pointer-events: none;
-    will-change: transform;
   }
-  
+
   &::after {
     content: '';
     position: absolute;
     bottom: 0;
     left: 0;
-    width: 30%;
-    height: 40%;
-    background: radial-gradient(ellipse at center, rgba(74, 0, 224, 0.05), transparent 70%);
-    filter: blur(60px);
+    width: 25%;
+    height: 30%;
+    background: radial-gradient(ellipse at center, rgba(58, 28, 113, 0.03), transparent 70%);
+    filter: blur(40px);
     z-index: 0;
     pointer-events: none;
-    will-change: transform;
   }
 `;
 
@@ -61,7 +59,7 @@ const SectionTitle = styled.h2`
   margin-bottom: 1.5rem;
   position: relative;
   display: inline-block;
-  background: linear-gradient(90deg, #8E2DE2, #4A00E0, #FF7D54);
+  background: var(--gradient-text);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -75,7 +73,7 @@ const SectionTitle = styled.h2`
     bottom: -10px;
     width: 80px;
     height: 4px;
-    background: linear-gradient(90deg, #8E2DE2, #4A00E0);
+    background: var(--gradient-secondary);
   }
 `;
 
@@ -101,9 +99,9 @@ const ServiceTabs = styled.div`
 `;
 
 const TabButton = styled.button<{ active: boolean }>`
-  background: ${props => props.active ? 'linear-gradient(90deg, #8E2DE2, #4A00E0)' : 'transparent'};
-  color: ${props => props.active ? '#fff' : '#a0a0a0'};
-  border: none;
+  background: ${props => props.active ? 'var(--gradient-button)' : 'transparent'};
+  color: ${props => props.active ? 'white !important' : '#a0a0a0'};
+  border: ${props => props.active ? 'none' : '1px solid rgba(215, 109, 119, 0.2)'};
   padding: 1rem 2rem;
   font-size: 1.1rem;
   font-weight: 600;
@@ -111,26 +109,23 @@ const TabButton = styled.button<{ active: boolean }>`
   transition: all 0.3s ease;
   position: relative;
   flex: 1;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: ${props => props.active ? '80%' : '0'};
-    height: 3px;
-    background: var(--color-primary-gradient);
-    transition: width 0.3s ease;
-    border-radius: 3px;
-  }
-  
-  &:hover {
-    color: #ffffff;
-    
-    &::after {
-      width: 40%;
+  border-radius: 8px;
+  box-shadow: ${props => props.active ? '0 2px 8px rgba(0, 0, 0, 0.1)' : 'none'};
+
+  span {
+    color: ${props => props.active ? 'white !important' : 'inherit'};
+
+    svg {
+      color: ${props => props.active ? 'white !important' : 'inherit'};
     }
+  }
+
+  &:hover {
+    color: ${props => props.active ? 'white !important' : '#ffffff'};
+    background: ${props => props.active ? 'var(--gradient-button)' : 'rgba(215, 109, 119, 0.08)'};
+    border-color: ${props => props.active ? 'transparent' : 'rgba(215, 109, 119, 0.3)'};
+    transform: translateY(-1px);
+    filter: brightness(${props => props.active ? '1.1' : '1'});
   }
 `;
 
@@ -164,41 +159,31 @@ const CategoryImage = styled(motion.div)`
   width: 100%;
   max-width: 350px;
   height: 280px;
-  background-color: rgba(17, 17, 17, 0.8);
+  background: linear-gradient(135deg, rgba(15, 15, 25, 0.8), rgba(25, 25, 35, 0.8));
   border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 2rem;
-  border: 1px solid rgba(142, 45, 226, 0.2);
+  border: 1px solid rgba(215, 109, 119, 0.15);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease;
-  will-change: transform;
-  
-  /* Упрощаем градиент фона */
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(142, 45, 226, 0.05), rgba(74, 0, 224, 0.05));
-    z-index: 0;
-  }
-  
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+
   &:hover {
-    transform: translateY(-5px);
+    transform: translateY(-3px);
+    border-color: rgba(215, 109, 119, 0.3);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
   }
-  
+
   svg {
     position: relative;
     z-index: 1;
-    filter: drop-shadow(0 0 5px rgba(142, 45, 226, 0.5));
+    filter: drop-shadow(0 0 3px rgba(215, 109, 119, 0.3));
   }
-  
+
   @media (min-width: 768px) {
     margin-bottom: 0;
     width: 40%;
@@ -239,7 +224,7 @@ const CategoryDescription = styled.p`
 const ToggleViewButton = styled.button`
   background: transparent;
   border: none;
-  color: #8E2DE2;
+  color: #D76D77;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -249,7 +234,7 @@ const ToggleViewButton = styled.button`
   transition: all 0.3s ease;
   
   &:hover {
-    color: #4A00E0;
+    color: #FFAF7B;
     transform: translateX(5px);
   }
   
@@ -278,17 +263,16 @@ const ServiceItem = styled(motion.div)`
   display: flex;
   align-items: flex-start;
   gap: 1.5rem;
-  background: rgba(17, 17, 17, 0.5);
+  background: linear-gradient(135deg, rgba(15, 15, 25, 0.6), rgba(25, 25, 35, 0.6));
   padding: 2rem;
   border-radius: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: transform 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+  border: 1px solid rgba(215, 109, 119, 0.1);
+  transition: all 0.3s ease;
   cursor: pointer;
   position: relative;
-  overflow: hidden;
-  will-change: transform;
-  
-  /* Упрощаем эффект бордера */
+  backdrop-filter: blur(5px);
+
+  /* Простой левый бордер */
   &::before {
     content: '';
     position: absolute;
@@ -296,16 +280,16 @@ const ServiceItem = styled(motion.div)`
     left: 0;
     width: 3px;
     height: 100%;
-    background: linear-gradient(to bottom, #8E2DE2, #4A00E0);
+    background: var(--color-primary);
     opacity: 0;
     transition: opacity 0.3s ease;
   }
-  
+
   &:hover {
-    transform: translateY(-5px);
-    border-color: rgba(142, 45, 226, 0.3);
-    background: rgba(25, 25, 25, 0.8);
-    
+    transform: translateY(-3px);
+    border-color: rgba(215, 109, 119, 0.25);
+    background: linear-gradient(135deg, rgba(25, 25, 35, 0.8), rgba(35, 35, 45, 0.8));
+
     &::before {
       opacity: 1;
     }
@@ -315,19 +299,19 @@ const ServiceItem = styled(motion.div)`
 const IconWrapper = styled.div`
   width: 60px;
   height: 60px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%);
+  border-radius: 16px;
+  background: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: transform 0.3s ease;
-  will-change: transform;
-  
+  transition: all 0.3s ease;
+
   ${ServiceItem}:hover & {
-    transform: scale(1.1);
+    transform: scale(1.05);
+    background: var(--gradient-button-hover);
   }
-  
+
   svg {
     font-size: 1.6rem;
     color: white;
@@ -345,7 +329,7 @@ const ServiceTitle = styled.h4`
   transition: color 0.3s ease;
   
   ${ServiceItem}:hover & {
-    color: #8E2DE2;
+    color: #D76D77;
   }
 `;
 
@@ -365,7 +349,7 @@ const ServiceDescriptionFull = styled(motion.div)`
 `;
 
 const TechHighlight = styled.span`
-  color: #8E2DE2;
+  color: #D76D77;
   font-weight: 500;
 `;
 
@@ -377,34 +361,40 @@ const CTAContainer = styled.div`
 
 const CTAButton = styled(motion.a)`
   display: inline-block;
-  background: linear-gradient(90deg, #8E2DE2, #4A00E0);
-  color: white;
+  background: var(--gradient-button);
+  color: white !important;
   padding: 1rem 3rem;
-  border-radius: 10px;
+  border-radius: 12px;
   font-weight: 700;
   font-size: 1.1rem;
   letter-spacing: 0.05em;
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  will-change: transform;
-  
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(142, 45, 226, 0.3);
-  }
-  
+  transition: all 0.3s ease;
+  border: none;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
   span {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    
+    color: white !important;
+
     svg {
+      color: white !important;
       transition: transform 0.3s ease;
     }
   }
-  
+
+  &:hover {
+    color: white !important;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    filter: brightness(1.1);
+  }
+
   &:hover span svg {
-    transform: translateX(5px);
+    transform: translateX(3px);
   }
 `;
 
@@ -500,12 +490,18 @@ const Services: React.FC = () => {
   
   // Функция для переключения расширенного описания сервиса
   const toggleExpand = useCallback((index: number) => {
-    setExpandedItems(prev => 
+    setExpandedItems(prev =>
       prev.includes(index)
         ? prev.filter(item => item !== index)
         : [...prev, index]
     );
   }, []);
+
+  // Сброс состояний при смене таба
+  useEffect(() => {
+    setExpandedItems([]);
+    setShowFullDescription(false);
+  }, [activeTab]);
 
   useEffect(() => {
     // Используем IntersectionObserver для более эффективного отслеживания видимости
@@ -585,16 +581,14 @@ const Services: React.FC = () => {
 
   // Оптимизированные варианты анимации
   const fadeInVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.4 }
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { duration: 0.3, ease: "easeOut" }
     },
-    exit: { 
-      opacity: 0, 
-      y: -20,
-      transition: { duration: 0.3 }
+    exit: {
+      opacity: 0,
+      transition: { duration: 0.2 }
     }
   };
 
@@ -635,36 +629,26 @@ const Services: React.FC = () => {
             >
               <CategoryImage>
                 {activeTab === 'web' ? (
-                  <FaLaptopCode size={70} color="#8E2DE2" />
+                  <FaLaptopCode size={70} color="#D76D77" />
                 ) : (
-                  <FaRobot size={70} color="#8E2DE2" />
+                  <FaRobot size={70} color="#D76D77" />
                 )}
               </CategoryImage>
               <CategoryContent>
                 <CategoryTitle>
                   {activeTab === 'web' ? 'Разработка сайтов' : 'Telegram-боты и веб-приложения'}
                 </CategoryTitle>
-                
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={`${activeTab}-${showFullDescription}`}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <CategoryDescription>
-                      {activeTab === 'web'
-                        ? showFullDescription 
-                          ? "Создаем современные, быстрые и отзывчивые веб-сайты для вашего бизнеса с фокусом на конверсию и удобство использования. Мы уделяем особое внимание деталям, используем современные технологии и следуем лучшим практикам разработки, чтобы создать сайты, которые не только хорошо выглядят, но и эффективно работают."
-                          : "Создаем современные, быстрые и отзывчивые веб-сайты для вашего бизнеса с фокусом на конверсию и удобство использования."
-                        : showFullDescription
-                          ? "Разрабатываем функциональных Telegram-ботов с веб-интерфейсом для автоматизации бизнес-процессов и взаимодействия с клиентами. Наши решения помогают автоматизировать рутинные задачи, повысить качество обслуживания клиентов и увеличить продажи благодаря интеграции с вашими бизнес-процессами."
-                          : "Разрабатываем функциональных Telegram-ботов с веб-интерфейсом для автоматизации бизнес-процессов и взаимодействия с клиентами."
-                      }
-                    </CategoryDescription>
-                  </motion.div>
-                </AnimatePresence>
+
+                <CategoryDescription>
+                  {activeTab === 'web'
+                    ? showFullDescription
+                      ? "Создаем современные, быстрые и отзывчивые веб-сайты для вашего бизнеса с фокусом на конверсию и удобство использования. Мы уделяем особое внимание деталям, используем современные технологии и следуем лучшим практикам разработки, чтобы создать сайты, которые не только хорошо выглядят, но и эффективно работают."
+                      : "Создаем современные, быстрые и отзывчивые веб-сайты для вашего бизнеса с фокусом на конверсию и удобство использования."
+                    : showFullDescription
+                      ? "Разрабатываем функциональных Telegram-ботов с веб-интерфейсом для автоматизации бизнес-процессов и взаимодействия с клиентами. Наши решения помогают автоматизировать рутинные задачи, повысить качество обслуживания клиентов и увеличить продажи благодаря интеграции с вашими бизнес-процессами."
+                      : "Разрабатываем функциональных Telegram-ботов с веб-интерфейсом для автоматизации бизнес-процессов и взаимодействия с клиентами."
+                  }
+                </CategoryDescription>
                 
                 <ToggleViewButton onClick={() => setShowFullDescription(!showFullDescription)}>
                   {showFullDescription ? "Свернуть описание" : "Развернуть описание"} 
@@ -673,11 +657,11 @@ const Services: React.FC = () => {
                 
                 <ServicesList>
                   {currentServices.map((service, index) => (
-                    <ServiceItem 
-                      key={index}
+                    <ServiceItem
+                      key={`${activeTab}-${index}`}
                       onClick={() => toggleExpand(index)}
-                      whileHover={{ y: -5 }}
-                      transition={{ duration: 0.3 }}
+                      whileHover={{ y: -3 }}
+                      transition={{ duration: 0.2, ease: "easeOut" }}
                     >
                       <IconWrapper>
                         <service.icon />
@@ -688,13 +672,14 @@ const Services: React.FC = () => {
                           {service.shortDescription}
                         </ServiceDescription>
                         
-                        <AnimatePresence>
+                        <AnimatePresence mode="wait">
                           {expandedItems.includes(index) && (
                             <ServiceDescriptionFull
+                              key={`expanded-${activeTab}-${index}`}
                               initial={{ opacity: 0, height: 0 }}
                               animate={{ opacity: 1, height: 'auto' }}
                               exit={{ opacity: 0, height: 0 }}
-                              transition={{ duration: 0.3 }}
+                              transition={{ duration: 0.2, ease: "easeOut" }}
                             >
                               {service.fullDescription}
                               {service.tech && (

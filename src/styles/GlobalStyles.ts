@@ -9,16 +9,26 @@ const GlobalStyles = createGlobalStyle`
     --color-background: #000000; /* Основной фон - черный */
     --color-surface: #0a0a0a; /* Вторичный фон */
     --color-surface-light: #111111; /* Светлая поверхность */
-    --color-primary: #8E2DE2; /* Основной фиолетовый */
-    --color-primary-gradient: linear-gradient(90deg, #8E2DE2, #4A00E0);
-    --color-secondary: #4A00E0; /* Фиолетовый вторичный */
+    --color-primary: #D76D77; /* Основной цвет */
+    --color-secondary: #3A1C71; /* Вторичный цвет */
     --color-accent: #FF7D54; /* Теплый акцентный цвет */
     --color-accent-secondary: #FFB443; /* Вторичный теплый акцент */
-    --color-accent-gradient: linear-gradient(90deg, #FF7D54, #FFB443);
     --color-success: #4CD964; /* Цвет успеха */
     --color-text: #ffffff;
     --color-text-secondary: #a0a0a0;
     --color-text-disabled: #777777;
+
+    /* Чистые градиенты */
+    --gradient-primary: linear-gradient(135deg, #D76D77 0%, #3A1C71 100%);
+    --gradient-button: linear-gradient(135deg, #D76D77 0%, #3A1C71 100%);
+    --gradient-button-hover: linear-gradient(135deg, #3A1C71 0%, #D76D77 100%);
+    --gradient-hover: linear-gradient(135deg, #3A1C71 0%, #D76D77 100%);
+    --gradient-secondary: linear-gradient(135deg, #3A1C71 0%, #D76D77 100%);
+    --gradient-text: linear-gradient(135deg, #D76D77 0%, #3A1C71 100%);
+    --gradient-subtle: linear-gradient(135deg, rgba(215, 109, 119, 0.05) 0%, rgba(58, 28, 113, 0.05) 100%);
+    --gradient-card: linear-gradient(135deg, rgba(215, 109, 119, 0.2) 0%, rgba(58, 28, 113, 0.2) 100%);
+    --gradient-background: linear-gradient(135deg, rgba(215, 109, 119, 0.03) 0%, rgba(58, 28, 113, 0.03) 100%);
+    --gradient-section-divider: linear-gradient(90deg, transparent 0%, rgba(215, 109, 119, 0.2) 50%, transparent 100%);
     
     /* Размеры и отступы */
     --space-xs: 0.25rem;
@@ -176,7 +186,7 @@ const GlobalStyles = createGlobalStyle`
   h1, h2, h3, h4, h5, h6 {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-weight: 700;
-    background: linear-gradient(90deg, #8E2DE2, #4A00E0, #FF7D54);
+    background: var(--gradient-text);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -302,7 +312,7 @@ const GlobalStyles = createGlobalStyle`
 
   /* Класс для красивых градиентных заголовков */
   .gradient-title {
-    background: linear-gradient(90deg, #8E2DE2, #4A00E0, #FF7D54);
+    background: var(--gradient-text);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -311,11 +321,38 @@ const GlobalStyles = createGlobalStyle`
 
   /* Альтернативный градиент для разнообразия */
   .gradient-title-alt {
-    background: linear-gradient(135deg, #8E2DE2, #4A00E0, #FF7D54, #FFB443);
+    background: var(--gradient-secondary);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     color: transparent;
+  }
+
+  /* Стили для разделителей секций */
+  .section-divider {
+    width: 100%;
+    height: 2px;
+    background: var(--gradient-section-divider);
+    margin: 0;
+    border: none;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+  }
+
+  /* Тонкий разделитель */
+  .section-divider--thin {
+    height: 1px;
+    opacity: 0.4;
+  }
+
+  /* Центрированная точка-разделитель */
+  .section-divider--dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--gradient-primary);
+    margin: 0 auto;
+    transform: translateY(-50%);
   }
 `;
 

@@ -15,27 +15,40 @@ gsap.registerPlugin(ScrollTrigger);
 const HeroSection = styled.section`
   display: flex;
   align-items: center;
-  justify-content: center; 
+  justify-content: center;
   min-height: 100vh;
-  padding: 120px clamp(2rem, 5vw, 4rem) 80px; 
-  background-color: var(--color-background);
+  padding: 120px clamp(2rem, 5vw, 4rem) 80px;
+  background: var(--gradient-background), var(--color-background);
   color: var(--color-text);
   position: relative;
-  overflow: hidden; 
-  width: 100%; 
+  overflow: hidden;
+  width: 100%;
   box-sizing: border-box;
   margin: 0;
-  
-  // Усиленное градиентное свечение позади текста
+
+  /* Упрощенные фоновые градиенты */
   &::before {
     content: '';
     position: absolute;
     top: 20%;
     left: 0;
-    width: 50%;
-    height: 60%;
-    background: radial-gradient(circle at center, rgba(142, 45, 226, 0.2), transparent 70%);
-    filter: blur(80px);
+    width: 40%;
+    height: 50%;
+    background: radial-gradient(circle at center, rgba(215, 109, 119, 0.08), transparent 70%);
+    filter: blur(60px);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 10%;
+    right: 0;
+    width: 35%;
+    height: 45%;
+    background: radial-gradient(circle at center, rgba(58, 28, 113, 0.08), transparent 70%);
+    filter: blur(60px);
     z-index: 0;
     pointer-events: none;
   }
@@ -117,15 +130,15 @@ const MainHeading = styled.h1`
   margin: 0 0 1rem 0;
   line-height: 1.2;
   font-size: clamp(2rem, 4vw, 2.8rem);
-  background: linear-gradient(90deg, #8E2DE2, #4A00E0, #FF7D54);
+  background: var(--gradient-text);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
-  
+
   span {
     display: block;
-    background: linear-gradient(90deg, #8E2DE2, #4A00E0, #FF7D54);
+    background: var(--gradient-primary);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -136,7 +149,7 @@ const MainHeading = styled.h1`
 // Компонент для анимированной смены слов
 const AnimatedWord = styled(motion.span)`
   display: inline-block;
-  background: var(--color-primary-gradient);
+  background: var(--gradient-hover);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -160,7 +173,7 @@ const Subtitle = styled.p`
   max-width: 600px;
   width: 100%;
   position: relative;
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -168,7 +181,7 @@ const Subtitle = styled.p`
     left: 0;
     width: 80px;
     height: 3px;
-    background: linear-gradient(90deg, #8E2DE2, #4A00E0);
+    background: var(--gradient-secondary);
     border-radius: 2px;
   }
 
@@ -185,7 +198,10 @@ const Subtitle = styled.p`
 const TypingText = styled.div`
   font-size: clamp(1rem, 2.5vw, 1.1rem);
   font-family: 'Space Mono', monospace;
-  color: var(--color-primary);
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 1rem;
   min-height: 2.5em;
   display: flex;
@@ -209,46 +225,42 @@ const TypingText = styled.div`
 
 const CTAButton = styled.a`
   display: inline-block;
-  background: var(--color-primary-gradient);
-  color: white;
-  padding: 1rem 2.7rem;
-  border-radius: var(--radius-sm);
+  background: var(--gradient-button);
+  color: white !important;
+  padding: 1.2rem 3rem;
+  border-radius: 12px;
   font-weight: 700;
   font-size: 1.1rem;
   letter-spacing: 0.05em;
   cursor: pointer;
-  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
-  box-shadow: 0 4px 15px rgba(142, 45, 226, 0.3);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border: none;
   position: relative;
   overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.3),
-      transparent
-    );
-    transition: left 0.7s ease;
-  }
-  
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 25px rgba(142, 45, 226, 0.4);
-    
-    &::before {
-      left: 100%;
+  text-decoration: none;
+
+  span {
+    color: white !important;
+
+    svg {
+      color: white !important;
     }
   }
 
+  &:hover {
+    color: white !important;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    filter: brightness(1.1);
+  }
+
+  &:active {
+    transform: translateY(0) scale(1);
+  }
+
   @media (max-width: 768px) {
-    padding: 0.8rem 2rem;
+    padding: 1rem 2.5rem;
     font-size: 1rem;
   }
 `;
@@ -272,18 +284,20 @@ const SocialLink = styled.a`
   justify-content: center;
   width: 50px;
   height: 50px;
-  background: rgba(142, 45, 226, 0.1);
-  border: 1px solid rgba(142, 45, 226, 0.3);
+  background: rgba(15, 15, 25, 0.8);
+  border: 1px solid rgba(215, 109, 119, 0.2);
   border-radius: 50%;
   color: var(--color-primary);
   font-size: 1.3rem;
-  transition: all var(--transition-normal);
-  
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+
   &:hover {
     background: var(--color-primary);
     color: white;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 15px rgba(142, 45, 226, 0.4);
+    transform: translateY(-2px);
+    border-color: var(--color-primary);
+    box-shadow: 0 6px 16px rgba(215, 109, 119, 0.3);
   }
 
   @media (max-width: 768px) {
@@ -297,7 +311,7 @@ const SocialLink = styled.a`
 const ModelPlaceholder = styled.div`
   width: 300px;
   height: 300px;
-  background: linear-gradient(135deg, rgba(142, 45, 226, 0.3), rgba(74, 0, 224, 0.3));
+  background: linear-gradient(135deg, rgba(25, 25, 35, 0.8), rgba(35, 35, 45, 0.8));
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -305,8 +319,14 @@ const ModelPlaceholder = styled.div`
   color: white;
   font-size: 1rem;
   text-align: center;
-  border: 2px solid rgba(142, 45, 226, 0.5);
-  
+  border: 1px solid rgba(215, 109, 119, 0.2);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: rgba(215, 109, 119, 0.4);
+  }
+
   @media (max-width: 768px) {
     width: 200px;
     height: 200px;
@@ -393,7 +413,7 @@ const Hero: React.FC = () => {
       <HeroContent>
         <LeftColumn ref={leftColumnRef}>
           <MainHeading>
-            Привет, я <span>Иван Мицкая</span>
+            Привет, я <span>Иван Мицька</span>
           </MainHeading>
         
         <AnimatePresence mode="wait">
@@ -403,10 +423,10 @@ const Hero: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5 }}
-            style={{ 
-              fontSize: 'clamp(1.3rem, 2.5vw, 1.8rem)', 
+            style={{
+              fontSize: 'clamp(1.3rem, 2.5vw, 1.8rem)',
               marginBottom: '1.5rem',
-              background: 'linear-gradient(90deg, #8E2DE2, #4A00E0, #FF7D54)',
+              background: 'var(--gradient-primary)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',

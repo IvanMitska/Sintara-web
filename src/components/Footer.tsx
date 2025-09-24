@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { FaTelegram, FaInstagram, FaGithub, FaHeart } from 'react-icons/fa';
 
 const FooterContainer = styled.footer`
-  background-color: #000;
+  background: var(--gradient-background), #000;
   padding: 4rem 0 2rem 0;
   color: #fff;
 `;
@@ -36,7 +36,7 @@ const Logo = styled.h2`
   color: #fff;
   
   span {
-    background: linear-gradient(90deg, #8E2DE2, #4A00E0);
+    background: var(--gradient-secondary);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -67,10 +67,11 @@ const SocialIcon = styled.a`
   color: #fff;
   font-size: 1.2rem;
   transition: all 0.3s ease;
-  
+
   &:hover {
-    background-color: #8E2DE2;
-    transform: translateY(-3px);
+    background-color: #D76D77;
+    transform: translateY(-1px);
+    filter: brightness(1.2);
   }
 `;
 
@@ -97,7 +98,7 @@ const FooterLink = styled.a`
   display: inline-block;
   
   &:hover {
-    color: #8E2DE2;
+    color: #D76D77;
     transform: translateX(5px);
   }
 `;
@@ -135,7 +136,7 @@ const MadeWithLove = styled.p`
   gap: 0.5rem;
   
   svg {
-    color: #8E2DE2;
+    color: #D76D77;
   }
 `;
 
