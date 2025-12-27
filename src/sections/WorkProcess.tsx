@@ -1,4 +1,4 @@
-import React, { memo, useState, useEffect, useRef, useCallback } from 'react';
+import React, { memo, useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 
 const ProcessSection = styled.section`
@@ -398,7 +398,6 @@ const steps = [
 const WorkProcess: React.FC = memo(() => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -410,37 +409,6 @@ const WorkProcess: React.FC = memo(() => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Scroll-based navigation for desktop
-  useEffect(() => {
-    if (isMobile) return;
-
-    const handleWheel = (e: WheelEvent) => {
-      const section = sectionRef.current;
-      if (!section) return;
-
-      const rect = section.getBoundingClientRect();
-      const isInView = rect.top < window.innerHeight * 0.5 && rect.bottom > window.innerHeight * 0.5;
-
-      if (isInView) {
-        // Check if we're at the boundaries
-        const atStart = activeIndex === 0 && e.deltaY < 0;
-        const atEnd = activeIndex === steps.length - 1 && e.deltaY > 0;
-
-        if (!atStart && !atEnd) {
-          e.preventDefault();
-
-          if (e.deltaY > 30) {
-            setActiveIndex(prev => Math.min(prev + 1, steps.length - 1));
-          } else if (e.deltaY < -30) {
-            setActiveIndex(prev => Math.max(prev - 1, 0));
-          }
-        }
-      }
-    };
-
-    window.addEventListener('wheel', handleWheel, { passive: false });
-    return () => window.removeEventListener('wheel', handleWheel);
-  }, [activeIndex, isMobile]);
 
   const goToNext = useCallback(() => {
     setActiveIndex(prev => Math.min(prev + 1, steps.length - 1));
@@ -455,7 +423,7 @@ const WorkProcess: React.FC = memo(() => {
   }, []);
 
   return (
-    <ProcessSection id="process" ref={sectionRef}>
+    <ProcessSection id="process">
       <Container>
         <SectionHeader>
           <SectionTitle>How we work</SectionTitle>
