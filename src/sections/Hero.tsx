@@ -162,20 +162,20 @@ const Hero: React.FC = memo(() => {
     <HeroSection id="hero">
       <Container>
         <Title>
-          Автоматизируем
+          We automate
           <br />
-          ваш бизнес
+          your business
         </Title>
 
         <Subtitle>
-          От идеи до работающей системы — без головной боли.
+          From idea to working system — without the headache.
           <br />
-          Вы растёте, а рутину берём на себя.
+          You grow, we handle the routine.
         </Subtitle>
 
         <CTAContainer>
           <CTAButton href="#contact">
-            Обсудить проект
+            Get in touch
           </CTAButton>
         </CTAContainer>
       </Container>
