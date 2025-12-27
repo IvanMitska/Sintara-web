@@ -134,47 +134,83 @@ const Card = styled.div<{ $offset: number; $isActive: boolean }>`
   }
 `;
 
-/* Mobile Swipe Carousel */
-const MobileCarousel = styled.div`
+/* Mobile 3D Carousel */
+const MobileCarouselWrapper = styled.div`
   display: none;
 
   @media (max-width: 768px) {
     display: block;
-    position: relative;
     overflow: hidden;
     width: 100%;
+    margin: 0 -20px;
+    padding: 0 20px;
+  }
+`;
+
+const MobileCarousel = styled.div`
+  @media (max-width: 768px) {
+    position: relative;
+    width: 100%;
+    perspective: 1000px;
+    padding: 20px 0;
   }
 `;
 
 const MobileTrack = styled.div<{ $activeIndex: number }>`
   display: flex;
-  transform: translateX(calc(-${props => props.$activeIndex} * 100%));
-  transition: transform 0.4s ease-out;
-  will-change: transform;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  height: 380px;
+  transform-style: preserve-3d;
 `;
 
-const MobileCard = styled.div<{ $isActive: boolean }>`
-  flex: 0 0 100%;
-  width: 100%;
-  padding: 0 20px;
+const MobileCard = styled.div<{ $isActive: boolean; $offset: number }>`
+  position: absolute;
+  width: calc(100% - 80px);
+  max-width: 340px;
+  padding: 0;
   box-sizing: border-box;
-  transition: transform 0.4s ease-out, opacity 0.4s ease-out;
-  transform: ${props => props.$isActive ? 'scale(1)' : 'scale(0.92)'};
-  opacity: ${props => props.$isActive ? 1 : 0.4};
+  transition: all 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+  transform-style: preserve-3d;
+
+  transform: ${props => {
+    const offset = props.$offset;
+    if (offset === 0) {
+      return 'translateX(0) translateZ(50px) rotateY(0deg) scale(1)';
+    }
+    const direction = offset > 0 ? 1 : -1;
+    const absOffset = Math.abs(offset);
+    const translateX = direction * (absOffset === 1 ? 75 : 90) + '%';
+    const translateZ = -absOffset * 100;
+    const rotateY = -direction * Math.min(absOffset * 15, 25);
+    const scale = Math.max(1 - absOffset * 0.15, 0.7);
+    return `translateX(${translateX}) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`;
+  }};
+
+  opacity: ${props => {
+    const absOffset = Math.abs(props.$offset);
+    if (absOffset === 0) return 1;
+    if (absOffset === 1) return 0.6;
+    return 0.3;
+  }};
+
+  z-index: ${props => 10 - Math.abs(props.$offset)};
+  pointer-events: ${props => props.$isActive ? 'auto' : 'none'};
 `;
 
 const MobileCardInner = styled.div<{ $isActive: boolean }>`
   background: linear-gradient(145deg, rgba(30, 20, 60, 0.95), rgba(20, 10, 45, 0.95));
   border: 2px solid ${props => props.$isActive
     ? 'rgba(124, 58, 237, 0.6)'
-    : 'rgba(124, 58, 237, 0.15)'};
+    : 'rgba(124, 58, 237, 0.2)'};
   border-radius: 24px;
   padding: 24px;
-  min-height: 300px;
-  transition: border-color 0.4s ease-out, box-shadow 0.4s ease-out;
+  min-height: 320px;
+  transition: all 0.5s cubic-bezier(0.33, 1, 0.68, 1);
   box-shadow: ${props => props.$isActive
-    ? '0 20px 60px rgba(124, 58, 237, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
-    : '0 8px 24px rgba(0, 0, 0, 0.2)'};
+    ? '0 25px 80px rgba(124, 58, 237, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+    : '0 10px 30px rgba(0, 0, 0, 0.3)'};
 `;
 
 const MobileNavigation = styled.div`
@@ -605,41 +641,47 @@ const WorkProcess: React.FC = memo(() => {
           </CarouselTrack>
         </DesktopCarousel>
 
-        {/* Mobile Swipe Carousel */}
-        <MobileCarousel
-          onTouchStart={onTouchStart}
-          onTouchEnd={onTouchEnd}
-        >
-          <MobileTrack $activeIndex={activeIndex}>
-            {steps.map((step, index) => {
-              const isActive = index === activeIndex;
+        {/* Mobile 3D Carousel */}
+        <MobileCarouselWrapper>
+          <MobileCarousel
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEnd}
+          >
+            <MobileTrack $activeIndex={activeIndex}>
+              {steps.map((step, index) => {
+                const offset = index - activeIndex;
+                const isActive = offset === 0;
+                const isVisible = Math.abs(offset) <= 2;
 
-              return (
-                <MobileCard key={index} $isActive={isActive}>
-                  <MobileCardInner $isActive={isActive}>
-                    <CardInner>
-                      <StepIndicator>
-                        <StepNumber $isActive={true}>{step.number}</StepNumber>
-                        <StepBadge $isActive={true}>{step.badge}</StepBadge>
-                      </StepIndicator>
-                      <StepTitle $isActive={true}>{step.title}</StepTitle>
-                      <StepDescription $isActive={true}>
-                        {step.description}
-                      </StepDescription>
-                      <StepDuration $isActive={true}>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <circle cx="12" cy="12" r="10" />
-                          <polyline points="12 6 12 12 16 14" />
-                        </svg>
-                        {step.duration}
-                      </StepDuration>
-                    </CardInner>
-                  </MobileCardInner>
-                </MobileCard>
-              );
-            })}
-          </MobileTrack>
-        </MobileCarousel>
+                if (!isVisible) return null;
+
+                return (
+                  <MobileCard key={index} $isActive={isActive} $offset={offset}>
+                    <MobileCardInner $isActive={isActive}>
+                      <CardInner>
+                        <StepIndicator>
+                          <StepNumber $isActive={isActive}>{step.number}</StepNumber>
+                          <StepBadge $isActive={isActive}>{step.badge}</StepBadge>
+                        </StepIndicator>
+                        <StepTitle $isActive={isActive}>{step.title}</StepTitle>
+                        <StepDescription $isActive={isActive}>
+                          {step.description}
+                        </StepDescription>
+                        <StepDuration $isActive={isActive}>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                          </svg>
+                          {step.duration}
+                        </StepDuration>
+                      </CardInner>
+                    </MobileCardInner>
+                  </MobileCard>
+                );
+              })}
+            </MobileTrack>
+          </MobileCarousel>
+        </MobileCarouselWrapper>
 
         {/* Mobile Navigation */}
         <MobileArrows>
