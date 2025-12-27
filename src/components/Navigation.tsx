@@ -109,7 +109,7 @@ const NavLinks = styled.div<{ $isOpen: boolean }>`
     display: flex;
     flex-direction: column;
     position: fixed;
-    top: 80px;
+    top: 90px;
     left: 12px;
     right: 12px;
     width: auto;
