@@ -60,7 +60,6 @@ const ProjectShowcase = lazyLoad(() => import('./sections/ProjectShowcase'));
 const FAQ = lazyLoad(() => import('./sections/FAQ'));
 const Contact = lazyLoad(() => import('./sections/Contact'));
 const Footer = lazyLoad(() => import('./components/Footer'));
-const BackToTop = lazy(() => import('./components/BackToTop'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
 
@@ -155,8 +154,6 @@ function HomePage({ isReady }: { isReady: boolean }) {
         <Footer />
       </LazyLoadSection>
 
-      {/* Кнопка "наверх" */}
-      {isReady && !isLowEndDevice && <BackToTop />}
     </>
   );
 }
