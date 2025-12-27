@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { FaTelegram, FaInstagram, FaGithub, FaHeart } from 'react-icons/fa';
 
 const FooterContainer = styled.footer`
-  background: var(--gradient-background), #000;
+  background: transparent;
   padding: 4rem 0 2rem 0;
   color: #fff;
 `;
@@ -146,11 +146,11 @@ const Footer: React.FC = () => {
       <FooterContent>
         <FooterColumn>
           <LogoContainer>
-            <Logo>SV<span>MITSKA</span></Logo>
+            <Logo>Sintara</Logo>
           </LogoContainer>
           <Description>
-            Создаем современные и эффективные веб-решения для развития вашего бизнеса.
-            От сайтов до Telegram-ботов.
+            We build modern and effective web solutions for your business.
+            From websites to Telegram bots.
           </Description>
           <SocialContainer>
             <SocialIcon href="https://t.me/username" target="_blank" rel="noopener noreferrer">
@@ -166,30 +166,30 @@ const Footer: React.FC = () => {
         </FooterColumn>
         
         <FooterColumn>
-          <ColumnTitle>Услуги</ColumnTitle>
+          <ColumnTitle>Services</ColumnTitle>
           <LinksList>
-            <LinkItem><FooterLink href="#services">Разработка сайтов</FooterLink></LinkItem>
-            <LinkItem><FooterLink href="#services">Telegram-боты</FooterLink></LinkItem>
-            <LinkItem><FooterLink href="#services">Веб-приложения</FooterLink></LinkItem>
-            <LinkItem><FooterLink href="#services">Техническая поддержка</FooterLink></LinkItem>
+            <LinkItem><FooterLink href="#services">Web Development</FooterLink></LinkItem>
+            <LinkItem><FooterLink href="#services">Telegram Bots</FooterLink></LinkItem>
+            <LinkItem><FooterLink href="#services">Web Applications</FooterLink></LinkItem>
+            <LinkItem><FooterLink href="#services">Technical Support</FooterLink></LinkItem>
           </LinksList>
         </FooterColumn>
-        
+
         <FooterColumn>
-          <ColumnTitle>Информация</ColumnTitle>
+          <ColumnTitle>Company</ColumnTitle>
           <LinksList>
-            <LinkItem><FooterLink href="#about">О нас</FooterLink></LinkItem>
-            <LinkItem><FooterLink href="#portfolio">Портфолио</FooterLink></LinkItem>
-            <LinkItem><FooterLink href="#process">Процесс работы</FooterLink></LinkItem>
-            <LinkItem><FooterLink href="#contact">Контакты</FooterLink></LinkItem>
+            <LinkItem><FooterLink href="#about">About</FooterLink></LinkItem>
+            <LinkItem><FooterLink href="#portfolio">Portfolio</FooterLink></LinkItem>
+            <LinkItem><FooterLink href="#process">Process</FooterLink></LinkItem>
+            <LinkItem><FooterLink href="#contact">Contact</FooterLink></LinkItem>
           </LinksList>
         </FooterColumn>
       </FooterContent>
       
       <BottomBar>
-        <Copyright>&copy; {new Date().getFullYear()} SV-MITSKA. Все права защищены.</Copyright>
+        <Copyright>&copy; {new Date().getFullYear()} Sintara. All rights reserved.</Copyright>
         <MadeWithLove>
-          Сделано с <FaHeart />
+          Made with <FaHeart />
         </MadeWithLove>
       </BottomBar>
     </FooterContainer>

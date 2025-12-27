@@ -16,7 +16,7 @@ const fadeIn = keyframes`
 const TechStackSection = styled.section`
   width: 100%;
   padding: 6rem 2rem;
-  background-color: #000;
+  background: transparent;
   color: #fff;
   position: relative;
   overflow: hidden;

@@ -1,101 +1,88 @@
-import React, { useState, useEffect, useRef } from 'react';
-import styled, { keyframes, css } from 'styled-components';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { FaPlay, FaCode, FaEye, FaCopy, FaCheck } from 'react-icons/fa';
-
-gsap.registerPlugin(ScrollTrigger);
-
-// Анимации
-const typewriter = keyframes`
-  from { width: 0 }
-  to { width: 100% }
-`;
+import React, { useState, useEffect, memo } from 'react';
+import styled, { keyframes } from 'styled-components';
+import { motion } from 'framer-motion';
+import { FaPlay, FaCode, FaEye, FaCopy, FaCheck, FaTerminal } from 'react-icons/fa';
 
 const blink = keyframes`
-  from, to { border-color: transparent }
-  50% { border-color: var(--color-primary) }
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+`;
+
+const pulse = keyframes`
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 `;
 
 const LiveCodeSection = styled.section`
-  padding: 8rem 0;
-  background: var(--gradient-background), #000;
+  padding: 100px 0;
+  background: transparent;
   position: relative;
   overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: 
-      radial-gradient(circle at 20% 20%, rgba(215, 109, 119, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(58, 28, 113, 0.1) 0%, transparent 50%);
-    pointer-events: none;
-  }
 `;
 
 const Container = styled.div`
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 2rem;
-  position: relative;
-  z-index: 1;
+  padding: 0 40px;
+
+  @media (max-width: 768px) {
+    padding: 0 20px;
+  }
 `;
 
 const SectionHeader = styled.div`
   text-align: center;
-  margin-bottom: 6rem;
+  margin-bottom: 60px;
 `;
 
-const SectionTitle = styled.h2`
-  font-size: clamp(2.5rem, 5vw, 3.5rem);
-  margin-bottom: 1.5rem;
-  background: var(--gradient-text);
+const Title = styled(motion.h2)`
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(3rem, 7vw, 5rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  color: transparent;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin: 0 0 20px;
 `;
 
-const SectionDescription = styled.p`
-  font-size: clamp(1rem, 2vw, 1.2rem);
-  max-width: 700px;
+const Subtitle = styled(motion.p)`
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.5);
+  max-width: 600px;
   margin: 0 auto;
-  color: #a0a0a0;
   line-height: 1.6;
 `;
 
-const DemoContainer = styled.div`
+const DemoContainer = styled(motion.div)`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 3rem;
+  gap: 24px;
   align-items: start;
-  
+
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
-    gap: 2rem;
   }
 `;
 
-const CodeEditor = styled.div`
-  background: #0d1117;
-  border-radius: 15px;
+const CodeEditor = styled(motion.div)`
+  background: linear-gradient(135deg, rgba(20, 10, 40, 0.8) 0%, rgba(10, 5, 20, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
   overflow: hidden;
-  border: 1px solid #30363d;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   position: relative;
-  
+
   &::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 3px;
-    background: linear-gradient(90deg, #ff5f56, #ffbd2e, #27ca3f);
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.5), transparent);
   }
 `;
 
@@ -103,459 +90,446 @@ const EditorHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.5rem;
-  background: #161b22;
-  border-bottom: 1px solid #30363d;
+  padding: 16px 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    gap: 12px;
+  }
 `;
 
 const EditorTabs = styled.div`
   display: flex;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 12px;
 `;
 
-const EditorTab = styled.div<{ active?: boolean }>`
-  padding: 0.5rem 1rem;
-  background: ${props => props.active ? 'var(--gradient-subtle)' : 'transparent'};
-  color: ${props => props.active ? '#fff' : '#7d8590'};
-  border-radius: 5px;
-  font-size: 0.85rem;
+const WindowDots = styled.div`
+  display: flex;
+  gap: 8px;
+  margin-right: 16px;
+`;
+
+const Dot = styled.div<{ $color: string }>`
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: ${props => props.$color};
+`;
+
+const EditorTab = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    color: #fff;
-    background: var(--gradient-subtle);
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(124, 58, 237, 0.15);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: 8px;
+  color: #a78bfa;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.85rem;
+  font-weight: 500;
+
+  svg {
+    font-size: 14px;
   }
 `;
 
 const EditorActions = styled.div`
   display: flex;
-  gap: 0.5rem;
-  align-items: center;
+  gap: 10px;
 `;
 
-const ActionButton = styled.button`
-  background: transparent;
-  border: 1px solid #30363d;
-  color: #7d8590;
-  padding: 0.4rem 0.8rem;
-  border-radius: 5px;
-  font-size: 0.8rem;
-  cursor: pointer;
+const ActionButton = styled.button<{ $primary?: boolean }>`
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
   transition: all 0.3s ease;
 
-  &:hover {
-    color: #fff;
-    border-color: var(--color-primary);
-    background: var(--gradient-subtle);
-    transform: translateY(-1px);
-    filter: brightness(1.2);
-  }
-
-  &.primary {
-    background: var(--gradient-button);
-    color: white !important;
+  ${props => props.$primary ? `
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    color: white;
     border: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-
-    span {
-      color: white !important;
-
-      svg {
-        color: white !important;
-      }
-    }
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
 
     &:hover {
-      color: white !important;
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-      filter: brightness(1.1);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
     }
+  ` : `
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    &:hover {
+      background: rgba(124, 58, 237, 0.1);
+      border-color: rgba(124, 58, 237, 0.3);
+      color: white;
+    }
+  `}
+
+  svg {
+    font-size: 14px;
   }
 `;
 
 const CodeContent = styled.div`
-  padding: 1.5rem;
-  font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: #e6edf3;
-  height: 500px;
+  padding: 24px;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  height: 450px;
   overflow-y: auto;
-  overflow-x: hidden;
-  position: relative;
-  
+
   &::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
   }
-  
+
   &::-webkit-scrollbar-track {
-    background: #0d1117;
+    background: transparent;
   }
-  
+
   &::-webkit-scrollbar-thumb {
-    background: #30363d;
-    border-radius: 4px;
-  }
-  
-  &::-webkit-scrollbar-thumb:hover {
-    background: #484f58;
+    background: rgba(124, 58, 237, 0.3);
+    border-radius: 3px;
   }
 `;
 
-const CodeLine = styled.div<{ highlight?: boolean }>`
+const CodeLine = styled.div<{ $highlight?: boolean }>`
   display: flex;
-  align-items: center;
-  min-height: 1.5rem;
-  padding: 0.1rem 0;
-  background: ${props => props.highlight ? 'var(--gradient-subtle)' : 'transparent'};
-  margin: 0 -1.5rem;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-  border-left: ${props => props.highlight ? '3px solid var(--color-primary)' : '3px solid transparent'};
-  transition: all 0.3s ease;
+  min-height: 24px;
+  padding: 2px 0;
+  margin: 0 -24px;
+  padding-left: 24px;
+  padding-right: 24px;
+  background: ${props => props.$highlight ? 'rgba(124, 58, 237, 0.1)' : 'transparent'};
+  border-left: ${props => props.$highlight ? '2px solid #7c3aed' : '2px solid transparent'};
+  transition: all 0.2s ease;
 `;
 
 const LineNumber = styled.span`
   display: inline-block;
-  width: 2rem;
-  color: #6e7681;
+  width: 32px;
+  color: rgba(255, 255, 255, 0.2);
   font-size: 0.8rem;
   user-select: none;
-  margin-right: 1rem;
+  text-align: right;
+  margin-right: 20px;
 `;
 
-const TypedText = styled.span<{ $isTyping?: boolean }>`
-  ${props => props.$isTyping && css`
-    border-right: 2px solid var(--color-primary);
-    animation: ${blink} 1s infinite;
-  `}
+const CodeText = styled.span`
+  color: rgba(255, 255, 255, 0.8);
 `;
 
-const PreviewContainer = styled.div`
-  background: #111;
-  border-radius: 15px;
+const Cursor = styled.span`
+  display: inline-block;
+  width: 2px;
+  height: 16px;
+  background: #7c3aed;
+  margin-left: 2px;
+  animation: ${blink} 1s step-end infinite;
+  vertical-align: middle;
+`;
+
+const PreviewContainer = styled(motion.div)`
+  background: linear-gradient(135deg, rgba(20, 10, 40, 0.8) 0%, rgba(10, 5, 20, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
   overflow: hidden;
-  border: 1px solid #333;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.5), transparent);
+  }
 `;
 
 const PreviewHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.5rem;
-  background: #1a1a1a;
-  border-bottom: 1px solid #333;
+  padding: 16px 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 `;
 
 const PreviewTitle = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  color: #fff;
-  font-weight: 600;
+  gap: 10px;
+  color: #ffffff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+
+  svg {
+    color: #a78bfa;
+  }
+`;
+
+const StatusBadge = styled.div<{ $active: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  background: ${props => props.$active
+    ? 'rgba(34, 197, 94, 0.15)'
+    : 'rgba(255, 255, 255, 0.05)'};
+  color: ${props => props.$active
+    ? '#22c55e'
+    : 'rgba(255, 255, 255, 0.5)'};
+  border: 1px solid ${props => props.$active
+    ? 'rgba(34, 197, 94, 0.3)'
+    : 'rgba(255, 255, 255, 0.1)'};
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: ${props => props.$active ? '#22c55e' : 'rgba(255, 255, 255, 0.3)'};
+    animation: ${props => props.$active ? pulse : 'none'} 2s ease-in-out infinite;
+  }
 `;
 
 const PreviewContent = styled.div`
-  padding: 2rem;
-  height: 500px;
+  padding: 40px;
+  height: 450px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  background: linear-gradient(135deg, #111 0%, #222 100%);
-  overflow: hidden;
+  background: radial-gradient(circle at 50% 50%, rgba(124, 58, 237, 0.08) 0%, transparent 70%);
 `;
 
-// Демо компонент для предварительного просмотра
-const AnimatedCard = styled.div<{ $isActive?: boolean }>`
+const DemoCard = styled(motion.div)<{ $isActive: boolean }>`
   width: 100%;
-  max-width: 320px;
-  height: 200px;
-  background: var(--gradient-primary);
+  max-width: 300px;
+  padding: 32px;
+  background: ${props => props.$isActive
+    ? 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)'
+    : 'linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(124, 58, 237, 0.1) 100%)'};
+  border: 1px solid ${props => props.$isActive
+    ? 'rgba(167, 139, 250, 0.5)'
+    : 'rgba(124, 58, 237, 0.3)'};
   border-radius: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.2rem;
-  font-weight: 600;
+  text-align: center;
   cursor: pointer;
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: ${props => props.$isActive ? 'scale(1.05) rotateY(5deg)' : 'scale(1)'};
-  box-shadow: ${props => props.$isActive ? 
-    '0 20px 40px rgba(215, 109, 119, 0.4)' : 
-    '0 10px 20px rgba(0, 0, 0, 0.3)'
-  };
   position: relative;
   overflow: hidden;
-  box-sizing: border-box;
-  
+
   &::before {
     content: '';
     position: absolute;
+    top: -100%;
+    left: -100%;
+    width: 300%;
+    height: 300%;
+    background: linear-gradient(
+      45deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+    transform: rotate(45deg);
+    transition: all 0.6s ease;
+    opacity: 0;
+  }
+
+  &:hover::before {
+    opacity: 1;
     top: -50%;
     left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-    transform: rotate(45deg);
-    transition: all 0.6s;
-    opacity: ${props => props.$isActive ? 1 : 0};
-  }
-  
-  &:hover {
-    transform: scale(1.05) rotateY(10deg);
-    box-shadow: 0 25px 50px rgba(215, 109, 119, 0.5);
   }
 `;
 
-const codeExamples = {
-  react: `import React, { useState } from 'react';
-import styled from 'styled-components';
+const DemoIcon = styled.div<{ $isActive: boolean }>`
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 20px;
+  border-radius: 16px;
+  background: ${props => props.$isActive
+    ? 'rgba(255, 255, 255, 0.2)'
+    : 'rgba(124, 58, 237, 0.2)'};
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-const AnimatedCard = styled.div\`
-  background: var(--gradient-primary);
-  border-radius: 20px;
-  padding: 2rem;
-  color: white;
-  cursor: pointer;
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  
-  &:hover {
-    transform: scale(1.05) rotateY(10deg);
-    box-shadow: 0 25px 50px rgba(215, 109, 119, 0.5);
+  svg {
+    font-size: 28px;
+    color: ${props => props.$isActive ? '#ffffff' : '#a78bfa'};
   }
-\`;
+`;
 
-const InteractiveDemo = () => {
+const DemoTitle = styled.h3<{ $isActive: boolean }>`
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: ${props => props.$isActive ? '#ffffff' : 'rgba(255, 255, 255, 0.9)'};
+  margin: 0 0 8px;
+`;
+
+const DemoText = styled.p<{ $isActive: boolean }>`
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.9rem;
+  color: ${props => props.$isActive ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.5)'};
+  margin: 0;
+`;
+
+const syntaxHighlight = (code: string) => {
+  return code
+    .replace(/(import|from|export|default|const|let|var|function|return|if|else)/g, '<span style="color: #c678dd">$1</span>')
+    .replace(/('.*?'|".*?")/g, '<span style="color: #98c379">$1</span>')
+    .replace(/(\{|\}|\(|\)|\[|\])/g, '<span style="color: #e5c07b">$1</span>')
+    .replace(/(useState|useEffect)/g, '<span style="color: #61afef">$1</span>')
+    .replace(/(&lt;.*?&gt;)/g, '<span style="color: #e06c75">$1</span>')
+    .replace(/(\/\/.*)/g, '<span style="color: rgba(255,255,255,0.3)">$1</span>');
+};
+
+const codeExample = `import { useState } from 'react';
+import { motion } from 'framer-motion';
+
+const InteractiveCard = () => {
   const [isActive, setIsActive] = useState(false);
-  
+
   return (
-    <AnimatedCard 
+    <motion.div
+      className="card"
+      animate={{
+        scale: isActive ? 1.05 : 1,
+        boxShadow: isActive
+          ? '0 20px 40px rgba(124,58,237,0.4)'
+          : '0 10px 20px rgba(0,0,0,0.2)'
+      }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
       onClick={() => setIsActive(!isActive)}
-      className={isActive ? 'active' : ''}
     >
-      Кликни меня!
-    </AnimatedCard>
+      <h3>Interactive Component</h3>
+      <p>Click to activate animation</p>
+    </motion.div>
   );
 };
 
-export default InteractiveDemo;`,
-  
-  css: `.animated-card {
-  background: var(--gradient-primary);
-  border-radius: 20px;
-  padding: 2rem;
-  color: white;
-  cursor: pointer;
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
+export default InteractiveCard;`;
 
-.animated-card::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(
-    45deg, 
-    transparent, 
-    rgba(255, 255, 255, 0.1), 
-    transparent
-  );
-  transform: rotate(45deg);
-  transition: all 0.6s;
-  opacity: 0;
-}
-
-.animated-card:hover {
-  transform: scale(1.05) rotateY(10deg);
-  box-shadow: 0 25px 50px rgba(142, 45, 226, 0.5);
-}
-
-.animated-card:hover::before {
-  opacity: 1;
-}`,
-  
-  js: `// Интерактивная анимация с GSAP
-import { gsap } from 'gsap';
-
-class InteractiveCard {
-  constructor(element) {
-    this.element = element;
-    this.isActive = false;
-    this.init();
-  }
-  
-  init() {
-    // Устанавливаем начальное состояние
-    gsap.set(this.element, {
-      scale: 1,
-      rotationY: 0,
-      boxShadow: '0 10px 20px rgba(0, 0, 0, 0.3)'
-    });
-    
-    // Добавляем обработчики событий
-    this.element.addEventListener('click', () => this.toggle());
-    this.element.addEventListener('mouseenter', () => this.onHover());
-    this.element.addEventListener('mouseleave', () => this.onLeave());
-  }
-  
-  toggle() {
-    this.isActive = !this.isActive;
-    
-    gsap.to(this.element, {
-      scale: this.isActive ? 1.1 : 1,
-      rotationY: this.isActive ? 15 : 0,
-      duration: 0.6,
-      ease: 'power2.out'
-    });
-  }
-  
-  onHover() {
-    gsap.to(this.element, {
-      scale: 1.05,
-      rotationY: 5,
-      duration: 0.3,
-      ease: 'power2.out'
-    });
-  }
-  
-  onLeave() {
-    if (!this.isActive) {
-      gsap.to(this.element, {
-        scale: 1,
-        rotationY: 0,
-        duration: 0.3,
-        ease: 'power2.out'
-      });
-    }
-  }
-}
-
-// Инициализация
-document.querySelectorAll('.interactive-card')
-  .forEach(card => new InteractiveCard(card));`
-};
-
-const LiveCodeDemo: React.FC = () => {
-  const [isTyping, setIsTyping] = useState(false);
+const LiveCodeDemo: React.FC = memo(() => {
   const [displayedCode, setDisplayedCode] = useState('');
+  const [isTyping, setIsTyping] = useState(true);
   const [isCardActive, setIsCardActive] = useState(false);
   const [copied, setCopied] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
-  const codeRef = useRef<HTMLDivElement>(null);
-
-  const mainCode = codeExamples.react;
-
-  const typeCode = async (code: string) => {
-    setIsTyping(true);
-    setDisplayedCode('');
-    
-    for (let i = 0; i <= code.length; i++) {
-      setDisplayedCode(code.slice(0, i));
-      await new Promise(resolve => setTimeout(resolve, 20));
-    }
-    
-    setIsTyping(false);
-  };
 
   useEffect(() => {
-    typeCode(mainCode);
+    let i = 0;
+    const timer = setInterval(() => {
+      if (i <= codeExample.length) {
+        setDisplayedCode(codeExample.slice(0, i));
+        i++;
+      } else {
+        setIsTyping(false);
+        clearInterval(timer);
+      }
+    }, 25);
+
+    return () => clearInterval(timer);
   }, []);
 
-  const handleRunCode = () => {
-    setIsCardActive(!isCardActive);
-  };
-
-  const handleCopyCode = async () => {
+  const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(mainCode);
+      await navigator.clipboard.writeText(codeExample);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy code:', err);
+      console.error('Failed to copy:', err);
     }
   };
 
-  useEffect(() => {
-    if (sectionRef.current) {
-      gsap.fromTo(
-        sectionRef.current.children,
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          stagger: 0.2,
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 80%',
-            toggleActions: 'play none none none',
-          },
-        }
-      );
-    }
-  }, []);
+  const handleRun = () => {
+    setIsCardActive(!isCardActive);
+  };
 
   const renderCodeLines = () => {
     const lines = displayedCode.split('\n');
     return lines.map((line, index) => (
-      <CodeLine key={index}>
+      <CodeLine key={index} $highlight={index >= 7 && index <= 16}>
         <LineNumber>{index + 1}</LineNumber>
-        <span>
-          {line}
-          {index === lines.length - 1 && isTyping && <TypedText $isTyping />}
-        </span>
+        <CodeText dangerouslySetInnerHTML={{ __html: syntaxHighlight(line) }} />
+        {index === lines.length - 1 && isTyping && <Cursor />}
       </CodeLine>
     ));
   };
 
   return (
-    <LiveCodeSection id="live-code" ref={sectionRef}>
+    <LiveCodeSection id="live-code">
       <Container>
         <SectionHeader>
-          <SectionTitle>Живой код в действии</SectionTitle>
-          <SectionDescription>
-            Посмотрите, как создаются интерактивные элементы. Код печатается в реальном времени, а результат отображается справа.
-          </SectionDescription>
+          <Title
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            Live code
+          </Title>
+          <Subtitle
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            Watch code come to life in real-time. Interactive preview shows exactly what gets built.
+          </Subtitle>
         </SectionHeader>
 
-        <DemoContainer>
+        <DemoContainer
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
           <CodeEditor>
             <EditorHeader>
               <EditorTabs>
-                <EditorTab active={true}>
-                  <FaCode />
+                <WindowDots>
+                  <Dot $color="#ef4444" />
+                  <Dot $color="#eab308" />
+                  <Dot $color="#22c55e" />
+                </WindowDots>
+                <EditorTab>
+                  <FaTerminal />
                   InteractiveCard.tsx
                 </EditorTab>
               </EditorTabs>
-              
+
               <EditorActions>
-                <ActionButton onClick={handleCopyCode}>
+                <ActionButton onClick={handleCopy}>
                   {copied ? <FaCheck /> : <FaCopy />}
-                  {copied ? 'Скопировано!' : 'Копировать'}
+                  {copied ? 'Copied!' : 'Copy'}
                 </ActionButton>
-                <ActionButton className="primary" onClick={handleRunCode}>
+                <ActionButton $primary onClick={handleRun}>
                   <FaPlay />
-                  Запустить
+                  Run
                 </ActionButton>
               </EditorActions>
             </EditorHeader>
-            
-            <CodeContent ref={codeRef}>
+
+            <CodeContent>
               {renderCodeLines()}
             </CodeContent>
           </CodeEditor>
@@ -564,23 +538,45 @@ const LiveCodeDemo: React.FC = () => {
             <PreviewHeader>
               <PreviewTitle>
                 <FaEye />
-                Предварительный просмотр
+                Preview
               </PreviewTitle>
+              <StatusBadge $active={isCardActive}>
+                {isCardActive ? 'Active' : 'Idle'}
+              </StatusBadge>
             </PreviewHeader>
-            
+
             <PreviewContent>
-              <AnimatedCard 
+              <DemoCard
                 $isActive={isCardActive}
                 onClick={() => setIsCardActive(!isCardActive)}
+                animate={{
+                  scale: isCardActive ? 1.05 : 1,
+                  boxShadow: isCardActive
+                    ? '0 25px 50px rgba(124, 58, 237, 0.4)'
+                    : '0 10px 30px rgba(0, 0, 0, 0.3)'
+                }}
+                whileHover={{ scale: isCardActive ? 1.08 : 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
               >
-                Кликни меня!
-              </AnimatedCard>
+                <DemoIcon $isActive={isCardActive}>
+                  <FaCode />
+                </DemoIcon>
+                <DemoTitle $isActive={isCardActive}>
+                  Interactive Component
+                </DemoTitle>
+                <DemoText $isActive={isCardActive}>
+                  Click to activate animation
+                </DemoText>
+              </DemoCard>
             </PreviewContent>
           </PreviewContainer>
         </DemoContainer>
       </Container>
     </LiveCodeSection>
   );
-};
+});
 
-export default LiveCodeDemo; 
+LiveCodeDemo.displayName = 'LiveCodeDemo';
+
+export default LiveCodeDemo;

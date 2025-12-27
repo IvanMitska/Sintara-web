@@ -1,296 +1,207 @@
-import React, { useEffect, useRef } from 'react';
+import React, { memo } from 'react';
 import styled from 'styled-components';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { FaClock, FaCode, FaUserFriends, FaRocket, FaAward, FaHeadset } from 'react-icons/fa';
-
-gsap.registerPlugin(ScrollTrigger);
+import { FaShieldAlt, FaHandshake, FaCode, FaComments } from 'react-icons/fa';
 
 const BenefitsSection = styled.section`
-  padding: 8rem 0;
-  background: var(--gradient-background), var(--color-background);
+  padding: 120px 0;
+  background: transparent;
   position: relative;
   overflow: hidden;
 
-  /* Добавляем разделитель сверху */
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background: var(--gradient-section-divider);
-    z-index: 1;
+  @media (max-width: 768px) {
+    padding: 80px 0;
   }
 `;
 
 const Container = styled.div`
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 40px;
+
+  @media (max-width: 768px) {
+    padding: 0 20px;
+  }
 `;
 
 const SectionHeader = styled.div`
   text-align: center;
-  margin-bottom: 5rem;
-`;
+  margin-bottom: 80px;
 
-const SectionTitle = styled.h2`
-  font-size: clamp(2rem, 5vw, 3rem);
-  margin-bottom: 1.5rem;
-  position: relative;
-  display: inline-block;
-  background: var(--gradient-text);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  color: transparent;
-
-  &::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: -10px;
-    width: 80px;
-    height: 4px;
-    background: var(--gradient-secondary);
+  @media (max-width: 768px) {
+    margin-bottom: 50px;
   }
 `;
 
-const SectionDescription = styled.p`
-  font-size: clamp(1rem, 2vw, 1.1rem);
+const SectionTitle = styled.h2`
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+`;
+
+const SectionSubtitle = styled.p`
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.6);
   max-width: 600px;
   margin: 0 auto;
-  color: #a0a0a0;
   line-height: 1.6;
+
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+  }
 `;
 
 const BenefitsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 2.5rem;
-  
-  @media (min-width: 576px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  @media (min-width: 992px) {
-    grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    gap: 24px;
   }
 `;
 
 const BenefitCard = styled.div`
-  padding: 2.5rem 2rem;
-  background: linear-gradient(135deg, rgba(15, 15, 25, 0.8), rgba(25, 25, 35, 0.8));
-  border-radius: 16px;
-  border: 1px solid rgba(215, 109, 119, 0.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
+  background: rgba(20, 10, 40, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 40px;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  backdrop-filter: blur(10px);
-  position: relative;
-  overflow: hidden;
-
-  /* Тонкий верхний бордер */
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: var(--gradient-primary);
-    opacity: 0.6;
-  }
+  gap: 24px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
 
   &:hover {
-    transform: translateY(-5px);
-    border-color: rgba(215, 109, 119, 0.25);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    transform: translateY(-4px);
+    border-color: rgba(124, 58, 237, 0.3);
+  }
 
-    &::before {
-      opacity: 1;
-    }
+  @media (max-width: 768px) {
+    padding: 28px;
+    flex-direction: column;
+    gap: 20px;
   }
 `;
 
-const IconContainer = styled.div`
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: var(--color-primary);
+const IconBox = styled.div`
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(168, 85, 247, 0.1) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 2rem;
-  position: relative;
-  transition: all 0.3s ease;
-
-  /* Тонкий светящийся ободок */
-  &::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: inherit;
-    background: var(--gradient-card);
-    -webkit-mask: radial-gradient(circle, transparent 38px, black 40px);
-    mask: radial-gradient(circle, transparent 38px, black 40px);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  ${BenefitCard}:hover & {
-    transform: scale(1.05);
-    background: var(--gradient-button-hover);
-
-    &::before {
-      opacity: 1;
-    }
-  }
+  flex-shrink: 0;
 
   svg {
-    font-size: 2.2rem;
-    color: white;
-    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.2));
+    font-size: 28px;
+    color: #a78bfa;
   }
 `;
 
-const BenefitTitle = styled.h3`
-  font-size: 1.4rem;
-  margin-bottom: 1rem;
-  color: #fff;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  line-height: 1.3;
+const BenefitContent = styled.div`
+  flex: 1;
+`;
 
-  ${BenefitCard}:hover & {
-    background: var(--gradient-text);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    color: transparent;
+const BenefitTitle = styled.h3`
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+
+  @media (max-width: 768px) {
+    font-size: 1.25rem;
   }
 `;
 
 const BenefitDescription = styled.p`
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 1rem;
-  color: #a0a0a0;
+  color: rgba(255, 255, 255, 0.5);
   line-height: 1.7;
-  transition: color 0.3s ease;
-
-  ${BenefitCard}:hover & {
-    color: #b8b8b8;
-  }
+  margin-bottom: 16px;
 `;
 
-const Benefits: React.FC = () => {
-  const sectionRef = useRef<HTMLElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const benefitsRef = useRef<HTMLDivElement>(null);
+const BenefitHighlight = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(124, 58, 237, 0.15);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #a78bfa;
+`;
 
-  useEffect(() => {
-    const section = sectionRef.current;
-    const header = headerRef.current;
-    const benefits = benefitsRef.current;
+const benefits = [
+  {
+    icon: FaShieldAlt,
+    title: 'Fixed price. No surprises.',
+    description: 'We agree on the final cost before starting. No hidden fees, no hourly billing tricks, no "unexpected" expenses. The price you see is the price you pay.',
+    highlight: '100% transparent pricing'
+  },
+  {
+    icon: FaCode,
+    title: 'You own everything.',
+    description: 'Full source code, design files, documentation — it\'s all yours. No vendor lock-in, no recurring fees for "access". Your project, your property.',
+    highlight: 'Complete code ownership'
+  },
+  {
+    icon: FaComments,
+    title: 'Direct developer access.',
+    description: 'Talk directly to the people building your product. No account managers, no game of telephone. Faster decisions, better results, zero miscommunication.',
+    highlight: 'No middlemen'
+  },
+  {
+    icon: FaHandshake,
+    title: '60-day warranty included.',
+    description: 'Found a bug after launch? We fix it free. No questions asked, no extra charges. We stand behind our work because we\'re confident in its quality.',
+    highlight: 'Free bug fixes'
+  }
+];
 
-    if (section && header && benefits) {
-      // Анимация заголовка
-      gsap.fromTo(
-        header,
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          scrollTrigger: {
-            trigger: section,
-            start: 'top 80%',
-            toggleActions: 'play none none none',
-          },
-        }
-      );
-
-      // Анимация карточек преимуществ
-      gsap.fromTo(
-        benefits.children,
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          stagger: 0.1,
-          scrollTrigger: {
-            trigger: benefits,
-            start: 'top 80%',
-            toggleActions: 'play none none none',
-          },
-        }
-      );
-    }
-  }, []);
-
-  const benefitsData = [
-    {
-      icon: <FaRocket />,
-      title: 'Быстрая разработка',
-      description: 'Оперативная реализация проектов в кратчайшие сроки без потери качества.'
-    },
-    {
-      icon: <FaCode />,
-      title: 'Современные технологии',
-      description: 'Используем передовые технологии и фреймворки для создания эффективных решений.'
-    },
-    {
-      icon: <FaUserFriends />,
-      title: 'Индивидуальный подход',
-      description: 'Учитываем особенности вашего бизнеса и целевой аудитории при разработке.'
-    },
-    {
-      icon: <FaAward />,
-      title: 'Высокое качество',
-      description: 'Гарантируем качественную реализацию и тщательное тестирование всех элементов.'
-    },
-    {
-      icon: <FaClock />,
-      title: 'Соблюдение сроков',
-      description: 'Всегда сдаем проекты в установленные сроки согласно договоренностям.'
-    },
-    {
-      icon: <FaHeadset />,
-      title: 'Поддержка 24/7',
-      description: 'Обеспечиваем техническую поддержку и консультации по любым вопросам.'
-    }
-  ];
-
+const Benefits: React.FC = memo(() => {
   return (
-    <BenefitsSection id="benefits" ref={sectionRef}>
+    <BenefitsSection id="benefits">
       <Container>
-        <SectionHeader ref={headerRef}>
-          <SectionTitle>Почему выбирают нас</SectionTitle>
-          <SectionDescription>
-            Мы стремимся обеспечить нашим клиентам лучший сервис и результат, превосходящий ожидания
-          </SectionDescription>
+        <SectionHeader>
+          <SectionTitle>Why choose us</SectionTitle>
+          <SectionSubtitle>
+            We do things differently. Here's what sets us apart.
+          </SectionSubtitle>
         </SectionHeader>
 
-        <BenefitsGrid ref={benefitsRef}>
-          {benefitsData.map((benefit, index) => (
+        <BenefitsGrid>
+          {benefits.map((benefit, index) => (
             <BenefitCard key={index}>
-              <IconContainer>
-                {benefit.icon}
-              </IconContainer>
-              <BenefitTitle>{benefit.title}</BenefitTitle>
-              <BenefitDescription>{benefit.description}</BenefitDescription>
+              <IconBox>
+                <benefit.icon />
+              </IconBox>
+              <BenefitContent>
+                <BenefitTitle>{benefit.title}</BenefitTitle>
+                <BenefitDescription>{benefit.description}</BenefitDescription>
+                <BenefitHighlight>{benefit.highlight}</BenefitHighlight>
+              </BenefitContent>
             </BenefitCard>
           ))}
         </BenefitsGrid>
       </Container>
     </BenefitsSection>
   );
-};
+});
 
-export default Benefits; 
+Benefits.displayName = 'Benefits';
+
+export default Benefits;

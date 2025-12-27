@@ -1,398 +1,229 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
-
-const NavContainer = styled.nav`
+const NavContainer = styled.nav<{ $isScrolled: boolean }>`
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
+  top: ${props => props.$isScrolled ? '12px' : '20px'};
+  left: 50%;
+  transform: translateX(-50%);
+  width: ${props => props.$isScrolled ? '95%' : '90%'};
+  max-width: 1200px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
-  padding: 1rem clamp(1.5rem, 5vw, 4rem);
-  z-index: var(--z-fixed);
-  background: var(--color-surface);
-  box-sizing: border-box;
-  box-shadow: 0 1px 0 rgba(4,4,5,0.2), 0 1.5px 0 rgba(6,6,7,0.05), 0 2px 0 rgba(4,4,5,0.05);
-  transition: all var(--transition-normal);
-
-  /* Уменьшаем размер при скролле */
-  &.scrolled {
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
-    background: var(--color-surface);
-  }
+  padding: ${props => props.$isScrolled ? '12px 24px' : '16px 32px'};
+  z-index: 1000;
+  background: ${props => props.$isScrolled
+    ? 'rgba(10, 5, 25, 0.9)'
+    : 'rgba(10, 5, 25, 0.7)'};
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: ${props => props.$isScrolled ? '20px' : '24px'};
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
 
   @media (max-width: 768px) {
-    justify-content: space-between;
-    padding: 1rem 1.5rem;
+    width: calc(100% - 24px);
+    padding: 12px 20px;
   }
 `;
 
-// Логотип для навигации
 const Logo = styled.a`
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 700;
-  font-size: 1.5rem;
-  color: var(--color-text);
-  margin-right: auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  font-weight: 600;
+  font-size: 1.375rem;
   text-decoration: none;
+  color: white;
   display: flex;
   align-items: center;
+  gap: 0.25rem;
+  letter-spacing: -0.02em;
   position: relative;
-  background: var(--gradient-text);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  
+  z-index: 2;
+
   span {
-    color: var(--color-text);
-    -webkit-text-fill-color: var(--color-text);
-    transition: color var(--transition-normal);
+    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
-  
-  &:hover {
-    span {
-      color: #D76D77;
-      -webkit-text-fill-color: #D76D77;
-    }
-  }
-  
-  /* Анимированная точка после логотипа */
+
   &::after {
     content: '';
     display: inline-block;
-    width: 6px;
-    height: 6px;
-    background: #D76D77;
+    width: 4px;
+    height: 4px;
+    background: #7c3aed;
     border-radius: 50%;
-    margin-left: 5px;
-    animation: pulse 2s infinite;
-  }
-  
-  @keyframes pulse {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.5); opacity: 0.7; }
-    100% { transform: scale(1); opacity: 1; }
+    margin-left: 4px;
+    animation: liquidPulse 3s ease-in-out infinite;
+    box-shadow: 0 0 10px rgba(124, 58, 237, 0.6);
   }
 
-  @media (max-width: 768px) {
-    margin-right: 0;
+  @keyframes liquidPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.7; }
   }
 `;
 
-// Контейнер для навигационных ссылок
 const NavLinks = styled.div<{ $isOpen: boolean }>`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  
+  gap: 2rem;
+  position: relative;
+  z-index: 2;
+
   @media (max-width: 768px) {
     display: ${props => props.$isOpen ? 'flex' : 'none'};
     flex-direction: column;
     position: absolute;
-    top: 100%;
+    top: calc(100% + 8px);
     left: 0;
     width: 100%;
-    background: var(--gradient-background), rgba(0, 0, 0, 0.95);
-    padding: 1rem 0;
-    border-top: 1px solid rgba(215, 109, 119, 0.2);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-    gap: 0.5rem;
+    background: rgba(10, 5, 25, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 24px;
+    gap: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   }
 `;
 
-// Улучшенная навигационная ссылка с индикатором активности и эффектами
-const NavLink = styled.a<{ $active: boolean }>`
-  color: ${props => props.$active ? 'var(--color-text)' : 'var(--color-text-secondary)'};
+const NavLink = styled.a`
+  color: rgba(255, 255, 255, 0.75);
   text-decoration: none;
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.9rem;
-  font-weight: 600;
-  padding: 0.6rem 1rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  position: relative;
-  overflow: hidden;
-  transition: all var(--transition-normal);
-  border-radius: var(--radius-sm);
-
-  /* Технологичный эффект подсветки */
-  &::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: ${props => props.$active ? 'var(--gradient-primary)' : 'transparent'};
-    transform: ${props => props.$active ? 'translateX(0)' : 'translateX(-100%)'};
-    transition: transform var(--transition-normal), background var(--transition-normal);
-  }
+  font-weight: 400;
+  font-size: 0.9375rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  transition: color 0.2s ease;
+  letter-spacing: -0.01em;
+  padding: 8px 16px;
 
   &:hover {
-    color: var(--color-text);
-    background: var(--gradient-subtle);
-    
-    &::before {
-      transform: translateX(0);
-      background: ${props => props.$active ? 'var(--gradient-primary)' : 'var(--gradient-secondary)'};
-    }
+    color: white;
   }
 
   @media (max-width: 768px) {
-    padding: 0.8rem 0.75rem;
-    font-size: 1.1rem;
+    font-size: 1rem;
+    padding: 12px 16px;
     width: 100%;
     text-align: center;
-    font-weight: 600;
   }
 `;
 
-// Кнопка с фиолетовым градиентом
-const ActionButton = styled.a`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--gradient-button);
-  color: white !important;
-  padding: 0.5rem 1rem;
-  margin-left: 1rem;
-  border-radius: var(--radius-sm);
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  position: relative;
+const CTAButton = styled.a`
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 16px;
   text-decoration: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
-
-  span {
-    color: white !important;
-
-    svg {
-      color: white !important;
-    }
-  }
+  font-weight: 500;
+  font-size: 0.9375rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  letter-spacing: -0.01em;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+  border: none;
+  z-index: 2;
 
   &:hover {
-    color: white !important;
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    filter: brightness(1.1);
-  }
-
-  &:active {
-    transform: translateY(-1px) scale(1.02);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
   }
 
   @media (max-width: 768px) {
-    margin-left: 0;
-    margin-top: 0.5rem;
-    width: calc(100% - 3rem);
-    align-self: center;
+    margin-top: 1rem;
+    width: 100%;
+    text-align: center;
   }
 `;
 
-// Кнопка гамбургера
-const HamburgerButton = styled.button`
+const MobileMenuButton = styled.button`
   display: none;
-  background: none;
-  border: none;
-  color: var(--color-text);
-  font-size: 1.5rem;
+  background: rgba(124, 58, 237, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
   cursor: pointer;
-  z-index: var(--z-modal);
+  position: relative;
+  width: 36px;
+  height: 36px;
+  z-index: 2;
 
   @media (max-width: 768px) {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-`;
-
-// Стили для иконки гамбургера
-const HamburgerIcon = styled.div<{ $isOpen: boolean }>`
-  width: 28px;
-  height: 20px;
-  position: relative;
-  transform: rotate(0deg);
-  transition: .5s ease-in-out;
-  cursor: pointer;
 
   span {
-    display: block;
     position: absolute;
-    height: 3px;
-    width: 100%;
-    background: var(--color-text);
-    border-radius: 3px;
-    opacity: 1;
-    left: 0;
-    transform: rotate(0deg);
-    transition: .25s ease-in-out;
-  }
+    left: 50%;
+    transform: translateX(-50%);
+    width: 16px;
+    height: 2px;
+    background: white;
+    border-radius: 2px;
+    transition: all 0.2s ease;
 
-  span:nth-child(1) {
-    top: ${props => props.$isOpen ? '8.5px' : '0px'};
-    transform: ${props => props.$isOpen ? 'rotate(45deg)' : 'rotate(0deg)'};
-  }
+    &:nth-child(1) {
+      top: 10px;
+    }
 
-  span:nth-child(2) {
-    top: 8.5px;
-    opacity: ${props => props.$isOpen ? '0' : '1'};
-    transform: ${props => props.$isOpen ? 'translateX(-100%)' : 'translateX(0)'};
-  }
+    &:nth-child(2) {
+      top: 17px;
+    }
 
-  span:nth-child(3) {
-    top: ${props => props.$isOpen ? '8.5px' : '17px'};
-    transform: ${props => props.$isOpen ? 'rotate(-45deg)' : 'rotate(0deg)'};
+    &:nth-child(3) {
+      top: 24px;
+    }
   }
 `;
-
-interface NavLinkItem {
-  id: string;
-  label: string;
-}
 
 const Navigation: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [activeLink, setActiveLink] = useState('#hero');
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const navLinksData: NavLinkItem[] = [
-    { id: '#hero', label: 'Главная' },
-    { id: '#services', label: 'Услуги' },
-    { id: '#pricing', label: 'Тарифы' },
-    { id: '#portfolio', label: 'Портфолио' },
-    { id: '#faq', label: 'FAQ' },
-    { id: '#contact', label: 'Связаться' }
-  ];
-
-  const checkScroll = () => {
-    setIsScrolled(window.scrollY > 50);
-    
-    const sections = document.querySelectorAll('section[id]');
-    const scrollPosition = window.scrollY + 100;
-    
-    sections.forEach(section => {
-      const sectionTop = (section as HTMLElement).offsetTop;
-      const sectionHeight = section.clientHeight;
-      const sectionId = section.getAttribute('id') || '';
-      
-      if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-        setActiveLink(sectionId);
-      }
-    });
-  };
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    window.addEventListener('scroll', checkScroll);
-    checkScroll();
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
 
-    return () => window.removeEventListener('scroll', checkScroll);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleScroll = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, targetId: string) => {
-    e.preventDefault();
-    const targetElement = document.querySelector(targetId);
-    if (targetElement) {
-      const offset = 80;
-      const bodyRect = document.body.getBoundingClientRect().top;
-      const elementRect = targetElement.getBoundingClientRect().top;
-      const elementPosition = elementRect - bodyRect;
-      const offsetPosition = elementPosition - offset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-      setActiveLink(targetId);
-      if (isMobileMenuOpen) {
-        setIsMobileMenuOpen(false);
-      }
-    }
-  };
-  
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
   };
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth > 768) {
-        setIsMobileMenuOpen(false);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  useEffect(() => {
-    const sections = navLinksData.map(link => document.querySelector(link.id));
-
-    const observerCallback = (entries: IntersectionObserverEntry[]) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const intersectingLink = navLinksData.find(link => link.id === `#${entry.target.id}`);
-          if (intersectingLink) {
-            setActiveLink(intersectingLink.id);
-          }
-        }
-      });
-    };
-
-    const observerOptions = {
-      root: null,
-      rootMargin: '-50% 0px -50% 0px',
-      threshold: 0,
-    };
-
-    const observer = new IntersectionObserver(observerCallback, observerOptions);
-    sections.forEach(section => {
-      if (section) observer.observe(section);
-    });
-
-    return () => {
-      sections.forEach(section => {
-        if (section) observer.unobserve(section);
-      });
-    };
-  }, [navLinksData]);
+  const closeMenu = () => {
+    setIsOpen(false);
+  };
 
   return (
-    <NavContainer className={isScrolled ? 'scrolled' : ''}>
-      <Logo href="#hero" onClick={(e) => handleScroll(e, '#hero')}>
-        MI<span>TSKA</span>
+    <NavContainer $isScrolled={isScrolled}>
+      <Logo href="#hero">
+        Sintara
       </Logo>
-      
-      <HamburgerButton 
-        onClick={toggleMobileMenu}
-        aria-label={isMobileMenuOpen ? 'Закрыть меню' : 'Открыть меню'}
-      >
-        <HamburgerIcon $isOpen={isMobileMenuOpen}>
-          <span />
-          <span />
-          <span />
-        </HamburgerIcon>
-      </HamburgerButton>
 
-      <NavLinks $isOpen={isMobileMenuOpen}>
-        {navLinksData.slice(1, -1).map((link) => (
-          <NavLink
-            key={link.id}
-            href={link.id}
-            onClick={(e) => handleScroll(e, link.id)}
-            $active={activeLink === link.id}
-          >
-            {link.label}
-          </NavLink>
-        ))}
-        <ActionButton href={navLinksData[navLinksData.length - 1].id} onClick={(e) => handleScroll(e, navLinksData[navLinksData.length - 1].id)}>
-          {navLinksData[navLinksData.length - 1].label}
-        </ActionButton>
+      <NavLinks $isOpen={isOpen}>
+        <NavLink href="#about" onClick={closeMenu}>About</NavLink>
+        <NavLink href="#services" onClick={closeMenu}>Our cases</NavLink>
+        <NavLink href="#pricing" onClick={closeMenu}>Services</NavLink>
+        <NavLink href="#portfolio" onClick={closeMenu}>Prices</NavLink>
+        <CTAButton href="#contact" onClick={closeMenu}>
+          Hire us
+        </CTAButton>
       </NavLinks>
+
+      <MobileMenuButton
+        onClick={toggleMenu}
+        aria-expanded={isOpen ? 'true' : 'false'}
+        aria-label="Toggle menu"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </MobileMenuButton>
     </NavContainer>
   );
 };

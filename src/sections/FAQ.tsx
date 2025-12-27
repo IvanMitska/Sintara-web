@@ -1,14 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, memo } from 'react';
 import styled from 'styled-components';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { FaChevronDown } from 'react-icons/fa';
-
-gsap.registerPlugin(ScrollTrigger);
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaPlus, FaMinus, FaArrowRight, FaQuestionCircle } from 'react-icons/fa';
 
 const FAQSection = styled.section`
-  padding: 8rem 0;
-  background: var(--gradient-background), #000;
+  padding: 100px 0;
+  background: transparent;
   position: relative;
   overflow: hidden;
 `;
@@ -16,279 +13,366 @@ const FAQSection = styled.section`
 const Container = styled.div`
   max-width: 900px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 40px;
+
+  @media (max-width: 768px) {
+    padding: 0 20px;
+  }
 `;
 
 const SectionHeader = styled.div`
   text-align: center;
-  margin-bottom: 5rem;
+  margin-bottom: 60px;
 `;
 
-const SectionTitle = styled.h2`
-  background: var(--gradient-text);
+const Title = styled(motion.h2)`
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(3rem, 7vw, 5rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  color: transparent;
-  font-size: clamp(2rem, 5vw, 3rem);
-  margin-bottom: 1.5rem;
-  position: relative;
-  display: inline-block;
-
-  &::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: -10px;
-    width: 80px;
-    height: 4px;
-    background: var(--gradient-secondary);
-  }
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin: 0 0 20px;
 `;
 
-const SectionDescription = styled.p`
-  font-size: clamp(1rem, 2vw, 1.1rem);
-  max-width: 600px;
+const Subtitle = styled(motion.p)`
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.5);
+  max-width: 500px;
   margin: 0 auto;
-  color: #a0a0a0;
   line-height: 1.6;
 `;
 
-const FAQContainer = styled.div`
+const FAQContainer = styled(motion.div)`
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 16px;
 `;
 
-const FAQItem = styled.div`
-  background-color: #0a0a0a;
-  border-radius: 10px;
+const FAQItem = styled(motion.div)<{ $isOpen: boolean }>`
+  background: ${props => props.$isOpen
+    ? 'linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(20, 10, 40, 0.9) 100%)'
+    : 'linear-gradient(135deg, rgba(20, 10, 40, 0.6) 0%, rgba(10, 5, 20, 0.8) 100%)'};
+  border: 1px solid ${props => props.$isOpen
+    ? 'rgba(124, 58, 237, 0.3)'
+    : 'rgba(255, 255, 255, 0.08)'};
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: rgba(124, 58, 237, 0.3);
+    background: ${props => props.$isOpen
+      ? 'linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(20, 10, 40, 0.9) 100%)'
+      : 'linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, rgba(20, 10, 40, 0.8) 100%)'};
+  }
 `;
 
-const FAQQuestion = styled.div<{ isOpen: boolean }>`
-  padding: 1.5rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #fff;
+const FAQQuestion = styled.button<{ $isOpen: boolean }>`
+  width: 100%;
+  padding: 24px 28px;
+  background: transparent;
+  border: none;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 20px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  
-  &:hover {
-    background-color: #111;
+  text-align: left;
+`;
+
+const QuestionText = styled.span<{ $isOpen: boolean }>`
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: ${props => props.$isOpen ? '#ffffff' : 'rgba(255, 255, 255, 0.9)'};
+  line-height: 1.4;
+  transition: color 0.3s ease;
+
+  ${FAQQuestion}:hover & {
+    color: #ffffff;
   }
-  
-  svg {
-    transition: transform 0.3s ease;
-    transform: ${props => props.isOpen ? 'rotate(180deg)' : 'rotate(0)'};
-    color: ${props => props.isOpen ? '#D76D77' : '#a0a0a0'};
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
   }
 `;
 
-const FAQAnswer = styled.div<{ isOpen: boolean }>`
-  padding: ${props => props.isOpen ? '1rem 1.5rem 1.5rem' : '0 1.5rem'};
-  color: #a0a0a0;
-  line-height: 1.6;
-  max-height: ${props => props.isOpen ? '1000px' : '0'};
-  opacity: ${props => props.isOpen ? '1' : '0'};
-  overflow: hidden;
-  transition: all 0.3s ease;
-`;
-
-const CTAContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  margin-top: 5rem;
-  padding: 3rem;
-  background-color: #0a0a0a;
+const IconWrapper = styled.div<{ $isOpen: boolean }>`
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  background: ${props => props.$isOpen
+    ? 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)'
+    : 'rgba(255, 255, 255, 0.05)'};
+  border: 1px solid ${props => props.$isOpen
+    ? 'transparent'
+    : 'rgba(255, 255, 255, 0.1)'};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+
+  svg {
+    font-size: 14px;
+    color: ${props => props.$isOpen ? '#ffffff' : 'rgba(255, 255, 255, 0.5)'};
+    transition: color 0.3s ease;
+  }
+
+  ${FAQQuestion}:hover & {
+    background: ${props => props.$isOpen
+      ? 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'
+      : 'rgba(124, 58, 237, 0.2)'};
+    border-color: ${props => props.$isOpen ? 'transparent' : 'rgba(124, 58, 237, 0.3)'};
+
+    svg {
+      color: ${props => props.$isOpen ? '#ffffff' : '#a78bfa'};
+    }
+  }
 `;
+
+const FAQAnswer = styled(motion.div)`
+  overflow: hidden;
+`;
+
+const AnswerContent = styled.div`
+  padding: 0 28px 24px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.7;
+
+  @media (max-width: 768px) {
+    font-size: 0.95rem;
+  }
+`;
+
+const CTAContainer = styled(motion.div)`
+  margin-top: 60px;
+  padding: 40px;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(20, 10, 40, 0.8) 100%);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+    padding: 32px 24px;
+  }
+`;
+
+const CTAContent = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`;
+
+const CTAIcon = styled.div`
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(124, 58, 237, 0.1) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    font-size: 24px;
+    color: #a78bfa;
+  }
+`;
+
+const CTAText = styled.div``;
 
 const CTATitle = styled.h3`
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  color: #fff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 6px;
 `;
 
 const CTADescription = styled.p`
-  font-size: 1rem;
-  color: #a0a0a0;
-  line-height: 1.6;
-  margin-bottom: 2rem;
-  max-width: 500px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+  line-height: 1.5;
 `;
 
 const CTAButton = styled.a`
-  display: inline-block;
-  background: var(--gradient-button);
-  color: white !important;
-  padding: 0.9rem 2.5rem;
-  border-radius: 5px;
-  font-weight: 700;
-  font-size: 1rem;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  color: white;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
   text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+  white-space: nowrap;
 
-  span {
-    color: white !important;
-
-    svg {
-      color: white !important;
-    }
+  svg {
+    font-size: 14px;
+    transition: transform 0.3s ease;
   }
 
   &:hover {
-    color: white !important;
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    filter: brightness(1.1);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(124, 58, 237, 0.4);
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+
+    svg {
+      transform: translateX(4px);
+    }
   }
 `;
 
-const FAQ: React.FC = () => {
+const faqItems = [
+  {
+    question: 'How long does it take to develop a website?',
+    answer: 'Development timelines depend on the complexity and scope of the project. A simple landing page can be ready in 1-2 weeks, while an e-commerce store takes 3-6 weeks. After reviewing your requirements, we\'ll provide accurate estimates.'
+  },
+  {
+    question: 'What payment methods do you accept?',
+    answer: 'We work with 50% upfront payment and milestone-based payments for larger projects. We accept bank transfers for businesses, as well as card payments and electronic transfers for individuals.'
+  },
+  {
+    question: 'Can you improve an existing website?',
+    answer: 'Yes, we handle website improvements and modernization. After analyzing your current project, we\'ll suggest optimal solutions for improving functionality, design, or performance.'
+  },
+  {
+    question: 'How does the Telegram bot development process work?',
+    answer: 'The process includes: requirements analysis, bot structure design, functionality development, integration with necessary systems, admin panel creation (if required), testing, and launch. We keep you updated on progress throughout.'
+  },
+  {
+    question: 'Do you provide technical support after launch?',
+    answer: 'Yes, we offer technical support after project launch. You can choose a support package that includes site monitoring, bug fixes, content updates, and consultations.'
+  },
+  {
+    question: 'Do you handle SEO optimization?',
+    answer: 'Yes, we include basic SEO optimization during development. This covers proper structure, meta tags, semantic markup, and speed optimization. We also offer comprehensive SEO promotion services separately.'
+  }
+];
+
+const FAQ: React.FC = memo(() => {
   const [openIndex, setOpenIndex] = useState<number>(0);
-  const sectionRef = useRef<HTMLElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const faqsRef = useRef<HTMLDivElement>(null);
-  const ctaRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const section = sectionRef.current;
-    const header = headerRef.current;
-    const faqs = faqsRef.current;
-    const cta = ctaRef.current;
-
-    if (section && header && faqs && cta) {
-      // Анимация заголовка
-      gsap.fromTo(
-        header,
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          scrollTrigger: {
-            trigger: section,
-            start: 'top 80%',
-            toggleActions: 'play none none none',
-          },
-        }
-      );
-
-      // Анимация вопросов
-      gsap.fromTo(
-        faqs.children,
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.5,
-          stagger: 0.1,
-          scrollTrigger: {
-            trigger: faqs,
-            start: 'top 80%',
-            toggleActions: 'play none none none',
-          },
-        }
-      );
-
-      // Анимация CTA
-      gsap.fromTo(
-        cta,
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          scrollTrigger: {
-            trigger: cta,
-            start: 'top 90%',
-            toggleActions: 'play none none none',
-          },
-        }
-      );
-    }
-  }, []);
-
-  const faqItems = [
-    {
-      question: 'Сколько времени займет разработка сайта?',
-      answer: 'Сроки разработки зависят от сложности и объема проекта. Простой лендинг может быть готов за 1-2 недели, интернет-магазин — от 3 до 6 недель. После изучения ваших требований мы сможем предоставить точные сроки.'
-    },
-    {
-      question: 'Какие способы оплаты вы принимаете?',
-      answer: 'Мы работаем по предоплате 50% и поэтапной оплате для крупных проектов. Принимаем оплату по безналичному расчету для юридических лиц, а также переводы на карту и электронные платежи для физических лиц.'
-    },
-    {
-      question: 'Можете ли вы доработать уже существующий сайт?',
-      answer: 'Да, мы занимаемся доработкой и модернизацией существующих сайтов. После анализа текущего состояния проекта мы предложим оптимальные решения для улучшения функциональности, дизайна или производительности.'
-    },
-    {
-      question: 'Как происходит процесс разработки Telegram-бота?',
-      answer: 'Процесс включает: анализ требований, проектирование структуры бота, разработку функционала, интеграцию с нужными системами, создание админ-панели (если требуется), тестирование и запуск. Мы постоянно держим вас в курсе прогресса работ.'
-    },
-    {
-      question: 'Предоставляете ли вы техническую поддержку после запуска проекта?',
-      answer: 'Да, мы предлагаем техническую поддержку после запуска проекта. Вы можете выбрать подходящий вам пакет поддержки, который может включать мониторинг работы сайта, исправление ошибок, обновление контента и консультации.'
-    },
-    {
-      question: 'Занимаетесь ли вы SEO-оптимизацией сайтов?',
-      answer: 'Да, мы занимаемся базовой SEO-оптимизацией при разработке сайта. Это включает правильную структуру, метатеги, семантическую разметку и оптимизацию скорости. Также мы предлагаем отдельные услуги по комплексному продвижению сайтов.'
-    }
-  ];
 
   const toggleQuestion = (index: number) => {
     setOpenIndex(openIndex === index ? -1 : index);
   };
 
   return (
-    <FAQSection id="faq" ref={sectionRef}>
+    <FAQSection id="faq">
       <Container>
-        <SectionHeader ref={headerRef}>
-          <SectionTitle>Часто задаваемые вопросы</SectionTitle>
-          <SectionDescription>
-            Ответы на распространенные вопросы о наших услугах, процессе работы и условиях сотрудничества
-          </SectionDescription>
+        <SectionHeader>
+          <Title
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            FAQ
+          </Title>
+          <Subtitle
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            Answers to common questions about our services and process
+          </Subtitle>
         </SectionHeader>
 
-        <FAQContainer ref={faqsRef}>
+        <FAQContainer
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
           {faqItems.map((item, index) => (
-            <FAQItem key={index}>
-              <FAQQuestion 
-                isOpen={openIndex === index}
+            <FAQItem
+              key={index}
+              $isOpen={openIndex === index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: index * 0.05 }}
+            >
+              <FAQQuestion
+                $isOpen={openIndex === index}
                 onClick={() => toggleQuestion(index)}
               >
-                {item.question}
-                <FaChevronDown />
+                <QuestionText $isOpen={openIndex === index}>
+                  {item.question}
+                </QuestionText>
+                <IconWrapper $isOpen={openIndex === index}>
+                  {openIndex === index ? <FaMinus /> : <FaPlus />}
+                </IconWrapper>
               </FAQQuestion>
-              <FAQAnswer isOpen={openIndex === index}>
-                {item.answer}
-              </FAQAnswer>
+
+              <AnimatePresence>
+                {openIndex === index && (
+                  <FAQAnswer
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  >
+                    <AnswerContent>
+                      {item.answer}
+                    </AnswerContent>
+                  </FAQAnswer>
+                )}
+              </AnimatePresence>
             </FAQItem>
           ))}
         </FAQContainer>
 
-        <CTAContainer ref={ctaRef}>
-          <CTATitle>Остались вопросы?</CTATitle>
-          <CTADescription>
-            Если вы не нашли ответа на свой вопрос, свяжитесь с нами для получения бесплатной консультации
-          </CTADescription>
-          <CTAButton href="#contact">Задать вопрос</CTAButton>
+        <CTAContainer
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          <CTAContent>
+            <CTAIcon>
+              <FaQuestionCircle />
+            </CTAIcon>
+            <CTAText>
+              <CTATitle>Still have questions?</CTATitle>
+              <CTADescription>
+                Get in touch for a free consultation
+              </CTADescription>
+            </CTAText>
+          </CTAContent>
+          <CTAButton href="#contact">
+            Contact us <FaArrowRight />
+          </CTAButton>
         </CTAContainer>
       </Container>
     </FAQSection>
   );
-};
+});
 
-export default FAQ; 
+FAQ.displayName = 'FAQ';
+
+export default FAQ;

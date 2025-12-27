@@ -4,29 +4,9 @@ import AnimatedMetrics from '../components/AnimatedMetrics';
 
 const StatsSection = styled.section`
   padding: 8rem 0;
-  background: linear-gradient(180deg, #000 0%, #0a0a0a 50%, #000 100%);
+  background: transparent;
   position: relative;
   overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #8E2DE2, transparent);
-  }
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #4A00E0, transparent);
-  }
 `;
 
 const Container = styled.div`

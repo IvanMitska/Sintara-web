@@ -1,612 +1,219 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { memo } from 'react';
 import styled from 'styled-components';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  FaRegComments, 
-  FaRegClipboard, 
-  FaRegLightbulb, 
-  FaCode, 
-  FaRegCheckCircle, 
-  FaRegThumbsUp, 
-  FaAngleDown,
-  FaToolbox,
-  FaRegClock,
-  FaListUl
-} from 'react-icons/fa';
-
-gsap.registerPlugin(ScrollTrigger);
 
 const ProcessSection = styled.section`
-  padding: 8rem 0;
-  background: var(--gradient-background), #0a0a0a;
+  padding: 120px 0;
+  background: transparent;
   position: relative;
   overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 30%;
-    height: 40%;
-    background: radial-gradient(ellipse at center, rgba(215, 109, 119, 0.08), transparent 70%);
-    filter: blur(100px);
-    z-index: 0;
-    pointer-events: none;
+
+  @media (max-width: 768px) {
+    padding: 80px 0;
   }
 `;
 
 const Container = styled.div`
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 2rem;
-  position: relative;
-  z-index: 1;
+  padding: 0 40px;
+
+  @media (max-width: 768px) {
+    padding: 0 20px;
+  }
 `;
 
 const SectionHeader = styled.div`
   text-align: center;
-  margin-bottom: 5rem;
+  margin-bottom: 80px;
+
+  @media (max-width: 768px) {
+    margin-bottom: 50px;
+  }
 `;
 
 const SectionTitle = styled.h2`
-  font-size: clamp(2rem, 5vw, 3rem);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
   margin-bottom: 1.5rem;
-  position: relative;
-  display: inline-block;
-
-  &::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: -10px;
-    width: 80px;
-    height: 4px;
-    background: var(--gradient-secondary);
-  }
 `;
 
-const SectionDescription = styled.p`
-  font-size: clamp(1rem, 2vw, 1.1rem);
+const SectionSubtitle = styled.p`
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.6);
   max-width: 600px;
   margin: 0 auto;
-  color: #a0a0a0;
   line-height: 1.6;
+
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+  }
 `;
 
-const ProcessSteps = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 3rem;
+const StepsContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
   position: relative;
-  
-  @media (max-width: 768px) {
-    gap: 4rem;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 `;
 
-// Упрощенная линия процесса для улучшения производительности
-const ProcessLine = styled.div`
-  position: absolute;
-  left: 35px;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: linear-gradient(180deg,
-    transparent 0%,
-    rgba(215, 109, 119, 0.3) 10%,
-    rgba(215, 109, 119, 0.5) 50%,
-    rgba(58, 28, 113, 0.3) 90%,
-    transparent 100%
-  );
-  z-index: 0;
-  transform-origin: top;
-  opacity: 0.6;
-  
-  @media (max-width: 768px) {
-    left: 25px;
-  }
-`;
-
-const Step = styled(motion.div)`
-  display: flex;
-  gap: 2rem;
-  align-items: flex-start;
+const StepCard = styled.div`
+  background: rgba(20, 10, 40, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 32px;
   position: relative;
-  z-index: 1;
-  
+  transition: transform 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: rgba(124, 58, 237, 0.3);
+  }
+
   @media (max-width: 768px) {
-    gap: 1rem;
+    padding: 24px;
   }
 `;
 
-const StepCircle = styled(motion.div)`
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  background: var(--gradient-button);
-  color: white;
-  font-size: 1.5rem;
-  font-weight: bold;
+const StepNumber = styled.div`
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(168, 85, 247, 0.1) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  position: relative;
-  will-change: transform;
-  flex-shrink: 0;
-  transition: all 0.3s ease;
-  
-  @media (max-width: 768px) {
-    width: 50px;
-    height: 50px;
-    font-size: 1.2rem;
-  }
-`;
-
-const StepContent = styled(motion.div)`
-  flex: 1;
-  padding: 2rem;
-  background: linear-gradient(135deg, rgba(15, 15, 25, 0.6), rgba(25, 25, 35, 0.6));
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(215, 109, 119, 0.1);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-  will-change: transform;
-  overflow: hidden;
-
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-    border-color: rgba(215, 109, 119, 0.2);
-    background: linear-gradient(135deg, rgba(15, 15, 25, 0.7), rgba(25, 25, 35, 0.7));
-  }
-  
-  @media (max-width: 768px) {
-    padding: 1.5rem;
-  }
-`;
-
-const StepHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 20px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #a78bfa;
 `;
 
 const StepTitle = styled.h3`
-  font-size: 1.4rem;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.25rem;
   font-weight: 600;
-
-  svg {
-    color: #D76D77;
-    font-size: 1.2rem;
-    opacity: 0.8;
-  }
+  color: #ffffff;
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
 `;
 
 const StepDescription = styled.p`
-  font-size: 1rem;
-  color: #a0a0a0;
-  line-height: 1.6;
-  margin-bottom: 0.5rem;
-`;
-
-const StepTimeframe = styled.p`
-  font-size: 0.9rem;
-  color: #D76D77;
-  font-weight: 600;
-  margin-top: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-`;
-
-const ToggleButton = styled(motion.button)`
-  background: transparent;
-  border: none;
-  color: #D76D77;
-  font-size: 1.2rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  transition: all 0.3s ease;
-  border-radius: 50%;
-
-  &:hover {
-    transform: scale(1.1);
-    background: rgba(215, 109, 119, 0.1);
-    color: #FFAF7B;
-  }
-
-  svg {
-    transition: transform 0.3s ease;
-  }
-`;
-
-const StepDetailContent = styled(motion.div)`
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(215, 109, 119, 0.15);
-  overflow: hidden;
-`;
-
-const DetailsList = styled.ul`
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-`;
-
-const DetailItem = styled(motion.li)`
-  margin-bottom: 0.75rem;
-  color: #a0a0a0;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 0.95rem;
-
-  svg {
-    color: #D76D77;
-    font-size: 0.8rem;
-    flex-shrink: 0;
-    opacity: 0.7;
-  }
-
-  &:last-child {
-    margin-bottom: 0;
-  }
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.6;
+  margin-bottom: 16px;
 `;
 
-const TechUsed = styled.div`
-  margin-top: 1rem;
-  
-  h4 {
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
-    color: white;
-    font-weight: 500;
-  }
-`;
-
-const TechTag = styled(motion.span)`
-  display: inline-block;
-  padding: 0.3rem 0.8rem;
-  background: rgba(215, 109, 119, 0.08);
-  color: #D76D77;
-  border-radius: 20px;
+const StepDuration = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(124, 58, 237, 0.1);
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 0.8rem;
-  margin-right: 0.5rem;
-  margin-bottom: 0.5rem;
-  border: 1px solid rgba(215, 109, 119, 0.15);
-  transition: all 0.3s ease;
-  cursor: default;
-
-  &:hover {
-    background: rgba(215, 109, 119, 0.15);
-    border-color: rgba(215, 109, 119, 0.3);
-    transform: translateY(-1px);
-  }
+  font-weight: 500;
+  color: #a78bfa;
 `;
 
-// Расширенная информация о каждом шаге
-interface IProcessStep {
-  number: number;
-  icon: JSX.Element;
-  title: string;
-  description: string;
-  timeframe: string;
-  details: string[];
-  technologies?: string[];
-}
+const steps = [
+  {
+    number: '01',
+    title: 'Discovery call',
+    description: 'We discuss your goals, requirements, and vision. You get a clear understanding of what\'s possible and a rough estimate.',
+    duration: '1-2 days'
+  },
+  {
+    number: '02',
+    title: 'Proposal & planning',
+    description: 'Detailed scope, fixed price, and timeline. No surprises. You approve before we write a single line of code.',
+    duration: '2-3 days'
+  },
+  {
+    number: '03',
+    title: 'Design & prototype',
+    description: 'Interactive mockups you can click through. See exactly how your product will look and feel before development.',
+    duration: '5-7 days'
+  },
+  {
+    number: '04',
+    title: 'Development',
+    description: 'We build your product with weekly demos. You see progress in real-time and can give feedback along the way.',
+    duration: '2-4 weeks'
+  },
+  {
+    number: '05',
+    title: 'Testing & QA',
+    description: 'Rigorous testing across devices and browsers. We catch bugs before your users do.',
+    duration: '3-5 days'
+  },
+  {
+    number: '06',
+    title: 'Launch',
+    description: 'Smooth deployment to production. We handle hosting setup, DNS, SSL — everything technical.',
+    duration: '1-2 days'
+  },
+  {
+    number: '07',
+    title: 'Handover',
+    description: 'Full source code, documentation, and training. You\'re in complete control of your product.',
+    duration: '1 day'
+  },
+  {
+    number: '08',
+    title: 'Support',
+    description: '60-day warranty included. After that, optional maintenance plans available if you need ongoing help.',
+    duration: 'Ongoing'
+  }
+];
 
-const WorkProcess: React.FC = () => {
-  const sectionRef = useRef<HTMLElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const stepsRef = useRef<HTMLDivElement>(null);
-  const lineRef = useRef<HTMLDivElement>(null);
-  
-  // Состояние для отслеживания открытых деталей
-  const [expandedStep, setExpandedStep] = useState<number | null>(null);
-  
-  // Состояние для отслеживания видимости секции
-  const [isVisible, setIsVisible] = useState(false);
-  
-  // Функция для переключения отображения деталей
-  const toggleDetails = (stepNumber: number) => {
-    if (expandedStep === stepNumber) {
-      setExpandedStep(null);
-    } else {
-      setExpandedStep(stepNumber);
-    }
-  };
-
-  useEffect(() => {
-    // Настраиваем IntersectionObserver для более эффективного запуска анимаций
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          // Отключаем наблюдение после обнаружения
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    // Запускаем GSAP анимации только когда секция видима
-    if (!isVisible) return;
-
-    const section = sectionRef.current;
-    const header = headerRef.current;
-
-    if (section && header) {
-      // Анимация заголовка (только один раз при видимости)
-      gsap.fromTo(
-        header,
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          ease: "power2.out"
-        }
-      );
-      
-      // Анимация линии (упрощенная)
-      if (lineRef.current) {
-        gsap.fromTo(
-          lineRef.current,
-          { scaleY: 0 },
-          { 
-            scaleY: 1, 
-            duration: 1,
-            ease: "power1.inOut"
-          }
-        );
-      }
-    }
-  }, [isVisible]);
-
-  const processSteps: IProcessStep[] = [
-    {
-      number: 1,
-      icon: <FaRegComments className="step-icon" />,
-      title: 'Консультация',
-      description: 'Обсуждаем ваш проект, определяем требования, цели и задачи. Проводим анализ конкурентов и целевой аудитории.',
-      timeframe: 'Продолжительность: 1-2 дня',
-      details: [
-        'Определение бизнес-целей и KPI проекта',
-        'Анализ целевой аудитории',
-        'Изучение конкурентов и отраслевых трендов',
-        'Формирование предварительного бюджета и сроков'
-      ]
-    },
-    {
-      number: 2,
-      icon: <FaRegClipboard className="step-icon" />,
-      title: 'Подготовка ТЗ',
-      description: 'Составляем подробное техническое задание с описанием всех функций, структуры и технических требований.',
-      timeframe: 'Продолжительность: 2-3 дня',
-      details: [
-        'Разработка структуры и пользовательских сценариев',
-        'Определение функциональных требований',
-        'Планирование интеграций с внешними сервисами',
-        'Составление детальных спецификаций'
-      ],
-      technologies: ['Figma', 'Miro', 'Google Docs']
-    },
-    {
-      number: 3,
-      icon: <FaRegLightbulb className="step-icon" />,
-      title: 'Дизайн',
-      description: 'Создаем уникальный, современный и удобный дизайн, соответствующий вашему бренду и целям проекта.',
-      timeframe: 'Продолжительность: 3-7 дней',
-      details: [
-        'Разработка концепции дизайна и стилистики',
-        'Создание мудбордов и цветовых палитр',
-        'Проектирование UI/UX для всех страниц и экранов',
-        'Анимации и интерактивные элементы интерфейса'
-      ],
-      technologies: ['Figma', 'Adobe Photoshop', 'Adobe Illustrator']
-    },
-    {
-      number: 4,
-      icon: <FaCode className="step-icon" />,
-      title: 'Разработка',
-      description: 'Приступаем к программированию сайта или бота, интегрируем все необходимые функции и системы.',
-      timeframe: 'Продолжительность: 7-14 дней',
-      details: [
-        'Верстка всех страниц и компонентов',
-        'Программирование функциональности на стороне клиента',
-        'Разработка серверной части и API',
-        'Интеграция с внешними сервисами и системами'
-      ],
-      technologies: ['React', 'TypeScript', 'Node.js', 'GraphQL', 'Telegram API']
-    },
-    {
-      number: 5,
-      icon: <FaRegCheckCircle className="step-icon" />,
-      title: 'Тестирование',
-      description: 'Проводим комплексное тестирование на разных устройствах и в разных браузерах, проверяем производительность.',
-      timeframe: 'Продолжительность: 2-4 дня',
-      details: [
-        'Функциональное тестирование всех компонентов',
-        'Проверка адаптивности и кроссбраузерности',
-        'Тестирование производительности и оптимизация',
-        'Проверка безопасности и стресс-тесты'
-      ],
-      technologies: ['Lighthouse', 'Jest', 'Cypress', 'BrowserStack']
-    },
-    {
-      number: 6,
-      icon: <FaRegThumbsUp className="step-icon" />,
-      title: 'Запуск',
-      description: 'Размещаем проект на хостинге, проводим финальные настройки и передаем вам все доступы и инструкции.',
-      timeframe: 'Продолжительность: 1-2 дня',
-      details: [
-        'Настройка окружения на сервере',
-        'Установка мониторинга и аналитики',
-        'Подготовка технической документации',
-        'Обучение команды заказчика работе с системой'
-      ],
-      technologies: ['AWS', 'Vercel', 'Google Analytics', 'Sentry']
-    },
-  ];
-
-  // Варианты анимации для Framer Motion (оптимизированные)
-  const stepVariants = {
-    hidden: { opacity: 0, x: -30 },
-    visible: (i: number) => ({
-      opacity: 1,
-      x: 0,
-      transition: {
-        delay: i * 0.15,
-        duration: 0.5,
-        ease: [0.4, 0, 0.2, 1]
-      }
-    })
-  };
-
+const WorkProcess: React.FC = memo(() => {
   return (
-    <ProcessSection id="process" ref={sectionRef}>
+    <ProcessSection id="process">
       <Container>
-        <SectionHeader ref={headerRef}>
-          <SectionTitle>Процесс работы</SectionTitle>
-          <SectionDescription>
-            Прозрачный и эффективный процесс разработки от первой консультации до запуска проекта
-          </SectionDescription>
+        <SectionHeader>
+          <SectionTitle>How we work</SectionTitle>
+          <SectionSubtitle>
+            A transparent process from first call to final delivery
+          </SectionSubtitle>
         </SectionHeader>
 
-        <ProcessSteps ref={stepsRef}>
-          <ProcessLine ref={lineRef} />
-          
-          {processSteps.map((step, index) => (
-            <Step 
-              key={step.number}
-              className="process-step"
-              custom={index}
-              initial="hidden"
-              animate={isVisible ? "visible" : "hidden"}
-              variants={stepVariants}
-            >
-              <StepCircle
-                whileHover={{ scale: 1.1 }}
-                transition={{ type: "spring", stiffness: 400 }}
-              >
-                {step.number}
-              </StepCircle>
-              <StepContent onClick={() => toggleDetails(step.number)}>
-                <StepHeader>
-                  <StepTitle>{step.icon} {step.title}</StepTitle>
-                  <ToggleButton
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <FaAngleDown
-                      style={{
-                        transform: expandedStep === step.number ? 'rotate(180deg)' : 'rotate(0)',
-                        transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
-                      }}
-                    />
-                  </ToggleButton>
-                </StepHeader>
-                
-                <StepDescription>{step.description}</StepDescription>
-                <StepTimeframe>
-                  <FaRegClock /> {step.timeframe}
-                </StepTimeframe>
-                
-                <AnimatePresence mode="wait">
-                  {expandedStep === step.number && (
-                    <StepDetailContent
-                      key={`detail-${step.number}`}
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{
-                        height: { duration: 0.4, ease: [0.4, 0, 0.2, 1] },
-                        opacity: { duration: 0.3, delay: 0.1 }
-                      }}
-                    >
-                      <DetailsList>
-                        {step.details.map((detail, index) => (
-                          <DetailItem
-                            key={index}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{
-                              delay: index * 0.05,
-                              duration: 0.3,
-                              ease: [0.4, 0, 0.2, 1]
-                            }}
-                          >
-                            <FaListUl />
-                            {detail}
-                          </DetailItem>
-                        ))}
-                      </DetailsList>
-                      
-                      {step.technologies && (
-                        <TechUsed>
-                          <h4>
-                            <FaToolbox style={{ marginRight: '8px' }} />
-                            Используемые технологии:
-                          </h4>
-                          <div>
-                            {step.technologies.map((tech, index) => (
-                              <TechTag
-                                key={index}
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{
-                                  delay: 0.2 + index * 0.05,
-                                  duration: 0.3,
-                                  ease: [0.4, 0, 0.2, 1]
-                                }}
-                                whileHover={{ scale: 1.05 }}
-                              >
-                                {tech}
-                              </TechTag>
-                            ))}
-                          </div>
-                        </TechUsed>
-                      )}
-                    </StepDetailContent>
-                  )}
-                </AnimatePresence>
-              </StepContent>
-            </Step>
+        <StepsContainer>
+          {steps.map((step, index) => (
+            <StepCard key={index}>
+              <StepNumber>{step.number}</StepNumber>
+              <StepTitle>{step.title}</StepTitle>
+              <StepDescription>{step.description}</StepDescription>
+              <StepDuration>{step.duration}</StepDuration>
+            </StepCard>
           ))}
-        </ProcessSteps>
+        </StepsContainer>
       </Container>
     </ProcessSection>
   );
-};
+});
 
-export default WorkProcess; 
+WorkProcess.displayName = 'WorkProcess';
+
+export default WorkProcess;

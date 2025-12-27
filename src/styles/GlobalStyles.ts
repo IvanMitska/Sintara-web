@@ -2,33 +2,41 @@ import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyles = createGlobalStyle`
   /* Используем системные шрифты для надежности */
-  
+
   /* Определяем CSS переменные для унификации стилей */
   :root {
-    /* Основные цвета */
-    --color-background: #000000; /* Основной фон - черный */
-    --color-surface: #0a0a0a; /* Вторичный фон */
-    --color-surface-light: #111111; /* Светлая поверхность */
-    --color-primary: #D76D77; /* Основной цвет */
-    --color-secondary: #3A1C71; /* Вторичный цвет */
-    --color-accent: #FF7D54; /* Теплый акцентный цвет */
-    --color-accent-secondary: #FFB443; /* Вторичный теплый акцент */
-    --color-success: #4CD964; /* Цвет успеха */
+    /* Основные цвета - iOS 26 Purple Theme */
+    --color-background: #0a0015; /* Основной фон - темно-фиолетовый */
+    --color-surface: #15082a; /* Вторичный фон */
+    --color-surface-light: #1a0d2e; /* Светлая поверхность */
+    --color-primary: #7c3aed; /* Основной фиолетовый */
+    --color-secondary: #6d28d9; /* Темно-фиолетовый */
+    --color-accent: #8b5cf6; /* Светло-фиолетовый акцент */
+    --color-accent-secondary: #a78bfa; /* Вторичный фиолетовый */
+    --color-success: #10b981; /* Цвет успеха */
     --color-text: #ffffff;
-    --color-text-secondary: #a0a0a0;
-    --color-text-disabled: #777777;
+    --color-text-secondary: #c7d2fe;
+    --color-text-disabled: #6b7280;
 
-    /* Чистые градиенты */
-    --gradient-primary: linear-gradient(135deg, #D76D77 0%, #3A1C71 100%);
-    --gradient-button: linear-gradient(135deg, #D76D77 0%, #3A1C71 100%);
-    --gradient-button-hover: linear-gradient(135deg, #3A1C71 0%, #D76D77 100%);
-    --gradient-hover: linear-gradient(135deg, #3A1C71 0%, #D76D77 100%);
-    --gradient-secondary: linear-gradient(135deg, #3A1C71 0%, #D76D77 100%);
-    --gradient-text: linear-gradient(135deg, #D76D77 0%, #3A1C71 100%);
-    --gradient-subtle: linear-gradient(135deg, rgba(215, 109, 119, 0.05) 0%, rgba(58, 28, 113, 0.05) 100%);
-    --gradient-card: linear-gradient(135deg, rgba(215, 109, 119, 0.2) 0%, rgba(58, 28, 113, 0.2) 100%);
-    --gradient-background: linear-gradient(135deg, rgba(215, 109, 119, 0.03) 0%, rgba(58, 28, 113, 0.03) 100%);
-    --gradient-section-divider: linear-gradient(90deg, transparent 0%, rgba(215, 109, 119, 0.2) 50%, transparent 100%);
+    /* Liquid Glass Gradients & Effects - Optimized */
+    --gradient-primary: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #6d28d9 100%);
+    --gradient-liquid: linear-gradient(45deg, rgba(124, 58, 237, 0.15) 0%, rgba(168, 85, 247, 0.2) 50%, rgba(124, 58, 237, 0.15) 100%);
+    --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 50%, rgba(124, 58, 237, 0.06) 100%);
+    --gradient-glass-strong: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.06) 50%, rgba(124, 58, 237, 0.1) 100%);
+    --gradient-button: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    --gradient-button-hover: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    --gradient-text: linear-gradient(135deg, #ffffff 0%, #e5e7eb 50%, #f9fafb 100%);
+    --gradient-background: #050208;
+    --gradient-section-divider: linear-gradient(90deg, transparent 0%, rgba(124, 58, 237, 0.4) 20%, rgba(168, 85, 247, 0.6) 50%, rgba(124, 58, 237, 0.4) 80%, transparent 100%);
+
+    /* Liquid Glass Morphing Effects - Performance Optimized */
+    --liquid-blur: blur(8px);
+    --liquid-blur-heavy: blur(12px);
+    --liquid-border: 1px solid rgba(255, 255, 255, 0.12);
+    --liquid-border-light: 1px solid rgba(255, 255, 255, 0.08);
+    --liquid-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 4px 16px rgba(124, 58, 237, 0.1);
+    --liquid-shadow-elevated: 0 20px 60px rgba(0, 0, 0, 0.2), 0 8px 32px rgba(124, 58, 237, 0.15);
+    --liquid-glow: 0 0 40px rgba(124, 58, 237, 0.3), 0 0 80px rgba(168, 85, 247, 0.15);
     
     /* Размеры и отступы */
     --space-xs: 0.25rem;
@@ -43,11 +51,12 @@ const GlobalStyles = createGlobalStyle`
     --shadow-lg: 0 8px 15px rgba(142, 45, 226, 0.15);
     --shadow-accent: 0 8px 15px rgba(255, 125, 84, 0.2);
     
-    /* Анимации - упрощаем для лучшей производительности */
-    --transition-fast: 0.2s ease;
-    --transition-normal: 0.3s ease;
-    --transition-slow: 0.5s ease;
-    --transition-bounce: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Liquid Animations - Optimized for performance */
+    --transition-liquid: 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    --transition-morph: 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --transition-glass: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --transition-float: 0.4s ease-out;
+    --transition-fast: 0.2s ease-out;
     
     /* Скругления углов */
     --radius-sm: 5px;
@@ -95,19 +104,17 @@ const GlobalStyles = createGlobalStyle`
   html {
     scroll-behavior: smooth;
     overflow-x: hidden;
+    overflow-y: auto;
     font-size: 16px;
-    
+
     @media (prefers-reduced-motion: reduce) {
       scroll-behavior: auto; /* Улучшение доступности */
     }
-    
+
     /* Явно задаем предпочтительные версии рендеринга */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    
-    /* Упрощаем обработку touch-событий */
-    touch-action: manipulation;
   }
   
   /* Класс для сильного снижения анимации на слабых устройствах */
@@ -142,32 +149,32 @@ const GlobalStyles = createGlobalStyle`
     }
   }
   
-  /* Задаем основной фон и цвет текста */
+  /* Liquid Glass Body Styling */
   body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
     font-weight: 400;
     line-height: 1.6;
-    background-color: var(--color-background);
+    background: #050208;
     color: var(--color-text);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
-    
-    /* Задаем минимальную высоту для предотвращения CLS при загрузке */
+    overflow-y: auto;
+    position: relative;
     min-height: 100vh;
-    
+
     /* Оптимизируем скроллбар */
     &::-webkit-scrollbar {
       width: 6px;
       height: 6px;
     }
-    
+
     &::-webkit-scrollbar-track {
-      background: var(--color-surface);
+      background: #0a0015;
     }
-    
+
     &::-webkit-scrollbar-thumb {
-      background: var(--color-primary);
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
       border-radius: 3px;
     }
   }
@@ -182,16 +189,17 @@ const GlobalStyles = createGlobalStyle`
     flex-direction: column;
   }
 
-  /* Стили для заголовков */
+  /* Стили для заголовков - iOS 26 style */
   h1, h2, h3, h4, h5, h6 {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
     font-weight: 700;
     background: var(--gradient-text);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     color: transparent;
-    line-height: 1.3;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
   }
 
   /* Стили для различных заголовков */
@@ -353,6 +361,126 @@ const GlobalStyles = createGlobalStyle`
     background: var(--gradient-primary);
     margin: 0 auto;
     transform: translateY(-50%);
+  }
+
+  /* Liquid Glass Animations - GPU Optimized */
+  @keyframes liquidFlow {
+    0%, 100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    33% {
+      transform: translate3d(30px, -20px, 0) scale(1.05);
+    }
+    66% {
+      transform: translate3d(-20px, 30px, 0) scale(0.95);
+    }
+  }
+
+  @keyframes liquidMorph {
+    0%, 100% {
+      border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    }
+    50% {
+      border-radius: 40% 60% 60% 40% / 40% 60% 40% 60%;
+    }
+  }
+
+  @keyframes liquidShimmer {
+    0% {
+      transform: translateX(-100%) rotate(45deg);
+    }
+    100% {
+      transform: translateX(200%) rotate(45deg);
+    }
+  }
+
+  @keyframes liquidPulse {
+    0%, 100% {
+      opacity: 0.3;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(1.02);
+    }
+  }
+
+  @keyframes liquidFloat {
+    0%, 100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(0, -15px, 0);
+    }
+  }
+
+  /* Liquid Glass Utility Classes - Optimized */
+  .liquid-glass {
+    background: var(--gradient-glass);
+    backdrop-filter: var(--liquid-blur);
+    -webkit-backdrop-filter: var(--liquid-blur);
+    border: var(--liquid-border);
+    box-shadow: var(--liquid-shadow);
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+    contain: layout style paint;
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+
+    /* Surface highlight */
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 100%);
+      border-radius: 24px 24px 0 0;
+      pointer-events: none;
+    }
+
+    &:hover {
+      transform: translate3d(0, -4px, 0);
+      box-shadow: var(--liquid-shadow-elevated);
+    }
+  }
+
+  .liquid-glass-elevated {
+    background: var(--gradient-glass-strong);
+    backdrop-filter: var(--liquid-blur-heavy);
+    -webkit-backdrop-filter: var(--liquid-blur-heavy);
+    border: var(--liquid-border);
+    box-shadow: var(--liquid-shadow-elevated);
+    border-radius: 28px;
+    position: relative;
+    overflow: hidden;
+    contain: layout style paint;
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .liquid-morphing {
+    animation: liquidMorph 12s ease-in-out infinite;
+    will-change: border-radius;
+  }
+
+  .liquid-floating {
+    animation: liquidFloat 8s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  /* Performance utility */
+  .gpu-accelerated {
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+
+  /* Pause animations when not visible */
+  .pause-animations * {
+    animation-play-state: paused !important;
   }
 `;
 

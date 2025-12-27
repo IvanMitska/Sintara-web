@@ -6,7 +6,7 @@
   --gradient-secondary: linear-gradient(135deg, #3A1C71 0%, #D76D77 100%);
   --gradient-card: linear-gradient(135deg, rgba(58, 28, 113, 0.6) 0%, rgba(215, 109, 119, 0.6) 100%);
   --gradient-hover: linear-gradient(135deg, #3A1C71 0%, #D76D77 50%, #FFAF7B 100%);
-  --gradient-text: linear-gradient(135deg, #D76D77 0%, #FFAF7B 100%);
+  --gradient-text: linear-gradient(135deg, #E85D75 0%, #FFB84D 100%);
   --gradient-subtle: linear-gradient(135deg, rgba(215, 109, 119, 0.05) 0%, rgba(58, 28, 113, 0.05) 100%);
   --gradient-background: radial-gradient(ellipse at top, rgba(215, 109, 119, 0.15) 0%, transparent 60%),
                          radial-gradient(ellipse at bottom, rgba(58, 28, 113, 0.15) 0%, transparent 60%);
@@ -68,6 +68,7 @@ body {
   background-color: #000 !important;
   min-height: 100vh;
   overflow-x: hidden;
+  overflow-y: auto;
 }
 
 #root {
@@ -96,12 +97,6 @@ body {
 
 /* Оптимизация для мобильных устройств */
 @media (max-width: 768px) {
-  * {
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    perspective: 1000px;
-  }
-
   .reduce-motion * {
     will-change: auto !important;
   }
@@ -110,7 +105,8 @@ body {
 /* Предотвращение мерцания при скролле */
 body {
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior: none;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: auto;
 }
 
 /* Исправление для styled-components */

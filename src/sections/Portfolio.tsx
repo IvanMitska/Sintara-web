@@ -1,470 +1,495 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, memo } from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaGlobe, FaRobot, FaExternalLinkAlt, FaArrowRight, FaMobileAlt, FaLaptopCode } from 'react-icons/fa';
 
 const PortfolioSection = styled.section`
-  padding: 8rem 0;
-  background: var(--gradient-background), #0a0a0a;
+  padding: 100px 0;
+  background: transparent;
   position: relative;
   overflow: hidden;
 `;
 
 const Container = styled.div`
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 40px;
+
+  @media (max-width: 768px) {
+    padding: 0 20px;
+  }
 `;
 
 const SectionHeader = styled.div`
   text-align: center;
-  margin-bottom: 5rem;
+  margin-bottom: 60px;
 `;
 
-const SectionTitle = styled.h2`
-  background: var(--gradient-text);
+const Title = styled(motion.h2)`
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(3rem, 7vw, 5rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  color: transparent;
-  font-size: clamp(2rem, 5vw, 3rem);
-  margin-bottom: 1.5rem;
-  position: relative;
-  display: inline-block;
-
-  &::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: -10px;
-    width: 80px;
-    height: 4px;
-    background: var(--gradient-secondary);
-  }
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin: 0 0 20px;
 `;
 
-const SectionDescription = styled.p`
-  font-size: clamp(1rem, 2vw, 1.1rem);
-  max-width: 600px;
+const Subtitle = styled(motion.p)`
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.5);
+  max-width: 500px;
   margin: 0 auto;
-  color: #a0a0a0;
   line-height: 1.6;
 `;
 
-const FilterContainer = styled.div`
+const FilterContainer = styled(motion.div)`
   display: flex;
   justify-content: center;
-  margin-bottom: 3rem;
+  gap: 12px;
+  margin-bottom: 50px;
   flex-wrap: wrap;
-  gap: 1rem;
 `;
 
-const FilterButton = styled.button<{ active: boolean }>`
-  background: ${props => props.active ? 'var(--gradient-button)' : 'transparent'};
-  color: ${props => props.active ? 'white !important' : '#a0a0a0'};
-  border: ${props => props.active ? 'none' : '1px solid #333'};
-  padding: 0.6rem 1.2rem;
-  border-radius: 5px;
-  font-weight: 600;
+const FilterButton = styled.button<{ $active: boolean }>`
+  background: ${props => props.$active
+    ? 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)'
+    : 'rgba(255, 255, 255, 0.03)'};
+  color: ${props => props.$active ? '#ffffff' : 'rgba(255, 255, 255, 0.6)'};
+  border: 1px solid ${props => props.$active
+    ? 'rgba(124, 58, 237, 0.5)'
+    : 'rgba(255, 255, 255, 0.1)'};
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
   cursor: pointer;
-  box-shadow: ${props => props.active ? '0 4px 12px rgba(0, 0, 0, 0.15)' : 'none'};
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 
-  span {
-    color: ${props => props.active ? 'white !important' : 'inherit'};
-
-    svg {
-      color: ${props => props.active ? 'white !important' : 'inherit'};
-    }
+  svg {
+    font-size: 14px;
   }
 
   &:hover {
-    color: ${props => props.active ? 'white !important' : '#a0a0a0'};
-    transform: ${props => props.active ? 'translateY(-2px) scale(1.02)' : 'translateY(-1px)'};
-    box-shadow: ${props => props.active ? '0 8px 20px rgba(0, 0, 0, 0.2)' : '0 4px 12px rgba(0, 0, 0, 0.15)'};
-    filter: ${props => props.active ? 'brightness(1.1)' : 'brightness(1.2)'};
-    background: ${props => props.active ? 'var(--gradient-button)' : 'var(--gradient-subtle)'};
-    border-color: ${props => props.active ? 'transparent' : '#D76D77'};
+    background: ${props => props.$active
+      ? 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'
+      : 'rgba(124, 58, 237, 0.15)'};
+    border-color: rgba(124, 58, 237, 0.4);
+    color: #ffffff;
+    transform: translateY(-2px);
   }
 `;
 
-const ProjectsGrid = styled.div`
+const ProjectsGrid = styled(motion.div)`
   display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 2rem;
-  position: relative;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
 
-  @media (min-width: 576px) {
+  @media (max-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  @media (min-width: 992px) {
-    grid-template-columns: repeat(3, 1fr);
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
   }
 `;
 
-const ProjectCard = styled.div`
-  background-color: #111;
-  border-radius: 10px;
+const ProjectCard = styled(motion.div)`
+  background: linear-gradient(135deg, rgba(20, 10, 40, 0.8) 0%, rgba(10, 5, 20, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+  cursor: pointer;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  opacity: 1;
-  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.5), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
   }
 
   &:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    transform: translateY(-8px);
+    border-color: rgba(124, 58, 237, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 60px rgba(124, 58, 237, 0.1);
 
-    .project-image {
-      transform: scale(1.05);
-    }
-
-    .overlay {
+    &::before {
       opacity: 1;
     }
   }
 `;
 
-const ProjectImageContainer = styled.div`
+const ProjectImageWrapper = styled.div`
   position: relative;
   width: 100%;
-  height: 250px;
+  height: 200px;
   overflow: hidden;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(168, 85, 247, 0.05) 100%);
 `;
 
-const ProjectImage = styled.div<{ imageUrl: string }>`
+const ProjectImage = styled.div<{ $imageUrl: string }>`
   width: 100%;
   height: 100%;
-  background-image: url(${props => props.imageUrl});
+  background-image: url(${props => props.$imageUrl});
   background-size: cover;
   background-position: center;
   transition: transform 0.5s ease;
+
+  ${ProjectCard}:hover & {
+    transform: scale(1.05);
+  }
+`;
+
+const ProjectPlaceholder = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(20, 10, 40, 0.9) 100%);
+
+  svg {
+    font-size: 48px;
+    color: rgba(124, 58, 237, 0.4);
+    transition: all 0.3s ease;
+  }
+
+  ${ProjectCard}:hover & svg {
+    color: rgba(124, 58, 237, 0.6);
+    transform: scale(1.1);
+  }
 `;
 
 const ProjectOverlay = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to top, rgba(10, 5, 20, 0.95) 0%, transparent 100%);
   display: flex;
   align-items: flex-end;
-  justify-content: flex-start;
-  padding: 1.5rem;
+  padding: 20px;
   opacity: 0;
   transition: opacity 0.3s ease;
+
+  ${ProjectCard}:hover & {
+    opacity: 1;
+  }
 `;
 
-const ProjectInfo = styled.div`
-  padding: 1.5rem;
+const ViewProjectButton = styled.span`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #a78bfa;
+  font-size: 0.9rem;
+  font-weight: 500;
+
+  svg {
+    transition: transform 0.3s ease;
+  }
+
+  ${ProjectCard}:hover & svg {
+    transform: translateX(4px);
+  }
 `;
 
-const ProjectCategory = styled.p`
+const ProjectContent = styled.div`
+  padding: 24px;
+`;
+
+const ProjectCategory = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.8rem;
-  text-transform: uppercase;
-  color: #D76D77;
-  margin-bottom: 0.5rem;
   font-weight: 600;
+  color: #a78bfa;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+
+  svg {
+    font-size: 12px;
+  }
 `;
 
 const ProjectTitle = styled.h3`
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 1.25rem;
-  color: #fff;
-  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 10px;
+  letter-spacing: -0.01em;
 `;
 
 const ProjectDescription = styled.p`
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 0.9rem;
-  color: #a0a0a0;
-  margin-bottom: 1.5rem;
+  color: rgba(255, 255, 255, 0.5);
   line-height: 1.6;
+  margin: 0;
 `;
 
-const ProjectLink = styled.a`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #D76D77;
-  font-weight: 600;
-  font-size: 0.9rem;
-  transition: color 0.3s ease;
-  
-  &:hover {
-    color: #FFAF7B;
-  }
-  
-  &::after {
-    content: '→';
-    transition: transform 0.3s ease;
-  }
-  
-  &:hover::after {
-    transform: translateX(5px);
-  }
+const TechStack = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
 `;
 
-const ViewAllContainer = styled.div`
+const TechBadge = styled.span`
+  background: rgba(124, 58, 237, 0.1);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 500;
+`;
+
+const CTAContainer = styled(motion.div)`
   display: flex;
   justify-content: center;
-  margin-top: 4rem;
+  margin-top: 60px;
 `;
 
-const ViewAllButton = styled.a`
-  display: inline-block;
-  background: var(--gradient-button);
-  border: none;
-  color: white !important;
-  padding: 0.9rem 2.5rem;
-  border-radius: 5px;
-  font-weight: 700;
+const CTAButton = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  color: white;
+  padding: 16px 32px;
+  border-radius: 14px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 1rem;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
+  font-weight: 500;
   text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
 
-  span {
-    color: white !important;
-
-    svg {
-      color: white !important;
-    }
+  svg {
+    transition: transform 0.3s ease;
   }
 
   &:hover {
-    color: white !important;
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    filter: brightness(1.1);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(124, 58, 237, 0.4);
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+
+    svg {
+      transform: translateX(4px);
+    }
   }
 `;
 
 type Project = {
   id: number;
+  slug: string;
   title: string;
-  category: string;
+  category: 'website' | 'bot';
   description: string;
   imageUrl: string;
-  link: string;
+  tech: string[];
 };
 
-const Portfolio: React.FC = () => {
-  const [activeFilter, setActiveFilter] = useState<string>('all');
-  const sectionRef = useRef<HTMLElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const filterRef = useRef<HTMLDivElement>(null);
-  const projectsRef = useRef<HTMLDivElement>(null);
-  const ctaRef = useRef<HTMLDivElement>(null);
+const projects: Project[] = [
+  {
+    id: 1,
+    slug: 'ecommerce-platform',
+    title: 'E-commerce Platform',
+    category: 'website',
+    description: 'Full-featured online store with payment integration and inventory management.',
+    imageUrl: '',
+    tech: ['React', 'Node.js', 'Stripe'],
+  },
+  {
+    id: 2,
+    slug: 'booking-bot',
+    title: 'Restaurant Bot',
+    category: 'bot',
+    description: 'Telegram bot for ordering food and table reservations with admin panel.',
+    imageUrl: '',
+    tech: ['Python', 'Telegram API', 'PostgreSQL'],
+  },
+  {
+    id: 3,
+    slug: 'saas-dashboard',
+    title: 'SaaS Dashboard',
+    category: 'website',
+    description: 'Analytics dashboard with real-time data visualization and reporting.',
+    imageUrl: '',
+    tech: ['Next.js', 'TypeScript', 'D3.js'],
+  },
+  {
+    id: 4,
+    slug: 'learning-bot',
+    title: 'Learning Platform Bot',
+    category: 'bot',
+    description: 'Educational bot with courses, quizzes, and progress tracking.',
+    imageUrl: '',
+    tech: ['Node.js', 'MongoDB', 'Telegram API'],
+  },
+  {
+    id: 5,
+    slug: 'corporate-website',
+    title: 'Corporate Website',
+    category: 'website',
+    description: 'Modern corporate website with CMS integration and multilingual support.',
+    imageUrl: '',
+    tech: ['React', 'Sanity CMS', 'i18n'],
+  },
+  {
+    id: 6,
+    slug: 'delivery-app',
+    title: 'Delivery Service Bot',
+    category: 'bot',
+    description: 'Complete delivery management system with driver tracking and notifications.',
+    imageUrl: '',
+    tech: ['Python', 'Redis', 'Google Maps API'],
+  },
+];
 
-  useEffect(() => {
-    const section = sectionRef.current;
-    const header = headerRef.current;
-    const filter = filterRef.current;
-    const projects = projectsRef.current;
-    const cta = ctaRef.current;
-
-    if (section && header && filter && projects && cta) {
-      // Анимация заголовка (только при первой загрузке)
-      gsap.fromTo(
-        header,
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          scrollTrigger: {
-            trigger: section,
-            start: 'top 80%',
-            toggleActions: 'play none none none',
-          },
-        }
-      );
-
-      // Анимация фильтров (только при первой загрузке)
-      gsap.fromTo(
-        filter,
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          delay: 0.3,
-          scrollTrigger: {
-            trigger: section,
-            start: 'top 80%',
-            toggleActions: 'play none none none',
-          },
-        }
-      );
-
-      // Анимация проектов (только при первой загрузке)
-      gsap.fromTo(
-        projects.children,
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          stagger: 0.1,
-          scrollTrigger: {
-            trigger: projects,
-            start: 'top 90%',
-            toggleActions: 'play none none none',
-          },
-        }
-      );
-
-      // Анимация кнопки "Все проекты" (только при первой загрузке)
-      gsap.fromTo(
-        cta,
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          scrollTrigger: {
-            trigger: cta,
-            start: 'top 95%',
-            toggleActions: 'play none none none',
-          },
-        }
-      );
-    }
-  }, []); // Убираем зависимость от activeFilter
-
-  const projects: Project[] = [
-    {
-      id: 1,
-      title: 'Корпоративный сайт',
-      category: 'website',
-      description: 'Современный корпоративный сайт для компании в сфере IT-услуг.',
-      imageUrl: '/icons/placeholder.svg',
-      link: '#',
-    },
-    {
-      id: 2,
-      title: 'Интернет-магазин',
-      category: 'website',
-      description: 'Многофункциональный интернет-магазин с интеграцией платежных систем.',
-      imageUrl: '/icons/placeholder.svg',
-      link: '#',
-    },
-    {
-      id: 3,
-      title: 'Бот для ресторана',
-      category: 'bot',
-      description: 'Telegram-бот для заказа блюд и бронирования столиков в ресторане.',
-      imageUrl: '/icons/placeholder.svg',
-      link: '#',
-    },
-    {
-      id: 4,
-      title: 'Лендинг для продукта',
-      category: 'website',
-      description: 'Высококонверсионный лендинг для нового IT-продукта.',
-      imageUrl: '/icons/placeholder.svg',
-      link: '#',
-    },
-    {
-      id: 5,
-      title: 'Бот для онлайн-школы',
-      category: 'bot',
-      description: 'Telegram-бот с личным кабинетом для учеников онлайн-школы.',
-      imageUrl: '/icons/placeholder.svg',
-      link: '#',
-    },
-    {
-      id: 6,
-      title: 'Сервис доставки',
-      category: 'bot',
-      description: 'Веб-приложение и Telegram-бот для службы доставки.',
-      imageUrl: '/icons/placeholder.svg',
-      link: '#',
-    },
-  ];
+const Portfolio: React.FC = memo(() => {
+  const [activeFilter, setActiveFilter] = useState<'all' | 'website' | 'bot'>('all');
 
   const filteredProjects = activeFilter === 'all'
     ? projects
     : projects.filter(project => project.category === activeFilter);
 
   return (
-    <PortfolioSection id="portfolio" ref={sectionRef}>
+    <PortfolioSection id="portfolio">
       <Container>
-        <SectionHeader ref={headerRef}>
-          <SectionTitle>Наши работы</SectionTitle>
-          <SectionDescription>
-            Примеры реализованных проектов — сайтов и Telegram-ботов для различных бизнесов
-          </SectionDescription>
+        <SectionHeader>
+          <Title
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            Our work
+          </Title>
+          <Subtitle
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            Selected projects showcasing our expertise in web development and automation
+          </Subtitle>
         </SectionHeader>
 
-        <FilterContainer ref={filterRef}>
-          <FilterButton 
-            active={activeFilter === 'all'} 
+        <FilterContainer
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <FilterButton
+            $active={activeFilter === 'all'}
             onClick={() => setActiveFilter('all')}
           >
-            Все проекты
+            All Projects
           </FilterButton>
-          <FilterButton 
-            active={activeFilter === 'website'} 
+          <FilterButton
+            $active={activeFilter === 'website'}
             onClick={() => setActiveFilter('website')}
           >
-            Сайты
+            <FaGlobe /> Websites
           </FilterButton>
-          <FilterButton 
-            active={activeFilter === 'bot'} 
+          <FilterButton
+            $active={activeFilter === 'bot'}
             onClick={() => setActiveFilter('bot')}
           >
-            Telegram-боты
+            <FaRobot /> Telegram Bots
           </FilterButton>
         </FilterContainer>
 
-        <ProjectsGrid ref={projectsRef} key={activeFilter}>
-          {filteredProjects.map(project => (
-            <ProjectCard key={project.id}>
-              <ProjectImageContainer>
-                <ProjectImage 
-                  className="project-image" 
-                  imageUrl={project.imageUrl} 
-                />
-                <ProjectOverlay className="overlay">
-                  <ProjectLink href={project.link}>Подробнее</ProjectLink>
-                </ProjectOverlay>
-              </ProjectImageContainer>
-              <ProjectInfo>
-                <ProjectCategory>
-                  {project.category === 'website' ? 'Сайт' : 'Telegram-бот'}
-                </ProjectCategory>
-                <ProjectTitle>{project.title}</ProjectTitle>
-                <ProjectDescription>{project.description}</ProjectDescription>
-                <ProjectLink href={project.link}>Смотреть проект</ProjectLink>
-              </ProjectInfo>
-            </ProjectCard>
-          ))}
+        <ProjectsGrid layout>
+          <AnimatePresence mode="popLayout">
+            {filteredProjects.map((project, index) => (
+              <Link
+                key={project.id}
+                to={`/project/${project.slug}`}
+                style={{ textDecoration: 'none' }}
+              >
+                <ProjectCard
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.4, delay: index * 0.05 }}
+                >
+                  <ProjectImageWrapper>
+                    {project.imageUrl ? (
+                      <ProjectImage $imageUrl={project.imageUrl} />
+                    ) : (
+                      <ProjectPlaceholder>
+                        {project.category === 'website' ? <FaGlobe /> : <FaRobot />}
+                      </ProjectPlaceholder>
+                    )}
+                    <ProjectOverlay>
+                      <ViewProjectButton>
+                        View Project <FaArrowRight />
+                      </ViewProjectButton>
+                    </ProjectOverlay>
+                  </ProjectImageWrapper>
+
+                  <ProjectContent>
+                    <ProjectCategory>
+                      {project.category === 'website' ? (
+                        <><FaGlobe /> Website</>
+                      ) : (
+                        <><FaRobot /> Telegram Bot</>
+                      )}
+                    </ProjectCategory>
+                    <ProjectTitle>{project.title}</ProjectTitle>
+                    <ProjectDescription>{project.description}</ProjectDescription>
+                    <TechStack>
+                      {project.tech.map((tech, i) => (
+                        <TechBadge key={i}>{tech}</TechBadge>
+                      ))}
+                    </TechStack>
+                  </ProjectContent>
+                </ProjectCard>
+              </Link>
+            ))}
+          </AnimatePresence>
         </ProjectsGrid>
 
-        <ViewAllContainer ref={ctaRef}>
-          <ViewAllButton href="#contact">Заказать похожий проект</ViewAllButton>
-        </ViewAllContainer>
+        <CTAContainer
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          <CTAButton href="#contact">
+            Start your project <FaArrowRight />
+          </CTAButton>
+        </CTAContainer>
       </Container>
     </PortfolioSection>
   );
-};
+});
 
-export default Portfolio; 
+Portfolio.displayName = 'Portfolio';
+
+export default Portfolio;
