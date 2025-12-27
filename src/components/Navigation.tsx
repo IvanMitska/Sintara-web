@@ -134,6 +134,7 @@ const CTAButton = styled.a`
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+    color: white;
   }
 
   @media (max-width: 768px) {
