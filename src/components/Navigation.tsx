@@ -4,8 +4,9 @@ import styled from 'styled-components';
 const NavContainer = styled.nav<{ $isScrolled: boolean }>`
   position: fixed;
   top: ${props => props.$isScrolled ? '12px' : '20px'};
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  margin: 0 auto;
   width: ${props => props.$isScrolled ? '95%' : '90%'};
   max-width: 1200px;
   display: flex;
@@ -23,9 +24,8 @@ const NavContainer = styled.nav<{ $isScrolled: boolean }>`
 
   @media (max-width: 768px) {
     width: calc(100% - 24px);
-    padding: 12px 20px;
-    left: 50%;
-    transform: translateX(-50%);
+    padding: 12px 16px;
+    top: 12px;
   }
 `;
 
