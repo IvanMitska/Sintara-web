@@ -95,7 +95,7 @@ const Card = styled.div<{ $offset: number; $isActive: boolean }>`
   border-radius: 24px;
   padding: 32px;
   cursor: pointer;
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.6s cubic-bezier(0.33, 1, 0.68, 1);
   transform-style: preserve-3d;
   backface-visibility: hidden;
 
@@ -143,47 +143,38 @@ const MobileCarousel = styled.div`
     position: relative;
     overflow: hidden;
     width: 100%;
-    perspective: 1000px;
   }
 `;
 
 const MobileTrack = styled.div<{ $activeIndex: number }>`
   display: flex;
-  transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
   transform: translateX(calc(-${props => props.$activeIndex} * 100%));
+  transition: transform 0.4s ease-out;
+  will-change: transform;
 `;
 
-const MobileCard = styled.div<{ $isActive: boolean; $offset: number }>`
+const MobileCard = styled.div<{ $isActive: boolean }>`
   flex: 0 0 100%;
   width: 100%;
-  min-height: 320px;
   padding: 0 20px;
   box-sizing: border-box;
-  transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.5s ease;
-  transform-style: preserve-3d;
-
-  transform: ${props => {
-    if (props.$isActive) return 'scale(1) rotateY(0deg)';
-    if (props.$offset === -1) return 'scale(0.9) rotateY(5deg)';
-    if (props.$offset === 1) return 'scale(0.9) rotateY(-5deg)';
-    return 'scale(0.85)';
-  }};
-  opacity: ${props => props.$isActive ? 1 : 0.5};
+  transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+  transform: ${props => props.$isActive ? 'scale(1)' : 'scale(0.92)'};
+  opacity: ${props => props.$isActive ? 1 : 0.4};
 `;
 
 const MobileCardInner = styled.div<{ $isActive: boolean }>`
   background: linear-gradient(145deg, rgba(30, 20, 60, 0.95), rgba(20, 10, 45, 0.95));
-  border: 1px solid ${props => props.$isActive
-    ? 'rgba(124, 58, 237, 0.5)'
-    : 'rgba(124, 58, 237, 0.2)'};
+  border: 2px solid ${props => props.$isActive
+    ? 'rgba(124, 58, 237, 0.6)'
+    : 'rgba(124, 58, 237, 0.15)'};
   border-radius: 24px;
-  padding: 28px;
-  height: 100%;
-  transition: all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+  padding: 24px;
+  min-height: 300px;
+  transition: border-color 0.4s ease-out, box-shadow 0.4s ease-out;
   box-shadow: ${props => props.$isActive
-    ? '0 25px 80px rgba(124, 58, 237, 0.35), 0 0 0 1px rgba(124, 58, 237, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
-    : '0 10px 30px rgba(0, 0, 0, 0.3)'};
-  transform: ${props => props.$isActive ? 'translateZ(20px)' : 'translateZ(0)'};
+    ? '0 20px 60px rgba(124, 58, 237, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+    : '0 8px 24px rgba(0, 0, 0, 0.2)'};
 `;
 
 const MobileNavigation = styled.div`
@@ -622,21 +613,20 @@ const WorkProcess: React.FC = memo(() => {
           <MobileTrack $activeIndex={activeIndex}>
             {steps.map((step, index) => {
               const isActive = index === activeIndex;
-              const offset = index - activeIndex;
 
               return (
-                <MobileCard key={index} $isActive={isActive} $offset={offset}>
+                <MobileCard key={index} $isActive={isActive}>
                   <MobileCardInner $isActive={isActive}>
                     <CardInner>
                       <StepIndicator>
-                        <StepNumber $isActive={isActive}>{step.number}</StepNumber>
-                        <StepBadge $isActive={isActive}>{step.badge}</StepBadge>
+                        <StepNumber $isActive={true}>{step.number}</StepNumber>
+                        <StepBadge $isActive={true}>{step.badge}</StepBadge>
                       </StepIndicator>
-                      <StepTitle $isActive={isActive}>{step.title}</StepTitle>
-                      <StepDescription $isActive={isActive}>
+                      <StepTitle $isActive={true}>{step.title}</StepTitle>
+                      <StepDescription $isActive={true}>
                         {step.description}
                       </StepDescription>
-                      <StepDuration $isActive={isActive}>
+                      <StepDuration $isActive={true}>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <circle cx="12" cy="12" r="10" />
                           <polyline points="12 6 12 12 16 14" />
