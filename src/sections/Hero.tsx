@@ -191,77 +191,6 @@ const CTAButton = styled.a`
   }
 `;
 
-const TrustIndicators = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 32px;
-  margin-top: 16px;
-  flex-wrap: wrap;
-
-  @media (max-width: 768px) {
-    gap: 20px;
-  }
-`;
-
-const TrustItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.4);
-
-  svg {
-    width: 16px;
-    height: 16px;
-    color: #22c55e;
-  }
-`;
-
-const ScrollIndicator = styled.div`
-  position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  animation: ${fadeInUp} 0.8s ease-out 0.5s both;
-
-  @media (max-width: 768px) {
-    bottom: 20px;
-  }
-`;
-
-const ScrollText = styled.span`
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.3);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-`;
-
-const scrollBounce = keyframes`
-  0%, 100% {
-    transform: translateY(0);
-    opacity: 0.5;
-  }
-  50% {
-    transform: translateY(8px);
-    opacity: 1;
-  }
-`;
-
-const ScrollArrow = styled.div`
-  width: 24px;
-  height: 24px;
-  border-right: 2px solid rgba(255, 255, 255, 0.3);
-  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
-  transform: rotate(45deg);
-  animation: ${scrollBounce} 2s ease-in-out infinite;
-`;
 
 const Hero: React.FC = memo(() => {
   return (
@@ -288,34 +217,8 @@ const Hero: React.FC = memo(() => {
           <CTAButton href="#contact">
             Обсудить проект
           </CTAButton>
-
-          <TrustIndicators>
-            <TrustItem>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              50+ проектов
-            </TrustItem>
-            <TrustItem>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              100% в срок
-            </TrustItem>
-            <TrustItem>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              NDA по запросу
-            </TrustItem>
-          </TrustIndicators>
         </CTAContainer>
       </Container>
-
-      <ScrollIndicator>
-        <ScrollText>Scroll</ScrollText>
-        <ScrollArrow />
-      </ScrollIndicator>
     </HeroSection>
   );
 });
