@@ -1,10 +1,29 @@
-import React, { memo, useMemo, useEffect, useState } from 'react';
-import styled, { keyframes, css } from 'styled-components';
+import React, { memo, useEffect, useState } from 'react';
+import styled, { keyframes } from 'styled-components';
 
-// Animations - simplified
+// Animations
 const twinkle = keyframes`
   0%, 100% { opacity: 0.4; }
   50% { opacity: 1; }
+`;
+
+// Slow falling animation - GPU accelerated with transform
+const fallingSlow = keyframes`
+  0% {
+    transform: translateY(-50%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
+`;
+
+const fallingMedium = keyframes`
+  0% {
+    transform: translateY(-50%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
 `;
 
 const StarFieldContainer = styled.div`
@@ -65,7 +84,87 @@ const MilkyWay = styled.div`
   }
 `;
 
-// Static stars layer using CSS background - much more performant
+// Moving stars layer 1 - slow (200% height for seamless loop)
+const MovingStarsLayer1 = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 200%;
+  animation: ${fallingSlow} 120s linear infinite;
+  will-change: transform;
+  background-image:
+    radial-gradient(1px 1px at 10% 5%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 25% 15%, rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 40% 8%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 55% 22%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 70% 12%, rgba(200,220,255,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 85% 18%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 15% 35%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 30% 42%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 45% 38%, rgba(255,240,220,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 60% 45%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 75% 32%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 90% 48%, rgba(220,200,255,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 5% 55%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 20% 62%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 35% 58%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 50% 65%, rgba(200,200,255,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 65% 52%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 80% 68%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 95% 72%, rgba(255,240,220,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 12% 78%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 28% 85%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 42% 82%, rgba(220,200,255,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 58% 88%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 72% 92%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 88% 95%, rgba(255,255,255,0.6) 0%, transparent 100%);
+
+  @media (max-width: 768px) {
+    animation-duration: 180s;
+  }
+`;
+
+// Moving stars layer 2 - medium speed (creates parallax)
+const MovingStarsLayer2 = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 200%;
+  animation: ${fallingMedium} 80s linear infinite;
+  will-change: transform;
+  background-image:
+    radial-gradient(1.5px 1.5px at 8% 3%, rgba(255,255,255,0.9) 0%, transparent 100%),
+    radial-gradient(2px 2px at 22% 12%, rgba(200,220,255,0.95) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 38% 8%, rgba(255,255,255,0.85) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 52% 18%, rgba(255,240,220,0.9) 0%, transparent 100%),
+    radial-gradient(2px 2px at 68% 6%, rgba(255,255,255,0.95) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 82% 15%, rgba(220,200,255,0.85) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 18% 28%, rgba(255,255,255,0.9) 0%, transparent 100%),
+    radial-gradient(2px 2px at 32% 35%, rgba(255,255,255,0.95) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 48% 32%, rgba(200,220,255,0.85) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 62% 42%, rgba(255,255,255,0.9) 0%, transparent 100%),
+    radial-gradient(2px 2px at 78% 38%, rgba(255,240,220,0.95) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 92% 45%, rgba(255,255,255,0.85) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 5% 58%, rgba(220,200,255,0.9) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 28% 52%, rgba(255,255,255,0.85) 0%, transparent 100%),
+    radial-gradient(2px 2px at 42% 62%, rgba(255,255,255,0.95) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 58% 55%, rgba(200,220,255,0.9) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 72% 68%, rgba(255,255,255,0.85) 0%, transparent 100%),
+    radial-gradient(2px 2px at 88% 72%, rgba(255,240,220,0.95) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 15% 82%, rgba(255,255,255,0.9) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 35% 78%, rgba(220,200,255,0.85) 0%, transparent 100%),
+    radial-gradient(2px 2px at 55% 85%, rgba(255,255,255,0.95) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 75% 92%, rgba(255,255,255,0.9) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 95% 88%, rgba(200,220,255,0.85) 0%, transparent 100%);
+
+  @media (max-width: 768px) {
+    animation-duration: 120s;
+  }
+`;
+
+// Static stars layer for depth (no animation)
 const StaticStarsLayer = styled.div`
   position: absolute;
   top: 0;
@@ -73,69 +172,27 @@ const StaticStarsLayer = styled.div`
   width: 100%;
   height: 100%;
   background-image:
-    radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.8) 0%, transparent 100%),
-    radial-gradient(1px 1px at 20% 35%, rgba(255,255,255,0.6) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 30% 10%, rgba(255,255,255,0.7) 0%, transparent 100%),
-    radial-gradient(1px 1px at 40% 60%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(1px 1px at 50% 25%, rgba(255,255,255,0.6) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 60% 80%, rgba(255,255,255,0.7) 0%, transparent 100%),
-    radial-gradient(1px 1px at 70% 45%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(1px 1px at 80% 70%, rgba(255,255,255,0.6) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 90% 20%, rgba(255,255,255,0.8) 0%, transparent 100%),
-    radial-gradient(1px 1px at 15% 85%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(1px 1px at 25% 55%, rgba(255,255,255,0.6) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 35% 90%, rgba(255,255,255,0.7) 0%, transparent 100%),
-    radial-gradient(1px 1px at 45% 5%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(1px 1px at 55% 40%, rgba(255,255,255,0.6) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 65% 95%, rgba(255,255,255,0.7) 0%, transparent 100%),
-    radial-gradient(1px 1px at 75% 30%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(1px 1px at 85% 50%, rgba(255,255,255,0.6) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 95% 75%, rgba(255,255,255,0.8) 0%, transparent 100%),
-    radial-gradient(1px 1px at 5% 65%, rgba(200,200,255,0.5) 0%, transparent 100%),
-    radial-gradient(1px 1px at 12% 42%, rgba(255,255,255,0.6) 0%, transparent 100%),
-    radial-gradient(1px 1px at 22% 78%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 32% 28%, rgba(200,220,255,0.7) 0%, transparent 100%),
-    radial-gradient(1px 1px at 42% 92%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(1px 1px at 52% 18%, rgba(255,255,255,0.6) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 62% 58%, rgba(255,240,220,0.7) 0%, transparent 100%),
-    radial-gradient(1px 1px at 72% 82%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(1px 1px at 82% 12%, rgba(255,255,255,0.6) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 92% 48%, rgba(220,200,255,0.8) 0%, transparent 100%),
-    radial-gradient(1px 1px at 8% 32%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(1px 1px at 18% 68%, rgba(255,255,255,0.6) 0%, transparent 100%);
+    radial-gradient(0.5px 0.5px at 10% 15%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(0.5px 0.5px at 20% 35%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(0.5px 0.5px at 30% 10%, rgba(255,255,255,0.35) 0%, transparent 100%),
+    radial-gradient(0.5px 0.5px at 40% 60%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(0.5px 0.5px at 50% 25%, rgba(255,255,255,0.35) 0%, transparent 100%),
+    radial-gradient(0.5px 0.5px at 60% 80%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(0.5px 0.5px at 70% 45%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(0.5px 0.5px at 80% 70%, rgba(255,255,255,0.35) 0%, transparent 100%),
+    radial-gradient(0.5px 0.5px at 90% 20%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(0.5px 0.5px at 15% 85%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(0.5px 0.5px at 25% 55%, rgba(255,255,255,0.35) 0%, transparent 100%),
+    radial-gradient(0.5px 0.5px at 35% 90%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(0.5px 0.5px at 45% 5%, rgba(255,255,255,0.35) 0%, transparent 100%),
+    radial-gradient(0.5px 0.5px at 55% 40%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(0.5px 0.5px at 65% 95%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(0.5px 0.5px at 75% 30%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(0.5px 0.5px at 85% 50%, rgba(255,255,255,0.35) 0%, transparent 100%),
+    radial-gradient(0.5px 0.5px at 95% 75%, rgba(255,255,255,0.4) 0%, transparent 100%);
 `;
 
-// Second layer of static stars
-const StaticStarsLayer2 = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image:
-    radial-gradient(1px 1px at 3% 8%, rgba(255,255,255,0.6) 0%, transparent 100%),
-    radial-gradient(1px 1px at 13% 22%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(1px 1px at 23% 48%, rgba(255,255,255,0.6) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 33% 72%, rgba(200,200,255,0.7) 0%, transparent 100%),
-    radial-gradient(1px 1px at 43% 38%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(1px 1px at 53% 88%, rgba(255,255,255,0.6) 0%, transparent 100%),
-    radial-gradient(1px 1px at 63% 15%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 73% 55%, rgba(255,240,220,0.7) 0%, transparent 100%),
-    radial-gradient(1px 1px at 83% 85%, rgba(255,255,255,0.6) 0%, transparent 100%),
-    radial-gradient(1px 1px at 93% 35%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(1px 1px at 7% 95%, rgba(255,255,255,0.6) 0%, transparent 100%),
-    radial-gradient(1px 1px at 17% 5%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 27% 62%, rgba(220,200,255,0.7) 0%, transparent 100%),
-    radial-gradient(1px 1px at 37% 18%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(1px 1px at 47% 78%, rgba(255,255,255,0.6) 0%, transparent 100%),
-    radial-gradient(1px 1px at 57% 52%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 67% 28%, rgba(200,220,255,0.7) 0%, transparent 100%),
-    radial-gradient(1px 1px at 77% 98%, rgba(255,255,255,0.6) 0%, transparent 100%),
-    radial-gradient(1px 1px at 87% 42%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(1px 1px at 97% 65%, rgba(255,255,255,0.6) 0%, transparent 100%);
-`;
-
-// Only a few animated "bright" stars for effect
+// Animated twinkling stars container
 const AnimatedStarsContainer = styled.div<{ $visible: boolean }>`
   position: absolute;
   top: 0;
@@ -154,13 +211,12 @@ const BrightStar = styled.div<{ $top: number; $left: number; $delay: number }>`
   height: 2px;
   border-radius: 50%;
   background: #ffffff;
-  box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.9), 0 0 12px rgba(124, 58, 237, 0.4);
   animation: ${twinkle} 3s ease-in-out infinite;
   animation-delay: ${props => props.$delay}s;
-  will-change: opacity;
 `;
 
-// Pre-defined positions for bright stars (only 15 animated stars)
+// Pre-defined positions for bright twinkling stars
 const brightStarPositions = [
   { top: 12, left: 8, delay: 0 },
   { top: 25, left: 35, delay: 0.5 },
@@ -183,7 +239,7 @@ const StarField: React.FC = memo(() => {
   const [showAnimated, setShowAnimated] = useState(false);
 
   useEffect(() => {
-    // Delay animated stars to not block initial render
+    // Delay animated elements to not block initial render
     const timer = requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         setShowAnimated(true);
@@ -197,7 +253,12 @@ const StarField: React.FC = memo(() => {
       <NebulaLayer />
       <MilkyWay />
       <StaticStarsLayer />
-      <StaticStarsLayer2 />
+      {showAnimated && (
+        <>
+          <MovingStarsLayer1 />
+          <MovingStarsLayer2 />
+        </>
+      )}
       <AnimatedStarsContainer $visible={showAnimated}>
         {brightStarPositions.map((star, i) => (
           <BrightStar
