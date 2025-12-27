@@ -1,4 +1,4 @@
-import React, { memo, useState, useEffect, useCallback, useRef } from 'react';
+import React, { memo, useState, useCallback, useRef } from 'react';
 import styled from 'styled-components';
 
 const ProcessSection = styled.section`
@@ -231,16 +231,19 @@ const MobileArrowButton = styled.button<{ $disabled?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
 
   &:active:not(:disabled) {
-    transform: scale(0.9);
-    background: rgba(124, 58, 237, 0.3);
+    background: rgba(124, 58, 237, 0.4);
   }
 
   svg {
     width: 20px;
     height: 20px;
+    pointer-events: none;
   }
 `;
 
@@ -501,11 +504,7 @@ const steps = [
 
 const WorkProcess: React.FC = memo(() => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-
-  const minSwipeDistance = 50;
+  const touchStartRef = useRef<number | null>(null);
 
   const goToNext = useCallback(() => {
     setActiveIndex(prev => Math.min(prev + 1, steps.length - 1));
@@ -519,28 +518,38 @@ const WorkProcess: React.FC = memo(() => {
     setActiveIndex(index);
   }, []);
 
-  // Touch handlers for mobile swipe
-  const onTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
-  };
+  // Simple touch handlers for mobile swipe
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartRef.current = e.touches[0].clientX;
+  }, []);
 
-  const onTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
+  const onTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (touchStartRef.current === null) return;
 
-  const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
+    const touchEnd = e.changedTouches[0].clientX;
+    const distance = touchStartRef.current - touchEnd;
 
-    if (isLeftSwipe) {
+    if (distance > 50) {
       goToNext();
-    } else if (isRightSwipe) {
+    } else if (distance < -50) {
       goToPrev();
     }
-  };
+
+    touchStartRef.current = null;
+  }, [goToNext, goToPrev]);
+
+  // Button click handlers with event prevention
+  const handlePrevClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    goToPrev();
+  }, [goToPrev]);
+
+  const handleNextClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    goToNext();
+  }, [goToNext]);
 
   return (
     <ProcessSection id="process">
@@ -592,10 +601,9 @@ const WorkProcess: React.FC = memo(() => {
         {/* Mobile Swipe Carousel */}
         <MobileCarousel
           onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
         >
-          <MobileTrack $activeIndex={activeIndex} ref={trackRef}>
+          <MobileTrack $activeIndex={activeIndex}>
             {steps.map((step, index) => {
               const isActive = index === activeIndex;
 
@@ -626,7 +634,12 @@ const WorkProcess: React.FC = memo(() => {
 
         {/* Mobile Navigation */}
         <MobileArrows>
-          <MobileArrowButton onClick={goToPrev} $disabled={activeIndex === 0}>
+          <MobileArrowButton
+            onClick={handlePrevClick}
+            $disabled={activeIndex === 0}
+            disabled={activeIndex === 0}
+            type="button"
+          >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="15 18 9 12 15 6" />
             </svg>
@@ -636,7 +649,12 @@ const WorkProcess: React.FC = memo(() => {
             {activeIndex + 1} / {steps.length}
           </MobileProgress>
 
-          <MobileArrowButton onClick={goToNext} $disabled={activeIndex === steps.length - 1}>
+          <MobileArrowButton
+            onClick={handleNextClick}
+            $disabled={activeIndex === steps.length - 1}
+            disabled={activeIndex === steps.length - 1}
+            type="button"
+          >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="9 18 15 12 9 6" />
             </svg>
