@@ -339,9 +339,9 @@ const Hero: React.FC = memo(() => {
           <Container style={{ marginTop: '4rem' }}>
             <InfoWindowsContainer>
               <InfoWindow
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6, duration: 0.8, ease: [0.34, 1.56, 0.64, 1] }}
+                initial={{ opacity: 1, y: 0 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
               >
                 <CardNumber>01</CardNumber>
                 <CardTitle>Smart development</CardTitle>
@@ -352,9 +352,9 @@ const Hero: React.FC = memo(() => {
               </InfoWindow>
 
               <InfoWindow
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8, duration: 0.8, ease: [0.34, 1.56, 0.64, 1] }}
+                initial={{ opacity: 1, y: 0 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
               >
                 <CardNumber>02</CardNumber>
                 <CardTitle>Super-fast delivery</CardTitle>
@@ -365,9 +365,9 @@ const Hero: React.FC = memo(() => {
               </InfoWindow>
 
               <InfoWindow
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1, duration: 0.8, ease: [0.34, 1.56, 0.64, 1] }}
+                initial={{ opacity: 1, y: 0 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
               >
                 <CardNumber>03</CardNumber>
                 <CardTitle>Global & synced</CardTitle>
