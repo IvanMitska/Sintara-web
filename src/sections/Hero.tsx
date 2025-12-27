@@ -21,14 +21,6 @@ const fadeInUp = keyframes`
   }
 `;
 
-const pulse = keyframes`
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 20px rgba(124, 58, 237, 0);
-  }
-`;
 
 const HeroSection = styled.section`
   min-height: 100vh;
@@ -54,33 +46,6 @@ const Container = styled.div`
   z-index: 2;
 `;
 
-const Eyebrow = styled.div`
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: rgba(124, 58, 237, 0.1);
-  border: 1px solid rgba(124, 58, 237, 0.2);
-  border-radius: 50px;
-  margin-bottom: 32px;
-  animation: ${fadeInUp} 0.8s ease-out;
-`;
-
-const EyebrowDot = styled.span`
-  width: 8px;
-  height: 8px;
-  background: #22c55e;
-  border-radius: 50%;
-  animation: ${pulse} 2s ease-in-out infinite;
-`;
-
-const EyebrowText = styled.span`
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.8);
-  letter-spacing: 0.02em;
-`;
 
 const Title = styled.h1`
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -196,11 +161,6 @@ const Hero: React.FC = memo(() => {
   return (
     <HeroSection id="hero">
       <Container>
-        <Eyebrow>
-          <EyebrowDot />
-          <EyebrowText>Принимаем проекты на Q1 2025</EyebrowText>
-        </Eyebrow>
-
         <Title>
           Автоматизируем
           <br />
