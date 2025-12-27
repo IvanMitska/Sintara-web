@@ -95,9 +95,8 @@ const Card = styled.div<{ $offset: number; $isActive: boolean }>`
   border-radius: 24px;
   padding: 32px;
   cursor: pointer;
-  transition: all 0.6s cubic-bezier(0.33, 1, 0.68, 1);
+  transition: all 0.5s ease-out;
   transform-style: preserve-3d;
-  backface-visibility: hidden;
 
   transform: ${props => {
     const offset = props.$offset;
@@ -128,10 +127,6 @@ const Card = styled.div<{ $offset: number; $isActive: boolean }>`
     : '0 10px 40px rgba(0, 0, 0, 0.3)'};
 
   pointer-events: ${props => Math.abs(props.$offset) <= 2 ? 'auto' : 'none'};
-
-  &:hover {
-    border-color: rgba(124, 58, 237, 0.5);
-  }
 `;
 
 /* Mobile 3D Carousel */
@@ -172,7 +167,7 @@ const MobileCard = styled.div<{ $isActive: boolean; $offset: number }>`
   max-width: 340px;
   padding: 0;
   box-sizing: border-box;
-  transition: all 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+  transition: all 0.5s ease-out;
   transform-style: preserve-3d;
 
   transform: ${props => {
@@ -211,7 +206,7 @@ const MobileCardInner = styled.div<{ $isActive: boolean }>`
   border-radius: 24px;
   padding: 24px;
   min-height: 320px;
-  transition: all 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+  transition: all 0.5s ease-out;
   box-shadow: ${props => props.$isActive
     ? '0 10px 40px rgba(0, 0, 0, 0.4)'
     : '0 5px 20px rgba(0, 0, 0, 0.3)'};
