@@ -11,10 +11,10 @@ import StarField from './components/StarField';
 
 // Определяем производительность устройства при загрузке
 const isMobile = window.innerWidth < 768;
-const isLowEndDevice = isMobile ||
-  navigator.hardwareConcurrency <= 4 ||
-  (navigator as any).deviceMemory < 4 ||
-  /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent);
+// Только очень слабые устройства (2 ядра или меньше, менее 2GB RAM)
+const isLowEndDevice =
+  navigator.hardwareConcurrency <= 2 ||
+  (navigator as any).deviceMemory < 2;
 
 // Минимальный компонент Layout без лишней логики
 const Layout = styled.div`
