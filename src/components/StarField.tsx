@@ -26,6 +26,15 @@ const fallingMedium = keyframes`
   }
 `;
 
+const fallingDeep = keyframes`
+  0% {
+    transform: translateY(-50%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
+`;
+
 const StarFieldContainer = styled.div`
   position: fixed;
   top: 0;
@@ -91,7 +100,7 @@ const MovingStarsLayer1 = styled.div`
   left: 0;
   width: 100%;
   height: 200%;
-  animation: ${fallingSlow} 120s linear infinite;
+  animation: ${fallingSlow} 60s linear infinite;
   will-change: transform;
   background-image:
     radial-gradient(1px 1px at 10% 5%, rgba(255,255,255,0.7) 0%, transparent 100%),
@@ -121,7 +130,7 @@ const MovingStarsLayer1 = styled.div`
     radial-gradient(1px 1px at 88% 95%, rgba(255,255,255,0.6) 0%, transparent 100%);
 
   @media (max-width: 768px) {
-    animation-duration: 180s;
+    animation-duration: 90s;
   }
 `;
 
@@ -132,7 +141,7 @@ const MovingStarsLayer2 = styled.div`
   left: 0;
   width: 100%;
   height: 200%;
-  animation: ${fallingMedium} 80s linear infinite;
+  animation: ${fallingMedium} 40s linear infinite;
   will-change: transform;
   background-image:
     radial-gradient(1.5px 1.5px at 8% 3%, rgba(255,255,255,0.9) 0%, transparent 100%),
@@ -160,17 +169,19 @@ const MovingStarsLayer2 = styled.div`
     radial-gradient(1.5px 1.5px at 95% 88%, rgba(200,220,255,0.85) 0%, transparent 100%);
 
   @media (max-width: 768px) {
-    animation-duration: 120s;
+    animation-duration: 60s;
   }
 `;
 
-// Static stars layer for depth (no animation)
-const StaticStarsLayer = styled.div`
+// Third layer - slowest for depth (distant stars)
+const MovingStarsLayer3 = styled.div`
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: 200%;
+  animation: ${fallingDeep} 100s linear infinite;
+  will-change: transform;
   background-image:
     radial-gradient(0.5px 0.5px at 10% 15%, rgba(255,255,255,0.4) 0%, transparent 100%),
     radial-gradient(0.5px 0.5px at 20% 35%, rgba(255,255,255,0.3) 0%, transparent 100%),
@@ -190,6 +201,10 @@ const StaticStarsLayer = styled.div`
     radial-gradient(0.5px 0.5px at 75% 30%, rgba(255,255,255,0.3) 0%, transparent 100%),
     radial-gradient(0.5px 0.5px at 85% 50%, rgba(255,255,255,0.35) 0%, transparent 100%),
     radial-gradient(0.5px 0.5px at 95% 75%, rgba(255,255,255,0.4) 0%, transparent 100%);
+
+  @media (max-width: 768px) {
+    animation-duration: 150s;
+  }
 `;
 
 // Animated twinkling stars container
@@ -252,9 +267,9 @@ const StarField: React.FC = memo(() => {
     <StarFieldContainer>
       <NebulaLayer />
       <MilkyWay />
-      <StaticStarsLayer />
       {showAnimated && (
         <>
+          <MovingStarsLayer3 />
           <MovingStarsLayer1 />
           <MovingStarsLayer2 />
         </>
