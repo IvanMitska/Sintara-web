@@ -78,7 +78,7 @@ const NavLinks = styled.div<{ $isOpen: boolean }>`
     display: ${props => props.$isOpen ? 'flex' : 'none'};
     flex-direction: column;
     position: fixed;
-    top: 70px;
+    top: 80px;
     left: 12px;
     right: 12px;
     width: auto;
