@@ -39,7 +39,7 @@ const NebulaLayer = styled.div`
     radial-gradient(ellipse 400px 600px at 5% 80%, rgba(167, 139, 250, 0.06) 0%, transparent 45%);
 `;
 
-// Milky way band - static
+// Milky way band - static (hidden on mobile)
 const MilkyWay = styled.div`
   position: absolute;
   top: 0;
@@ -59,6 +59,10 @@ const MilkyWay = styled.div`
     transparent 100%
   );
   transform: rotate(-20deg);
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 // Static stars layer using CSS background - much more performant
