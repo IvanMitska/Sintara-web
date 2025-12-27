@@ -19,11 +19,13 @@ const NavContainer = styled.nav<{ $isScrolled: boolean }>`
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: ${props => props.$isScrolled ? '20px' : '24px'};
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
+  transition: top 0.3s ease, width 0.3s ease, padding 0.3s ease, background 0.3s ease, border-radius 0.3s ease;
 
   @media (max-width: 768px) {
     width: calc(100% - 24px);
     padding: 12px 20px;
+    left: 50%;
+    transform: translateX(-50%);
   }
 `;
 
@@ -75,16 +77,20 @@ const NavLinks = styled.div<{ $isOpen: boolean }>`
   @media (max-width: 768px) {
     display: ${props => props.$isOpen ? 'flex' : 'none'};
     flex-direction: column;
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 0;
-    width: 100%;
-    background: rgba(10, 5, 25, 0.95);
+    position: fixed;
+    top: 70px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    background: rgba(10, 5, 25, 0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 20px;
     padding: 24px;
-    gap: 1.5rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    gap: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    z-index: 999;
   }
 `;
 
@@ -137,7 +143,25 @@ const CTAButton = styled.a`
   }
 `;
 
-const MobileMenuButton = styled.button`
+const MobileOverlay = styled.div<{ $isOpen: boolean }>`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: ${props => props.$isOpen ? 1 : 0};
+    visibility: ${props => props.$isOpen ? 'visible' : 'hidden'};
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 998;
+  }
+`;
+
+const MobileMenuButton = styled.button<{ $isOpen: boolean }>`
   display: none;
   background: rgba(124, 58, 237, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -146,7 +170,7 @@ const MobileMenuButton = styled.button`
   position: relative;
   width: 36px;
   height: 36px;
-  z-index: 2;
+  z-index: 1001;
 
   @media (max-width: 768px) {
     display: flex;
@@ -157,22 +181,29 @@ const MobileMenuButton = styled.button`
   span {
     position: absolute;
     left: 50%;
-    transform: translateX(-50%);
     width: 16px;
     height: 2px;
     background: white;
     border-radius: 2px;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
 
     &:nth-child(1) {
+      transform: ${props => props.$isOpen
+        ? 'translateX(-50%) translateY(7px) rotate(45deg)'
+        : 'translateX(-50%) translateY(0) rotate(0)'};
       top: 10px;
     }
 
     &:nth-child(2) {
+      opacity: ${props => props.$isOpen ? '0' : '1'};
+      transform: translateX(-50%);
       top: 17px;
     }
 
     &:nth-child(3) {
+      transform: ${props => props.$isOpen
+        ? 'translateX(-50%) translateY(-7px) rotate(-45deg)'
+        : 'translateX(-50%) translateY(0) rotate(0)'};
       top: 24px;
     }
   }
@@ -200,12 +231,14 @@ const Navigation: React.FC = () => {
   };
 
   return (
-    <NavContainer $isScrolled={isScrolled}>
-      <Logo href="#hero">
-        Sintara
-      </Logo>
+    <>
+      <MobileOverlay $isOpen={isOpen} onClick={closeMenu} />
+      <NavContainer $isScrolled={isScrolled}>
+        <Logo href="#hero" onClick={closeMenu}>
+          Sintara
+        </Logo>
 
-      <NavLinks $isOpen={isOpen}>
+        <NavLinks $isOpen={isOpen}>
         <NavLink href="#about" onClick={closeMenu}>About</NavLink>
         <NavLink href="#services" onClick={closeMenu}>Our cases</NavLink>
         <NavLink href="#pricing" onClick={closeMenu}>Services</NavLink>
@@ -215,16 +248,18 @@ const Navigation: React.FC = () => {
         </CTAButton>
       </NavLinks>
 
-      <MobileMenuButton
-        onClick={toggleMenu}
-        aria-expanded={isOpen ? 'true' : 'false'}
-        aria-label="Toggle menu"
-      >
-        <span></span>
-        <span></span>
-        <span></span>
-      </MobileMenuButton>
-    </NavContainer>
+        <MobileMenuButton
+          $isOpen={isOpen}
+          onClick={toggleMenu}
+          aria-expanded={isOpen ? 'true' : 'false'}
+          aria-label="Toggle menu"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </MobileMenuButton>
+      </NavContainer>
+    </>
   );
 };
 

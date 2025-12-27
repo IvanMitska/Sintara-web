@@ -104,8 +104,8 @@ function HomePage({ isReady }: { isReady: boolean }) {
 
   return (
     <>
-      {/* Starfield background */}
-      {!isLowEndDevice && <StarField />}
+      {/* Starfield background - показываем на всех устройствах */}
+      <StarField />
 
       <Navigation />
       <AIChatWidget />
