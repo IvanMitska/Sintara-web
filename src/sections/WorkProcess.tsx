@@ -1,4 +1,4 @@
-import React, { memo, useState, useEffect, useCallback } from 'react';
+import React, { memo, useState, useEffect, useCallback, useRef } from 'react';
 import styled from 'styled-components';
 
 const ProcessSection = styled.section`
@@ -18,7 +18,7 @@ const Container = styled.div`
   padding: 0 40px;
 
   @media (max-width: 768px) {
-    padding: 0 20px;
+    padding: 0;
   }
 `;
 
@@ -27,7 +27,8 @@ const SectionHeader = styled.div`
   margin-bottom: 60px;
 
   @media (max-width: 768px) {
-    margin-bottom: 40px;
+    margin-bottom: 32px;
+    padding: 0 20px;
   }
 `;
 
@@ -53,11 +54,12 @@ const SectionSubtitle = styled.p`
   line-height: 1.6;
 
   @media (max-width: 768px) {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 `;
 
-const CarouselWrapper = styled.div`
+/* Desktop 3D Carousel */
+const DesktopCarousel = styled.div`
   position: relative;
   perspective: 1200px;
   height: 500px;
@@ -66,8 +68,7 @@ const CarouselWrapper = styled.div`
   justify-content: center;
 
   @media (max-width: 768px) {
-    height: auto;
-    perspective: none;
+    display: none;
   }
 `;
 
@@ -79,15 +80,9 @@ const CarouselTrack = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 16px;
-    transform-style: flat;
-  }
 `;
 
-const Card = styled.div<{ $offset: number; $isActive: boolean; $totalCards: number }>`
+const Card = styled.div<{ $offset: number; $isActive: boolean }>`
   position: absolute;
   width: 380px;
   min-height: 280px;
@@ -104,7 +99,6 @@ const Card = styled.div<{ $offset: number; $isActive: boolean; $totalCards: numb
   transform-style: preserve-3d;
   backface-visibility: hidden;
 
-  /* 3D positioning based on offset from active card */
   transform: ${props => {
     const offset = props.$offset;
     if (offset === 0) {
@@ -138,22 +132,123 @@ const Card = styled.div<{ $offset: number; $isActive: boolean; $totalCards: numb
   &:hover {
     border-color: rgba(124, 58, 237, 0.5);
   }
+`;
+
+/* Mobile Swipe Carousel */
+const MobileCarousel = styled.div`
+  display: none;
 
   @media (max-width: 768px) {
+    display: block;
     position: relative;
-    width: 100%;
-    min-height: auto;
-    transform: none !important;
-    opacity: 1 !important;
-    z-index: 1 !important;
-    background: ${props => props.$isActive
-      ? 'linear-gradient(145deg, rgba(30, 20, 60, 0.95), rgba(20, 10, 45, 0.95))'
-      : 'rgba(20, 10, 40, 0.6)'};
-    box-shadow: ${props => props.$isActive
-      ? '0 15px 50px rgba(124, 58, 237, 0.25), 0 0 0 1px rgba(124, 58, 237, 0.2)'
-      : '0 5px 20px rgba(0, 0, 0, 0.2)'};
-    padding: 24px;
+    overflow: hidden;
   }
+`;
+
+const MobileTrack = styled.div<{ $activeIndex: number }>`
+  display: flex;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transform: translateX(calc(-${props => props.$activeIndex * 100}% - ${props => props.$activeIndex * 16}px));
+  padding: 0 20px;
+  gap: 16px;
+`;
+
+const MobileCard = styled.div<{ $isActive: boolean }>`
+  flex: 0 0 calc(100% - 40px);
+  min-height: 320px;
+  background: linear-gradient(145deg, rgba(30, 20, 60, 0.95), rgba(20, 10, 45, 0.95));
+  border: 1px solid ${props => props.$isActive
+    ? 'rgba(124, 58, 237, 0.5)'
+    : 'rgba(124, 58, 237, 0.2)'};
+  border-radius: 24px;
+  padding: 28px;
+  transition: all 0.4s ease;
+  box-shadow: ${props => props.$isActive
+    ? '0 20px 60px rgba(124, 58, 237, 0.3), 0 0 0 1px rgba(124, 58, 237, 0.2)'
+    : '0 10px 40px rgba(0, 0, 0, 0.3)'};
+  transform: ${props => props.$isActive ? 'scale(1)' : 'scale(0.95)'};
+  opacity: ${props => props.$isActive ? 1 : 0.6};
+`;
+
+const MobileNavigation = styled.div`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 24px;
+    padding: 0 20px;
+  }
+`;
+
+const MobileDot = styled.button<{ $isActive: boolean }>`
+  width: ${props => props.$isActive ? '24px' : '8px'};
+  height: 8px;
+  border-radius: 4px;
+  border: none;
+  background: ${props => props.$isActive
+    ? 'linear-gradient(90deg, #7c3aed, #a78bfa)'
+    : 'rgba(255, 255, 255, 0.2)'};
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+
+  &:hover {
+    background: ${props => props.$isActive
+      ? 'linear-gradient(90deg, #7c3aed, #a78bfa)'
+      : 'rgba(255, 255, 255, 0.4)'};
+  }
+`;
+
+const MobileArrows = styled.div`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    margin-top: 16px;
+  }
+`;
+
+const MobileArrowButton = styled.button<{ $disabled?: boolean }>`
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: ${props => props.$disabled
+    ? 'rgba(255, 255, 255, 0.05)'
+    : 'rgba(124, 58, 237, 0.2)'};
+  border: 1px solid ${props => props.$disabled
+    ? 'rgba(255, 255, 255, 0.05)'
+    : 'rgba(124, 58, 237, 0.3)'};
+  color: ${props => props.$disabled
+    ? 'rgba(255, 255, 255, 0.2)'
+    : '#a78bfa'};
+  cursor: ${props => props.$disabled ? 'not-allowed' : 'pointer'};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+
+  &:active:not(:disabled) {
+    transform: scale(0.9);
+    background: rgba(124, 58, 237, 0.3);
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+`;
+
+const MobileProgress = styled.div`
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
 `;
 
 const CardInner = styled.div`
@@ -161,7 +256,7 @@ const CardInner = styled.div`
   z-index: 2;
 `;
 
-const StepIndicator = styled.div<{ $isActive: boolean }>`
+const StepIndicator = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
@@ -188,10 +283,8 @@ const StepNumber = styled.div<{ $isActive: boolean }>`
   transition: all 0.4s ease;
 
   @media (max-width: 768px) {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    font-size: 1.1rem;
+    width: 48px;
+    height: 48px;
   }
 `;
 
@@ -225,7 +318,7 @@ const StepTitle = styled.h3<{ $isActive: boolean }>`
   transition: font-size 0.4s ease;
 
   @media (max-width: 768px) {
-    font-size: 1.25rem;
+    font-size: 1.375rem;
   }
 `;
 
@@ -236,6 +329,11 @@ const StepDescription = styled.p<{ $isActive: boolean }>`
   line-height: 1.7;
   margin-bottom: 20px;
   transition: color 0.4s ease;
+
+  @media (max-width: 768px) {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+  }
 `;
 
 const StepDuration = styled.div<{ $isActive: boolean }>`
@@ -255,6 +353,12 @@ const StepDuration = styled.div<{ $isActive: boolean }>`
   font-weight: 500;
   color: ${props => props.$isActive ? '#22c55e' : '#a78bfa'};
   transition: all 0.4s ease;
+
+  @media (max-width: 768px) {
+    background: rgba(34, 197, 94, 0.15);
+    border-color: rgba(34, 197, 94, 0.25);
+    color: #22c55e;
+  }
 
   svg {
     width: 16px;
@@ -397,18 +501,11 @@ const steps = [
 
 const WorkProcess: React.FC = memo(() => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
+  const minSwipeDistance = 50;
 
   const goToNext = useCallback(() => {
     setActiveIndex(prev => Math.min(prev + 1, steps.length - 1));
@@ -422,6 +519,29 @@ const WorkProcess: React.FC = memo(() => {
     setActiveIndex(index);
   }, []);
 
+  // Touch handlers for mobile swipe
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      goToNext();
+    } else if (isRightSwipe) {
+      goToPrev();
+    }
+  };
+
   return (
     <ProcessSection id="process">
       <Container>
@@ -432,7 +552,8 @@ const WorkProcess: React.FC = memo(() => {
           </SectionSubtitle>
         </SectionHeader>
 
-        <CarouselWrapper>
+        {/* Desktop 3D Carousel */}
+        <DesktopCarousel>
           <CarouselTrack>
             {steps.map((step, index) => {
               const offset = index - activeIndex;
@@ -443,11 +564,10 @@ const WorkProcess: React.FC = memo(() => {
                   key={index}
                   $offset={offset}
                   $isActive={isActive}
-                  $totalCards={steps.length}
-                  onClick={() => !isMobile && goToStep(index)}
+                  onClick={() => goToStep(index)}
                 >
                   <CardInner>
-                    <StepIndicator $isActive={isActive}>
+                    <StepIndicator>
                       <StepNumber $isActive={isActive}>{step.number}</StepNumber>
                       <StepBadge $isActive={isActive}>{step.badge}</StepBadge>
                     </StepIndicator>
@@ -467,8 +587,73 @@ const WorkProcess: React.FC = memo(() => {
               );
             })}
           </CarouselTrack>
-        </CarouselWrapper>
+        </DesktopCarousel>
 
+        {/* Mobile Swipe Carousel */}
+        <MobileCarousel
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+        >
+          <MobileTrack $activeIndex={activeIndex} ref={trackRef}>
+            {steps.map((step, index) => {
+              const isActive = index === activeIndex;
+
+              return (
+                <MobileCard key={index} $isActive={isActive}>
+                  <CardInner>
+                    <StepIndicator>
+                      <StepNumber $isActive={true}>{step.number}</StepNumber>
+                      <StepBadge $isActive={true}>{step.badge}</StepBadge>
+                    </StepIndicator>
+                    <StepTitle $isActive={true}>{step.title}</StepTitle>
+                    <StepDescription $isActive={true}>
+                      {step.description}
+                    </StepDescription>
+                    <StepDuration $isActive={true}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                      </svg>
+                      {step.duration}
+                    </StepDuration>
+                  </CardInner>
+                </MobileCard>
+              );
+            })}
+          </MobileTrack>
+        </MobileCarousel>
+
+        {/* Mobile Navigation */}
+        <MobileArrows>
+          <MobileArrowButton onClick={goToPrev} $disabled={activeIndex === 0}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </MobileArrowButton>
+
+          <MobileProgress>
+            {activeIndex + 1} / {steps.length}
+          </MobileProgress>
+
+          <MobileArrowButton onClick={goToNext} $disabled={activeIndex === steps.length - 1}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </MobileArrowButton>
+        </MobileArrows>
+
+        <MobileNavigation>
+          {steps.map((_, index) => (
+            <MobileDot
+              key={index}
+              $isActive={index === activeIndex}
+              onClick={() => goToStep(index)}
+            />
+          ))}
+        </MobileNavigation>
+
+        {/* Desktop Navigation */}
         <NavigationContainer>
           <NavButton onClick={goToPrev} $disabled={activeIndex === 0}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
