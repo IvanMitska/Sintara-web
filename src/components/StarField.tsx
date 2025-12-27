@@ -100,7 +100,7 @@ const MovingStarsLayer1 = styled.div`
   left: 0;
   width: 100%;
   height: 200%;
-  animation: ${fallingSlow} 60s linear infinite;
+  animation: ${fallingSlow} 35s linear infinite;
   will-change: transform;
   background-image:
     radial-gradient(1px 1px at 10% 5%, rgba(255,255,255,0.7) 0%, transparent 100%),
@@ -130,7 +130,7 @@ const MovingStarsLayer1 = styled.div`
     radial-gradient(1px 1px at 88% 95%, rgba(255,255,255,0.6) 0%, transparent 100%);
 
   @media (max-width: 768px) {
-    animation-duration: 90s;
+    animation-duration: 50s;
   }
 `;
 
@@ -141,7 +141,7 @@ const MovingStarsLayer2 = styled.div`
   left: 0;
   width: 100%;
   height: 200%;
-  animation: ${fallingMedium} 40s linear infinite;
+  animation: ${fallingMedium} 25s linear infinite;
   will-change: transform;
   background-image:
     radial-gradient(1.5px 1.5px at 8% 3%, rgba(255,255,255,0.9) 0%, transparent 100%),
@@ -169,7 +169,7 @@ const MovingStarsLayer2 = styled.div`
     radial-gradient(1.5px 1.5px at 95% 88%, rgba(200,220,255,0.85) 0%, transparent 100%);
 
   @media (max-width: 768px) {
-    animation-duration: 60s;
+    animation-duration: 35s;
   }
 `;
 
@@ -180,7 +180,7 @@ const MovingStarsLayer3 = styled.div`
   left: 0;
   width: 100%;
   height: 200%;
-  animation: ${fallingDeep} 100s linear infinite;
+  animation: ${fallingDeep} 50s linear infinite;
   will-change: transform;
   background-image:
     radial-gradient(0.5px 0.5px at 10% 15%, rgba(255,255,255,0.4) 0%, transparent 100%),
@@ -203,7 +203,7 @@ const MovingStarsLayer3 = styled.div`
     radial-gradient(0.5px 0.5px at 95% 75%, rgba(255,255,255,0.4) 0%, transparent 100%);
 
   @media (max-width: 768px) {
-    animation-duration: 150s;
+    animation-duration: 70s;
   }
 `;
 
