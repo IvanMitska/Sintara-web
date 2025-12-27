@@ -142,32 +142,31 @@ const MobileCarousel = styled.div`
     display: block;
     position: relative;
     overflow: hidden;
+    width: 100%;
   }
 `;
 
 const MobileTrack = styled.div<{ $activeIndex: number }>`
   display: flex;
-  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  transform: translateX(calc(-${props => props.$activeIndex * 100}% - ${props => props.$activeIndex * 16}px));
-  padding: 0 20px;
-  gap: 16px;
+  transition: transform 0.3s ease-out;
+  transform: translateX(calc(-${props => props.$activeIndex} * 100%));
 `;
 
-const MobileCard = styled.div<{ $isActive: boolean }>`
-  flex: 0 0 calc(100% - 40px);
+const MobileCard = styled.div`
+  flex: 0 0 100%;
+  width: 100%;
   min-height: 320px;
+  padding: 0 20px;
+  box-sizing: border-box;
+`;
+
+const MobileCardInner = styled.div`
   background: linear-gradient(145deg, rgba(30, 20, 60, 0.95), rgba(20, 10, 45, 0.95));
-  border: 1px solid ${props => props.$isActive
-    ? 'rgba(124, 58, 237, 0.5)'
-    : 'rgba(124, 58, 237, 0.2)'};
+  border: 1px solid rgba(124, 58, 237, 0.4);
   border-radius: 24px;
   padding: 28px;
-  transition: all 0.4s ease;
-  box-shadow: ${props => props.$isActive
-    ? '0 20px 60px rgba(124, 58, 237, 0.3), 0 0 0 1px rgba(124, 58, 237, 0.2)'
-    : '0 10px 40px rgba(0, 0, 0, 0.3)'};
-  transform: ${props => props.$isActive ? 'scale(1)' : 'scale(0.95)'};
-  opacity: ${props => props.$isActive ? 1 : 0.6};
+  height: 100%;
+  box-shadow: 0 20px 60px rgba(124, 58, 237, 0.2), 0 0 0 1px rgba(124, 58, 237, 0.1);
 `;
 
 const MobileNavigation = styled.div`
@@ -604,11 +603,9 @@ const WorkProcess: React.FC = memo(() => {
           onTouchEnd={onTouchEnd}
         >
           <MobileTrack $activeIndex={activeIndex}>
-            {steps.map((step, index) => {
-              const isActive = index === activeIndex;
-
-              return (
-                <MobileCard key={index} $isActive={isActive}>
+            {steps.map((step, index) => (
+              <MobileCard key={index}>
+                <MobileCardInner>
                   <CardInner>
                     <StepIndicator>
                       <StepNumber $isActive={true}>{step.number}</StepNumber>
@@ -626,9 +623,9 @@ const WorkProcess: React.FC = memo(() => {
                       {step.duration}
                     </StepDuration>
                   </CardInner>
-                </MobileCard>
-              );
-            })}
+                </MobileCardInner>
+              </MobileCard>
+            ))}
           </MobileTrack>
         </MobileCarousel>
 
