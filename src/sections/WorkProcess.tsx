@@ -167,7 +167,8 @@ const MobileTrack = styled.div<{ $activeIndex: number }>`
 
 const MobileCard = styled.div<{ $isActive: boolean; $offset: number }>`
   position: absolute;
-  width: calc(100% - 80px);
+  left: 50%;
+  width: calc(100% - 60px);
   max-width: 340px;
   padding: 0;
   box-sizing: border-box;
@@ -177,22 +178,23 @@ const MobileCard = styled.div<{ $isActive: boolean; $offset: number }>`
   transform: ${props => {
     const offset = props.$offset;
     if (offset === 0) {
-      return 'translateX(0) translateZ(50px) rotateY(0deg) scale(1)';
+      return 'translateX(-50%) translateZ(50px) rotateY(0deg) scale(1)';
     }
     const direction = offset > 0 ? 1 : -1;
     const absOffset = Math.abs(offset);
-    const translateX = direction * (absOffset === 1 ? 75 : 90) + '%';
-    const translateZ = -absOffset * 100;
-    const rotateY = -direction * Math.min(absOffset * 15, 25);
-    const scale = Math.max(1 - absOffset * 0.15, 0.7);
-    return `translateX(${translateX}) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`;
+    const baseTranslate = -50;
+    const offsetTranslate = direction * (absOffset === 1 ? 70 : 100);
+    const translateZ = -absOffset * 80;
+    const rotateY = -direction * Math.min(absOffset * 12, 20);
+    const scale = Math.max(1 - absOffset * 0.12, 0.75);
+    return `translateX(calc(${baseTranslate}% + ${offsetTranslate}%)) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`;
   }};
 
   opacity: ${props => {
     const absOffset = Math.abs(props.$offset);
     if (absOffset === 0) return 1;
-    if (absOffset === 1) return 0.6;
-    return 0.3;
+    if (absOffset === 1) return 0.5;
+    return 0.2;
   }};
 
   z-index: ${props => 10 - Math.abs(props.$offset)};
@@ -200,17 +202,19 @@ const MobileCard = styled.div<{ $isActive: boolean; $offset: number }>`
 `;
 
 const MobileCardInner = styled.div<{ $isActive: boolean }>`
-  background: linear-gradient(145deg, rgba(30, 20, 60, 0.95), rgba(20, 10, 45, 0.95));
-  border: 2px solid ${props => props.$isActive
-    ? 'rgba(124, 58, 237, 0.6)'
-    : 'rgba(124, 58, 237, 0.2)'};
+  background: ${props => props.$isActive
+    ? 'linear-gradient(145deg, rgba(30, 20, 60, 0.95), rgba(20, 10, 45, 0.95))'
+    : 'rgba(20, 10, 40, 0.7)'};
+  border: 1px solid ${props => props.$isActive
+    ? 'rgba(124, 58, 237, 0.4)'
+    : 'rgba(255, 255, 255, 0.08)'};
   border-radius: 24px;
   padding: 24px;
   min-height: 320px;
   transition: all 0.5s cubic-bezier(0.33, 1, 0.68, 1);
   box-shadow: ${props => props.$isActive
-    ? '0 25px 80px rgba(124, 58, 237, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
-    : '0 10px 30px rgba(0, 0, 0, 0.3)'};
+    ? '0 10px 40px rgba(0, 0, 0, 0.4)'
+    : '0 5px 20px rgba(0, 0, 0, 0.3)'};
 `;
 
 const MobileNavigation = styled.div`
