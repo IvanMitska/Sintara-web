@@ -1,0 +1,338 @@
+import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+
+type Language = 'en' | 'ru';
+
+interface LanguageContextType {
+  language: Language;
+  toggleLanguage: () => void;
+  t: (key: string) => string;
+}
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+// All translations
+const translations: Record<Language, Record<string, string>> = {
+  en: {
+    // Navigation
+    'nav.services': 'Services',
+    'nav.work': 'Work',
+    'nav.pricing': 'Pricing',
+    'nav.contact': 'Contact',
+    'nav.getStarted': 'Get Started',
+
+    // Hero
+    'hero.badge': 'Available for new projects',
+    'hero.title1': 'We build',
+    'hero.title2': 'digital products',
+    'hero.title3': 'that work',
+    'hero.subtitle': 'Web apps, mobile apps, Telegram bots, and automation — delivered fast, priced fairly, built to last.',
+    'hero.cta.primary': 'Start a project',
+    'hero.cta.secondary': 'See our work',
+    'hero.stats.projects': 'Projects delivered',
+    'hero.stats.clients': 'Happy clients',
+    'hero.stats.years': 'Years of experience',
+
+    // Services
+    'services.title1': 'What we',
+    'services.title2': 'build',
+    'services.subtitle': 'We turn ambitious ideas into digital products that people actually want to use',
+    'services.web.number': '01',
+    'services.web.title': 'Web Development',
+    'services.web.description': 'We craft digital experiences that captivate and convert. From blazing-fast landing pages to complex web applications.',
+    'services.mobile.number': '02',
+    'services.mobile.title': 'Mobile Apps',
+    'services.mobile.description': 'Native performance meets cross-platform efficiency. Apps that feel at home on any device with fluid animations.',
+    'services.additional.title': 'Plus everything else you need',
+    'services.telegram': 'Telegram Bots',
+    'services.telegram.desc': 'Custom bots for automation, customer service, and business processes',
+    'services.ecommerce': 'E-commerce',
+    'services.ecommerce.desc': 'Full-featured online stores with payment integration',
+    'services.crm': 'CRM Systems',
+    'services.crm.desc': 'Tailored solutions to streamline your sales',
+    'services.seo': 'SEO Optimization',
+    'services.seo.desc': 'Data-driven strategies to improve rankings',
+    'services.redesign': 'Redesign',
+    'services.redesign.desc': 'Transform outdated websites into modern experiences',
+    'services.support': 'Tech Support',
+    'services.support.desc': 'Ongoing maintenance and 24/7 support',
+
+    // Benefits
+    'benefits.title': 'Why choose us',
+    'benefits.subtitle': 'We do things differently. Here\'s what sets us apart.',
+    'benefits.price.title': 'Fixed price. No surprises.',
+    'benefits.price.desc': 'We agree on the final cost before starting. No hidden fees, no hourly billing tricks.',
+    'benefits.price.tag': 'Transparent pricing',
+    'benefits.code.title': 'You own everything.',
+    'benefits.code.desc': 'Full source code, design files, documentation — it\'s all yours. No vendor lock-in.',
+    'benefits.code.tag': 'Code ownership',
+    'benefits.direct.title': 'Direct developer access.',
+    'benefits.direct.desc': 'Talk directly to the people building your product. No account managers.',
+    'benefits.direct.tag': 'No middlemen',
+    'benefits.warranty.title': '60-day warranty.',
+    'benefits.warranty.desc': 'Found a bug after launch? We fix it free. No questions asked, no extra charges.',
+    'benefits.warranty.tag': 'Free bug fixes',
+
+    // Work Process
+    'process.title': 'How we work',
+    'process.subtitle': 'A simple, transparent process from idea to launch',
+    'process.step1.title': 'Discovery',
+    'process.step1.desc': 'We learn about your business, goals, and target audience to create a solid foundation.',
+    'process.step2.title': 'Design',
+    'process.step2.desc': 'We create stunning designs that reflect your brand and delight your users.',
+    'process.step3.title': 'Development',
+    'process.step3.desc': 'We build your product with clean code and modern technologies.',
+    'process.step4.title': 'Launch',
+    'process.step4.desc': 'We deploy your product and ensure everything runs smoothly.',
+
+    // Testimonials
+    'testimonials.badge': '4.7 — average rating',
+    'testimonials.title': 'What clients say',
+    'testimonials.1.text': 'Was skeptical at first — small team, thought there\'d be delays. But they built our store in 2.5 weeks, faster than Shopify. Conversion up 34% in the first month',
+    'testimonials.1.name': 'Denis V.',
+    'testimonials.1.role': 'VeloShop',
+    'testimonials.2.text': 'Bot handles 400+ orders daily. Running 8 months with zero downtime. Paid for itself in 3 weeks 🔥',
+    'testimonials.2.name': 'Anna K.',
+    'testimonials.2.role': 'EasyFood',
+    'testimonials.3.text': 'They redesigned our 2019 website. Now we\'re not embarrassed to show it to clients. Leads doubled, without any ads',
+    'testimonials.3.name': 'Igor P.',
+    'testimonials.3.role': 'StroyMaster',
+    'testimonials.4.text': 'Working together for a year, completed 3 projects. Always available, always on time. That\'s rare, trust me',
+    'testimonials.4.name': 'Michael S.',
+    'testimonials.4.role': 'Digital Solutions',
+    'testimonials.5.text': 'Custom CRM for our processes — night and day compared to Bitrix. Team learned it in a day, not a week',
+    'testimonials.5.name': 'Elena N.',
+    'testimonials.5.role': 'AutoTrade',
+    'testimonials.6.text': 'Built a bot + client portal. Orders are now automated, managers don\'t waste time on routine. Saved ~80 hours per month',
+    'testimonials.6.name': 'Artem L.',
+    'testimonials.6.role': 'PrintExpress',
+
+    // Pricing
+    'pricing.title': 'Simple, transparent pricing',
+    'pricing.subtitle': 'No hidden fees. No hourly rates. Just clear, fixed prices.',
+    'pricing.landing.title': 'Landing Page',
+    'pricing.landing.desc': 'Perfect for startups and product launches',
+    'pricing.landing.feature1': 'Custom design',
+    'pricing.landing.feature2': 'Mobile responsive',
+    'pricing.landing.feature3': 'SEO optimized',
+    'pricing.landing.feature4': 'Contact form',
+    'pricing.landing.feature5': '2-week delivery',
+    'pricing.webapp.title': 'Web Application',
+    'pricing.webapp.desc': 'For complex business solutions',
+    'pricing.webapp.feature1': 'Custom functionality',
+    'pricing.webapp.feature2': 'User authentication',
+    'pricing.webapp.feature3': 'Database integration',
+    'pricing.webapp.feature4': 'Admin panel',
+    'pricing.webapp.feature5': 'API development',
+    'pricing.bot.title': 'Telegram Bot',
+    'pricing.bot.desc': 'Automate your business processes',
+    'pricing.bot.feature1': 'Custom commands',
+    'pricing.bot.feature2': 'Payment integration',
+    'pricing.bot.feature3': 'Admin dashboard',
+    'pricing.bot.feature4': 'Analytics',
+    'pricing.bot.feature5': '1-2 week delivery',
+    'pricing.from': 'from',
+    'pricing.getStarted': 'Get Started',
+    'pricing.popular': 'Popular',
+
+    // FAQ
+    'faq.title': 'Frequently asked questions',
+    'faq.subtitle': 'Everything you need to know about working with us',
+
+    // Contact
+    'contact.title': 'Let\'s work together',
+    'contact.subtitle': 'Ready to start your project? Get in touch and let\'s discuss your ideas.',
+    'contact.name': 'Your name',
+    'contact.email': 'Email',
+    'contact.message': 'Tell us about your project',
+    'contact.send': 'Send message',
+    'contact.or': 'Or reach out directly',
+
+    // Footer
+    'footer.description': 'We build digital products that help businesses grow.',
+    'footer.services': 'Services',
+    'footer.company': 'Company',
+    'footer.contact': 'Contact',
+    'footer.rights': 'All rights reserved.',
+  },
+  ru: {
+    // Navigation
+    'nav.services': 'Услуги',
+    'nav.work': 'Работы',
+    'nav.pricing': 'Цены',
+    'nav.contact': 'Контакты',
+    'nav.getStarted': 'Начать проект',
+
+    // Hero
+    'hero.badge': 'Открыты для новых проектов',
+    'hero.title1': 'Создаём',
+    'hero.title2': 'цифровые продукты',
+    'hero.title3': 'которые работают',
+    'hero.subtitle': 'Веб-приложения, мобильные приложения, Telegram-боты и автоматизация — быстро, честно, надёжно.',
+    'hero.cta.primary': 'Начать проект',
+    'hero.cta.secondary': 'Наши работы',
+    'hero.stats.projects': 'Проектов выполнено',
+    'hero.stats.clients': 'Довольных клиентов',
+    'hero.stats.years': 'Лет опыта',
+
+    // Services
+    'services.title1': 'Что мы',
+    'services.title2': 'создаём',
+    'services.subtitle': 'Превращаем амбициозные идеи в цифровые продукты, которыми хочется пользоваться',
+    'services.web.number': '01',
+    'services.web.title': 'Веб-разработка',
+    'services.web.description': 'Создаём цифровые решения, которые привлекают и конвертируют. От быстрых лендингов до сложных веб-приложений.',
+    'services.mobile.number': '02',
+    'services.mobile.title': 'Мобильные приложения',
+    'services.mobile.description': 'Нативная производительность и кроссплатформенность. Приложения с плавными анимациями для любых устройств.',
+    'services.additional.title': 'И всё остальное, что вам нужно',
+    'services.telegram': 'Telegram-боты',
+    'services.telegram.desc': 'Боты для автоматизации, поддержки клиентов и бизнес-процессов',
+    'services.ecommerce': 'Интернет-магазины',
+    'services.ecommerce.desc': 'Полнофункциональные магазины с интеграцией оплаты',
+    'services.crm': 'CRM-системы',
+    'services.crm.desc': 'Решения под ваши процессы продаж',
+    'services.seo': 'SEO-оптимизация',
+    'services.seo.desc': 'Стратегии продвижения на основе данных',
+    'services.redesign': 'Редизайн',
+    'services.redesign.desc': 'Превращаем устаревшие сайты в современные',
+    'services.support': 'Техподдержка',
+    'services.support.desc': 'Обслуживание и поддержка 24/7',
+
+    // Benefits
+    'benefits.title': 'Почему мы',
+    'benefits.subtitle': 'Мы работаем иначе. Вот что нас отличает.',
+    'benefits.price.title': 'Фиксированная цена.',
+    'benefits.price.desc': 'Договариваемся о стоимости до начала работ. Никаких скрытых платежей.',
+    'benefits.price.tag': 'Прозрачные цены',
+    'benefits.code.title': 'Всё ваше.',
+    'benefits.code.desc': 'Исходный код, дизайн-файлы, документация — всё принадлежит вам.',
+    'benefits.code.tag': 'Владение кодом',
+    'benefits.direct.title': 'Прямой контакт.',
+    'benefits.direct.desc': 'Общаетесь напрямую с разработчиками. Без менеджеров-посредников.',
+    'benefits.direct.tag': 'Без посредников',
+    'benefits.warranty.title': 'Гарантия 60 дней.',
+    'benefits.warranty.desc': 'Нашли баг после запуска? Исправим бесплатно. Без вопросов.',
+    'benefits.warranty.tag': 'Бесплатные исправления',
+
+    // Work Process
+    'process.title': 'Как мы работаем',
+    'process.subtitle': 'Простой и прозрачный процесс от идеи до запуска',
+    'process.step1.title': 'Анализ',
+    'process.step1.desc': 'Изучаем ваш бизнес, цели и аудиторию для создания прочной основы.',
+    'process.step2.title': 'Дизайн',
+    'process.step2.desc': 'Создаём дизайн, который отражает ваш бренд и радует пользователей.',
+    'process.step3.title': 'Разработка',
+    'process.step3.desc': 'Строим продукт на чистом коде и современных технологиях.',
+    'process.step4.title': 'Запуск',
+    'process.step4.desc': 'Разворачиваем продукт и следим, чтобы всё работало идеально.',
+
+    // Testimonials
+    'testimonials.badge': '4.7 — средняя оценка',
+    'testimonials.title': 'Что пишут клиенты',
+    'testimonials.1.text': 'Сначала сомневался — маленькая команда, думал будут срывы. Но ребята сделали магазин за 2.5 недели, работает быстрее чем Shopify. Конверсия +34% за первый месяц',
+    'testimonials.1.name': 'Денис В.',
+    'testimonials.1.role': 'VeloShop',
+    'testimonials.2.text': 'Бот обрабатывает 400+ заказов в день. Работает 8 месяцев без сбоев. Окупился за 3 недели 🔥',
+    'testimonials.2.name': 'Анна К.',
+    'testimonials.2.role': 'EasyFood',
+    'testimonials.3.text': 'Переделали сайт 2019 года. Теперь не стыдно показывать клиентам. Заявок стало в 2 раза больше, и это без рекламы',
+    'testimonials.3.name': 'Игорь П.',
+    'testimonials.3.role': 'StroyMaster',
+    'testimonials.4.text': 'Работаем год, сделали 3 проекта вместе. Всегда на связи, всегда в срок. Это редкость, поверьте',
+    'testimonials.4.name': 'Михаил С.',
+    'testimonials.4.role': 'Digital Solutions',
+    'testimonials.5.text': 'CRM под наши процессы — небо и земля по сравнению с Битрикс. Менеджеры освоили за день, не за неделю',
+    'testimonials.5.name': 'Елена Н.',
+    'testimonials.5.role': 'АвтоТрейд',
+    'testimonials.6.text': 'Сделали бота + личный кабинет для клиентов. Теперь заказы идут автоматом, менеджеры не тратят время на рутину. За месяц сэкономили ~80 часов',
+    'testimonials.6.name': 'Артём Л.',
+    'testimonials.6.role': 'PrintExpress',
+
+    // Pricing
+    'pricing.title': 'Простые и честные цены',
+    'pricing.subtitle': 'Никаких скрытых платежей. Никаких почасовых ставок. Только фиксированные цены.',
+    'pricing.landing.title': 'Лендинг',
+    'pricing.landing.desc': 'Идеально для стартапов и запуска продуктов',
+    'pricing.landing.feature1': 'Уникальный дизайн',
+    'pricing.landing.feature2': 'Адаптив для мобильных',
+    'pricing.landing.feature3': 'SEO-оптимизация',
+    'pricing.landing.feature4': 'Форма обратной связи',
+    'pricing.landing.feature5': 'Срок: 2 недели',
+    'pricing.webapp.title': 'Веб-приложение',
+    'pricing.webapp.desc': 'Для сложных бизнес-решений',
+    'pricing.webapp.feature1': 'Кастомный функционал',
+    'pricing.webapp.feature2': 'Авторизация пользователей',
+    'pricing.webapp.feature3': 'Интеграция с БД',
+    'pricing.webapp.feature4': 'Админ-панель',
+    'pricing.webapp.feature5': 'API-разработка',
+    'pricing.bot.title': 'Telegram-бот',
+    'pricing.bot.desc': 'Автоматизируйте бизнес-процессы',
+    'pricing.bot.feature1': 'Кастомные команды',
+    'pricing.bot.feature2': 'Интеграция оплаты',
+    'pricing.bot.feature3': 'Панель управления',
+    'pricing.bot.feature4': 'Аналитика',
+    'pricing.bot.feature5': 'Срок: 1-2 недели',
+    'pricing.from': 'от',
+    'pricing.getStarted': 'Начать',
+    'pricing.popular': 'Популярно',
+
+    // FAQ
+    'faq.title': 'Частые вопросы',
+    'faq.subtitle': 'Всё, что нужно знать о работе с нами',
+
+    // Contact
+    'contact.title': 'Давайте работать вместе',
+    'contact.subtitle': 'Готовы начать проект? Свяжитесь с нами и обсудим ваши идеи.',
+    'contact.name': 'Ваше имя',
+    'contact.email': 'Email',
+    'contact.message': 'Расскажите о проекте',
+    'contact.send': 'Отправить',
+    'contact.or': 'Или напишите напрямую',
+
+    // Footer
+    'footer.description': 'Создаём цифровые продукты, которые помогают бизнесу расти.',
+    'footer.services': 'Услуги',
+    'footer.company': 'Компания',
+    'footer.contact': 'Контакты',
+    'footer.rights': 'Все права защищены.',
+  }
+};
+
+export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [language, setLanguage] = useState<Language>(() => {
+    // Check localStorage for saved preference
+    const saved = localStorage.getItem('language');
+    if (saved === 'en' || saved === 'ru') return saved;
+    // Default to browser language or Russian
+    const browserLang = navigator.language.slice(0, 2);
+    return browserLang === 'ru' ? 'ru' : 'en';
+  });
+
+  const toggleLanguage = useCallback(() => {
+    setLanguage(prev => {
+      const newLang = prev === 'en' ? 'ru' : 'en';
+      localStorage.setItem('language', newLang);
+      return newLang;
+    });
+  }, []);
+
+  const t = useCallback((key: string): string => {
+    return translations[language][key] || key;
+  }, [language]);
+
+  return (
+    <LanguageContext.Provider value={{ language, toggleLanguage, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+};
+
+export const useLanguage = (): LanguageContextType => {
+  const context = useContext(LanguageContext);
+  if (!context) {
+    throw new Error('useLanguage must be used within LanguageProvider');
+  }
+  return context;
+};
+
+export default LanguageContext;

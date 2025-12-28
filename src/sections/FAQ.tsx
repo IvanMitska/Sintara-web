@@ -2,6 +2,7 @@ import React, { useState, memo } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlus, FaMinus, FaArrowRight, FaQuestionCircle } from 'react-icons/fa';
+import { useLanguage } from '../context/LanguageContext';
 
 const FAQSection = styled.section`
   padding: 100px 0;
@@ -246,35 +247,65 @@ const CTAButton = styled.a`
   }
 `;
 
-const faqItems = [
-  {
-    question: 'How long does it take to develop a website?',
-    answer: 'Development timelines depend on the complexity and scope of the project. A simple landing page can be ready in 1-2 weeks, while an e-commerce store takes 3-6 weeks. After reviewing your requirements, we\'ll provide accurate estimates.'
-  },
-  {
-    question: 'What payment methods do you accept?',
-    answer: 'We work with 50% upfront payment and milestone-based payments for larger projects. We accept bank transfers for businesses, as well as card payments and electronic transfers for individuals.'
-  },
-  {
-    question: 'Can you improve an existing website?',
-    answer: 'Yes, we handle website improvements and modernization. After analyzing your current project, we\'ll suggest optimal solutions for improving functionality, design, or performance.'
-  },
-  {
-    question: 'How does the Telegram bot development process work?',
-    answer: 'The process includes: requirements analysis, bot structure design, functionality development, integration with necessary systems, admin panel creation (if required), testing, and launch. We keep you updated on progress throughout.'
-  },
-  {
-    question: 'Do you provide technical support after launch?',
-    answer: 'Yes, we offer technical support after project launch. You can choose a support package that includes site monitoring, bug fixes, content updates, and consultations.'
-  },
-  {
-    question: 'Do you handle SEO optimization?',
-    answer: 'Yes, we include basic SEO optimization during development. This covers proper structure, meta tags, semantic markup, and speed optimization. We also offer comprehensive SEO promotion services separately.'
-  }
-];
+const faqItemsData = {
+  en: [
+    {
+      question: 'How long does it take to develop a website?',
+      answer: 'Development timelines depend on the complexity and scope of the project. A simple landing page can be ready in 1-2 weeks, while an e-commerce store takes 3-6 weeks. After reviewing your requirements, we\'ll provide accurate estimates.'
+    },
+    {
+      question: 'What payment methods do you accept?',
+      answer: 'We work with 50% upfront payment and milestone-based payments for larger projects. We accept bank transfers for businesses, as well as card payments and electronic transfers for individuals.'
+    },
+    {
+      question: 'Can you improve an existing website?',
+      answer: 'Yes, we handle website improvements and modernization. After analyzing your current project, we\'ll suggest optimal solutions for improving functionality, design, or performance.'
+    },
+    {
+      question: 'How does the Telegram bot development process work?',
+      answer: 'The process includes: requirements analysis, bot structure design, functionality development, integration with necessary systems, admin panel creation (if required), testing, and launch. We keep you updated on progress throughout.'
+    },
+    {
+      question: 'Do you provide technical support after launch?',
+      answer: 'Yes, we offer technical support after project launch. You can choose a support package that includes site monitoring, bug fixes, content updates, and consultations.'
+    },
+    {
+      question: 'Do you handle SEO optimization?',
+      answer: 'Yes, we include basic SEO optimization during development. This covers proper structure, meta tags, semantic markup, and speed optimization. We also offer comprehensive SEO promotion services separately.'
+    }
+  ],
+  ru: [
+    {
+      question: 'Сколько времени занимает разработка сайта?',
+      answer: 'Сроки зависят от сложности и объёма проекта. Простой лендинг можно сделать за 1-2 недели, интернет-магазин — за 3-6 недель. После изучения ваших требований мы назовём точные сроки.'
+    },
+    {
+      question: 'Какие способы оплаты вы принимаете?',
+      answer: 'Работаем по предоплате 50% и поэтапной оплате для крупных проектов. Принимаем банковские переводы для юрлиц, а также оплату картой и электронные переводы для физлиц.'
+    },
+    {
+      question: 'Можете ли вы улучшить существующий сайт?',
+      answer: 'Да, мы занимаемся доработкой и модернизацией сайтов. После анализа вашего проекта предложим оптимальные решения по улучшению функционала, дизайна или производительности.'
+    },
+    {
+      question: 'Как проходит разработка Telegram-бота?',
+      answer: 'Процесс включает: анализ требований, проектирование структуры бота, разработку функционала, интеграцию с нужными системами, создание админ-панели (при необходимости), тестирование и запуск. На каждом этапе держим вас в курсе.'
+    },
+    {
+      question: 'Оказываете ли вы техподдержку после запуска?',
+      answer: 'Да, мы предлагаем техническую поддержку после запуска проекта. Вы можете выбрать пакет поддержки, который включает мониторинг сайта, исправление ошибок, обновление контента и консультации.'
+    },
+    {
+      question: 'Занимаетесь ли вы SEO-оптимизацией?',
+      answer: 'Да, базовая SEO-оптимизация входит в разработку. Это правильная структура, мета-теги, семантическая вёрстка и оптимизация скорости. Также предлагаем комплексное SEO-продвижение отдельно.'
+    }
+  ]
+};
 
 const FAQ: React.FC = memo(() => {
   const [openIndex, setOpenIndex] = useState<number>(0);
+  const { language } = useLanguage();
+  const faqItems = faqItemsData[language];
 
   const toggleQuestion = (index: number) => {
     setOpenIndex(openIndex === index ? -1 : index);
@@ -290,7 +321,7 @@ const FAQ: React.FC = memo(() => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            FAQ
+            {language === 'en' ? 'FAQ' : 'Вопросы и ответы'}
           </Title>
           <Subtitle
             initial={{ opacity: 0, y: 20 }}
@@ -298,7 +329,9 @@ const FAQ: React.FC = memo(() => {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            Answers to common questions about our services and process
+            {language === 'en'
+              ? 'Answers to common questions about our services and process'
+              : 'Ответы на частые вопросы о наших услугах и процессе работы'}
           </Subtitle>
         </SectionHeader>
 
@@ -358,14 +391,14 @@ const FAQ: React.FC = memo(() => {
               <FaQuestionCircle />
             </CTAIcon>
             <CTAText>
-              <CTATitle>Still have questions?</CTATitle>
+              <CTATitle>{language === 'en' ? 'Still have questions?' : 'Остались вопросы?'}</CTATitle>
               <CTADescription>
-                Get in touch for a free consultation
+                {language === 'en' ? 'Get in touch for a free consultation' : 'Свяжитесь с нами для бесплатной консультации'}
               </CTADescription>
             </CTAText>
           </CTAContent>
           <CTAButton href="#contact">
-            Contact us <FaArrowRight />
+            {language === 'en' ? 'Contact us' : 'Связаться'} <FaArrowRight />
           </CTAButton>
         </CTAContainer>
       </Container>

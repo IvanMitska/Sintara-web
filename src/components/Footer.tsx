@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FaTelegram, FaInstagram, FaGithub, FaHeart } from 'react-icons/fa';
+import { FaTelegram, FaInstagram, FaGithub } from 'react-icons/fa';
+import { useLanguage } from '../context/LanguageContext';
 
 const FooterContainer = styled.footer`
   background: transparent;
@@ -69,9 +70,8 @@ const SocialIcon = styled.a`
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: #D76D77;
+    background-color: #7c3aed;
     transform: translateY(-1px);
-    filter: brightness(1.2);
   }
 `;
 
@@ -94,12 +94,12 @@ const LinkItem = styled.li`
 const FooterLink = styled.a`
   color: #a0a0a0;
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
   display: inline-block;
-  
+
   &:hover {
-    color: #D76D77;
-    transform: translateX(5px);
+    color: #a78bfa;
+    transform: translateX(3px);
   }
 `;
 
@@ -128,19 +128,10 @@ const Copyright = styled.p`
   }
 `;
 
-const MadeWithLove = styled.p`
-  color: #777;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  
-  svg {
-    color: #D76D77;
-  }
-`;
 
 const Footer: React.FC = () => {
+  const { language } = useLanguage();
+
   return (
     <FooterContainer>
       <FooterContent>
@@ -149,11 +140,12 @@ const Footer: React.FC = () => {
             <Logo>Sintara</Logo>
           </LogoContainer>
           <Description>
-            We build modern and effective web solutions for your business.
-            From websites to Telegram bots.
+            {language === 'en'
+              ? 'We build modern and effective web solutions for your business. From websites to Telegram bots.'
+              : 'Мы создаём современные и эффективные веб-решения для вашего бизнеса. От сайтов до Telegram-ботов.'}
           </Description>
           <SocialContainer>
-            <SocialIcon href="https://t.me/username" target="_blank" rel="noopener noreferrer">
+            <SocialIcon href="https://t.me/IvanMitska" target="_blank" rel="noopener noreferrer">
               <FaTelegram />
             </SocialIcon>
             <SocialIcon href="https://instagram.com/username" target="_blank" rel="noopener noreferrer">
@@ -164,33 +156,30 @@ const Footer: React.FC = () => {
             </SocialIcon>
           </SocialContainer>
         </FooterColumn>
-        
+
         <FooterColumn>
-          <ColumnTitle>Services</ColumnTitle>
+          <ColumnTitle>{language === 'en' ? 'Services' : 'Услуги'}</ColumnTitle>
           <LinksList>
-            <LinkItem><FooterLink href="#services">Web Development</FooterLink></LinkItem>
-            <LinkItem><FooterLink href="#services">Telegram Bots</FooterLink></LinkItem>
-            <LinkItem><FooterLink href="#services">Web Applications</FooterLink></LinkItem>
-            <LinkItem><FooterLink href="#services">Technical Support</FooterLink></LinkItem>
+            <LinkItem><FooterLink href="#services">{language === 'en' ? 'Web Development' : 'Веб-разработка'}</FooterLink></LinkItem>
+            <LinkItem><FooterLink href="#services">{language === 'en' ? 'Telegram Bots' : 'Telegram-боты'}</FooterLink></LinkItem>
+            <LinkItem><FooterLink href="#services">{language === 'en' ? 'Web Applications' : 'Веб-приложения'}</FooterLink></LinkItem>
+            <LinkItem><FooterLink href="#services">{language === 'en' ? 'Technical Support' : 'Техподдержка'}</FooterLink></LinkItem>
           </LinksList>
         </FooterColumn>
 
         <FooterColumn>
-          <ColumnTitle>Company</ColumnTitle>
+          <ColumnTitle>{language === 'en' ? 'Company' : 'Компания'}</ColumnTitle>
           <LinksList>
-            <LinkItem><FooterLink href="#about">About</FooterLink></LinkItem>
-            <LinkItem><FooterLink href="#portfolio">Portfolio</FooterLink></LinkItem>
-            <LinkItem><FooterLink href="#process">Process</FooterLink></LinkItem>
-            <LinkItem><FooterLink href="#contact">Contact</FooterLink></LinkItem>
+            <LinkItem><FooterLink href="#about">{language === 'en' ? 'About' : 'О нас'}</FooterLink></LinkItem>
+            <LinkItem><FooterLink href="#portfolio">{language === 'en' ? 'Portfolio' : 'Портфолио'}</FooterLink></LinkItem>
+            <LinkItem><FooterLink href="#process">{language === 'en' ? 'Process' : 'Процесс'}</FooterLink></LinkItem>
+            <LinkItem><FooterLink href="#contact">{language === 'en' ? 'Contact' : 'Контакты'}</FooterLink></LinkItem>
           </LinksList>
         </FooterColumn>
       </FooterContent>
-      
+
       <BottomBar>
-        <Copyright>&copy; {new Date().getFullYear()} Sintara. All rights reserved.</Copyright>
-        <MadeWithLove>
-          Made with <FaHeart />
-        </MadeWithLove>
+        <Copyright>&copy; {new Date().getFullYear()} Sintara. {language === 'en' ? 'All rights reserved.' : 'Все права защищены.'}</Copyright>
       </BottomBar>
     </FooterContainer>
   );

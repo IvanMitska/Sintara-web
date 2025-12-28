@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, memo } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEnvelope, FaTelegram, FaMapMarkerAlt, FaArrowRight, FaPaperPlane, FaChevronDown, FaCheck, FaGlobe, FaRobot, FaMobileAlt, FaCode, FaCog } from 'react-icons/fa';
+import { useLanguage } from '../context/LanguageContext';
 
 const ContactSection = styled.section`
   padding: 100px 0;
@@ -369,6 +370,7 @@ const SubmitButton = styled.button`
     transform: translateY(-2px);
     box-shadow: 0 8px 30px rgba(124, 58, 237, 0.4);
     background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
 
     svg {
       transform: translateX(4px);
@@ -484,7 +486,7 @@ const TelegramButton = styled.a`
   align-items: center;
   justify-content: center;
   gap: 10px;
-  background: linear-gradient(135deg, #0088cc 0%, #0077b5 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
   color: white;
   padding: 14px 28px;
   border-radius: 12px;
@@ -493,7 +495,7 @@ const TelegramButton = styled.a`
   font-weight: 500;
   text-decoration: none;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(0, 136, 204, 0.3);
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
 
   svg {
     font-size: 18px;
@@ -501,7 +503,9 @@ const TelegramButton = styled.a`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(0, 136, 204, 0.4);
+    box-shadow: 0 8px 30px rgba(124, 58, 237, 0.4);
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
   }
 `;
 
@@ -547,15 +551,26 @@ const LocationValue = styled.div`
 `;
 
 // Service options with icons
-const serviceOptions = [
-  { value: 'website', label: 'Website Development', description: 'Landing pages, corporate sites', icon: FaGlobe },
-  { value: 'webapp', label: 'Web Application', description: 'Complex SaaS, dashboards', icon: FaCode },
-  { value: 'bot', label: 'Telegram Bot', description: 'Automation, customer service', icon: FaRobot },
-  { value: 'mobile', label: 'Mobile App', description: 'iOS & Android applications', icon: FaMobileAlt },
-  { value: 'other', label: 'Other', description: 'Custom development needs', icon: FaCog },
-];
+const serviceOptionsData = {
+  en: [
+    { value: 'website', label: 'Website Development', description: 'Landing pages, corporate sites', icon: FaGlobe },
+    { value: 'webapp', label: 'Web Application', description: 'Complex SaaS, dashboards', icon: FaCode },
+    { value: 'bot', label: 'Telegram Bot', description: 'Automation, customer service', icon: FaRobot },
+    { value: 'mobile', label: 'Mobile App', description: 'iOS & Android applications', icon: FaMobileAlt },
+    { value: 'other', label: 'Other', description: 'Custom development needs', icon: FaCog },
+  ],
+  ru: [
+    { value: 'website', label: 'Разработка сайта', description: 'Лендинги, корпоративные сайты', icon: FaGlobe },
+    { value: 'webapp', label: 'Веб-приложение', description: 'Сложные SaaS, дашборды', icon: FaCode },
+    { value: 'bot', label: 'Telegram-бот', description: 'Автоматизация, поддержка клиентов', icon: FaRobot },
+    { value: 'mobile', label: 'Мобильное приложение', description: 'Приложения для iOS и Android', icon: FaMobileAlt },
+    { value: 'other', label: 'Другое', description: 'Индивидуальная разработка', icon: FaCog },
+  ]
+};
 
 const Contact: React.FC = memo(() => {
+  const { language } = useLanguage();
+  const serviceOptions = serviceOptionsData[language];
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -622,16 +637,16 @@ const Contact: React.FC = memo(() => {
     console.log('Form data:', formData);
     setFormData({ name: '', email: '', services: [], message: '' });
     setIsDropdownOpen(false);
-    alert('Thank you! We\'ll get back to you soon.');
+    alert(language === 'en' ? 'Thank you! We\'ll get back to you soon.' : 'Спасибо! Мы свяжемся с вами в ближайшее время.');
   };
 
   const getSelectedText = () => {
-    if (formData.services.length === 0) return 'Select services';
+    if (formData.services.length === 0) return language === 'en' ? 'Select services' : 'Выберите услуги';
     if (formData.services.length === 1) {
       const service = serviceOptions.find(s => s.value === formData.services[0]);
-      return service?.label || 'Select services';
+      return service?.label || (language === 'en' ? 'Select services' : 'Выберите услуги');
     }
-    return `${formData.services.length} services selected`;
+    return language === 'en' ? `${formData.services.length} services selected` : `Выбрано услуг: ${formData.services.length}`;
   };
 
   return (
@@ -644,7 +659,7 @@ const Contact: React.FC = memo(() => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            Get in touch
+            {language === 'en' ? 'Get in touch' : 'Свяжитесь с нами'}
           </Title>
           <Subtitle
             initial={{ opacity: 0, y: 20 }}
@@ -652,7 +667,9 @@ const Contact: React.FC = memo(() => {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            Let's discuss your project and bring your ideas to life
+            {language === 'en'
+              ? "Let's discuss your project and bring your ideas to life"
+              : 'Давайте обсудим ваш проект и воплотим ваши идеи в жизнь'}
           </Subtitle>
         </SectionHeader>
 
@@ -663,16 +680,16 @@ const Contact: React.FC = memo(() => {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <FormTitle>Send us a message</FormTitle>
+            <FormTitle>{language === 'en' ? 'Send us a message' : 'Отправьте нам сообщение'}</FormTitle>
             <Form onSubmit={handleSubmit}>
               <FormRow>
                 <FormGroup>
-                  <Label htmlFor="name">Name</Label>
+                  <Label htmlFor="name">{language === 'en' ? 'Name' : 'Имя'}</Label>
                   <Input
                     type="text"
                     id="name"
                     name="name"
-                    placeholder="Your name"
+                    placeholder={language === 'en' ? 'Your name' : 'Ваше имя'}
                     value={formData.name}
                     onChange={handleChange}
                     required
@@ -684,7 +701,7 @@ const Contact: React.FC = memo(() => {
                     type="email"
                     id="email"
                     name="email"
-                    placeholder="your@email.com"
+                    placeholder={language === 'en' ? 'your@email.com' : 'ваш@email.com'}
                     value={formData.email}
                     onChange={handleChange}
                     required
@@ -693,7 +710,7 @@ const Contact: React.FC = memo(() => {
               </FormRow>
 
               <FormGroup>
-                <Label>Services</Label>
+                <Label>{language === 'en' ? 'Services' : 'Услуги'}</Label>
                 <MultiSelectContainer>
                   <MultiSelectTrigger
                     ref={triggerRef}
@@ -724,7 +741,7 @@ const Contact: React.FC = memo(() => {
                         transition={{ duration: 0.2 }}
                       >
                         <DropdownHeader>
-                          <DropdownTitle>Выберите услуги</DropdownTitle>
+                          <DropdownTitle>{language === 'en' ? 'Select services' : 'Выберите услуги'}</DropdownTitle>
                         </DropdownHeader>
                         <OptionsList>
                           {serviceOptions.map((option) => {
@@ -758,11 +775,11 @@ const Contact: React.FC = memo(() => {
               </FormGroup>
 
               <FormGroup>
-                <Label htmlFor="message">Message</Label>
+                <Label htmlFor="message">{language === 'en' ? 'Message' : 'Сообщение'}</Label>
                 <Textarea
                   id="message"
                   name="message"
-                  placeholder="Tell us about your project..."
+                  placeholder={language === 'en' ? 'Tell us about your project...' : 'Расскажите о вашем проекте...'}
                   value={formData.message}
                   onChange={handleChange}
                   required
@@ -770,7 +787,7 @@ const Contact: React.FC = memo(() => {
               </FormGroup>
 
               <SubmitButton type="submit">
-                Send message <FaPaperPlane />
+                {language === 'en' ? 'Send message' : 'Отправить'} <FaPaperPlane />
               </SubmitButton>
             </Form>
           </FormCard>
@@ -787,7 +804,7 @@ const Contact: React.FC = memo(() => {
                   <FaEnvelope />
                 </MethodIcon>
                 <MethodContent>
-                  <MethodLabel>Email us</MethodLabel>
+                  <MethodLabel>{language === 'en' ? 'Email us' : 'Напишите нам'}</MethodLabel>
                   <MethodValue>hello@sintara.dev</MethodValue>
                 </MethodContent>
                 <MethodArrow>
@@ -815,12 +832,14 @@ const Contact: React.FC = memo(() => {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.4 }}
             >
-              <QuickContactTitle>Prefer a quick chat?</QuickContactTitle>
+              <QuickContactTitle>{language === 'en' ? 'Prefer a quick chat?' : 'Хотите быстро связаться?'}</QuickContactTitle>
               <QuickContactText>
-                Get instant response on Telegram. We're usually online during business hours.
+                {language === 'en'
+                  ? "Get instant response on Telegram. We're usually online during business hours."
+                  : 'Получите мгновенный ответ в Telegram. Мы обычно онлайн в рабочее время.'}
               </QuickContactText>
               <TelegramButton href="https://t.me/IvanMitska" target="_blank" rel="noopener noreferrer">
-                <FaTelegram /> Message on Telegram
+                <FaTelegram /> {language === 'en' ? 'Message on Telegram' : 'Написать в Telegram'}
               </TelegramButton>
             </QuickContactCard>
 
@@ -834,8 +853,8 @@ const Contact: React.FC = memo(() => {
                 <FaMapMarkerAlt />
               </LocationIcon>
               <LocationText>
-                <LocationLabel>Based in</LocationLabel>
-                <LocationValue>Phuket, Thailand</LocationValue>
+                <LocationLabel>{language === 'en' ? 'Based in' : 'Мы находимся'}</LocationLabel>
+                <LocationValue>{language === 'en' ? 'Phuket, Thailand' : 'Пхукет, Таиланд'}</LocationValue>
               </LocationText>
             </LocationCard>
           </InfoCard>

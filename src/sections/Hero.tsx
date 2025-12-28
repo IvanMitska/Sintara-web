@@ -1,5 +1,6 @@
-import React, { memo, useState, useEffect } from 'react';
+import React, { memo } from 'react';
 import styled, { keyframes } from 'styled-components';
+import { useLanguage } from '../context/LanguageContext';
 
 const gradientShift = keyframes`
   0%, 100% {
@@ -71,7 +72,7 @@ const Title = styled.h1`
   animation: ${fadeInUp} 0.8s ease-out 0.1s both, ${gradientShift} 8s ease-in-out infinite;
 
   @media (max-width: 768px) {
-    font-size: clamp(2.5rem, 12vw, 4rem);
+    font-size: clamp(2.25rem, 11vw, 3.5rem);
     margin-bottom: 20px;
   }
 `;
@@ -159,24 +160,30 @@ const CTAButton = styled.a`
 
 
 const Hero: React.FC = memo(() => {
+  const { language } = useLanguage();
+
   return (
     <HeroSection id="hero">
       <Container>
         <Title>
-          We automate
-          <br />
-          your business
+          {language === 'en' ? (
+            <>We automate<br />your business</>
+          ) : (
+            <>Автоматизируем<br />ваш бизнес</>
+          )}
         </Title>
 
         <Subtitle>
-          From idea to working system — without the headache.
-          <br />
-          You grow, we handle the routine.
+          {language === 'en' ? (
+            <>From idea to working system — without the headache.<br />You grow, we handle the routine.</>
+          ) : (
+            <>От идеи до работающей системы — без головной боли.<br />Вы растёте, мы берём рутину на себя.</>
+          )}
         </Subtitle>
 
         <CTAContainer>
           <CTAButton href="#contact">
-            Get in touch
+            {language === 'en' ? 'Get in touch' : 'Связаться'}
           </CTAButton>
         </CTAContainer>
       </Container>

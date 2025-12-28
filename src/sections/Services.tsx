@@ -12,6 +12,7 @@ import {
   FaDatabase,
   FaArrowRight
 } from 'react-icons/fa';
+import { useLanguage } from '../context/LanguageContext';
 
 // Optimized keyframes - no blur, using transform and opacity only
 const gradientShift = keyframes`
@@ -409,7 +410,7 @@ const GlowRing = styled.div`
   }
 `;
 
-// Additional services
+// Additional services with Bento Grid
 const AdditionalServices = styled.div`
   padding: 100px 40px;
   position: relative;
@@ -427,33 +428,51 @@ const AdditionalTitle = styled.h3`
   text-align: center;
   margin: 0 0 50px;
   letter-spacing: -0.02em;
+
+  @media (max-width: 768px) {
+    margin-bottom: 32px;
+  }
 `;
 
-const ServicesGrid = styled.div`
+const BentoGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: auto auto;
   gap: 20px;
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
 
-  @media (max-width: 900px) {
+  @media (max-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto;
   }
 
   @media (max-width: 600px) {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 `;
 
-const ServiceCard = styled(motion.a)`
-  background: linear-gradient(135deg, rgba(20, 10, 40, 0.7) 0%, rgba(10, 5, 20, 0.9) 100%);
+const BentoCard = styled(motion.a)<{ $large?: boolean }>`
+  background: linear-gradient(135deg, rgba(20, 10, 40, 0.8) 0%, rgba(10, 5, 20, 0.95) 100%);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 24px;
-  padding: 36px;
+  padding: ${props => props.$large ? '36px' : '28px'};
   text-decoration: none;
+  display: flex;
+  flex-direction: column;
   position: relative;
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+
+  /* Большие карточки занимают 2 колонки */
+  ${props => props.$large && `
+    grid-column: span 2;
+
+    @media (max-width: 600px) {
+      grid-column: span 1;
+    }
+  `}
 
   &::before {
     content: '';
@@ -462,15 +481,15 @@ const ServiceCard = styled(motion.a)`
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.4), transparent);
+    background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.5), transparent);
     opacity: 0;
     transition: opacity 0.3s ease;
   }
 
   &:hover {
-    transform: translateY(-10px);
+    transform: translateY(-5px);
     border-color: rgba(124, 58, 237, 0.3);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 20px 50px rgba(124, 58, 237, 0.12);
 
     &::before {
       opacity: 1;
@@ -478,49 +497,70 @@ const ServiceCard = styled(motion.a)`
   }
 
   @media (max-width: 768px) {
-    padding: 28px;
+    padding: 24px;
   }
 `;
 
-const ServiceCardIcon = styled.div`
-  width: 64px;
-  height: 64px;
-  border-radius: 18px;
+const BentoCardIcon = styled.div<{ $large?: boolean }>`
+  width: ${props => props.$large ? '64px' : '52px'};
+  height: ${props => props.$large ? '64px' : '52px'};
+  border-radius: ${props => props.$large ? '18px' : '14px'};
   background: linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(124, 58, 237, 0.05) 100%);
+  border: 1px solid rgba(124, 58, 237, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: ${props => props.$large ? '20px' : '16px'};
 
   svg {
-    font-size: 28px;
+    font-size: ${props => props.$large ? '28px' : '22px'};
     color: #a78bfa;
+  }
+
+  @media (max-width: 768px) {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    margin-bottom: 16px;
+
+    svg {
+      font-size: 22px;
+    }
   }
 `;
 
-const ServiceCardTitle = styled.span`
-  display: block;
+const BentoCardTitle = styled.span<{ $large?: boolean }>`
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 1.35rem;
+  font-size: ${props => props.$large ? '1.5rem' : '1.15rem'};
   font-weight: 600;
   color: #ffffff;
-  margin-bottom: 10px;
+  margin-bottom: ${props => props.$large ? '12px' : '8px'};
+  letter-spacing: -0.02em;
+
+  @media (max-width: 768px) {
+    font-size: 1.15rem;
+    margin-bottom: 8px;
+  }
 `;
 
-const ServiceCardDescription = styled.span`
-  display: block;
+const BentoCardDescription = styled.span<{ $large?: boolean }>`
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 0.95rem;
+  font-size: ${props => props.$large ? '1rem' : '0.9rem'};
   color: rgba(255, 255, 255, 0.5);
-  line-height: 1.5;
+  line-height: 1.6;
+  flex: 1;
+
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+  }
 `;
 
-const ServiceCardArrow = styled.div`
+const BentoCardArrow = styled.div`
   position: absolute;
-  bottom: 36px;
-  right: 36px;
-  width: 44px;
-  height: 44px;
+  bottom: 28px;
+  right: 28px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: rgba(124, 58, 237, 0.1);
   display: flex;
@@ -528,73 +568,127 @@ const ServiceCardArrow = styled.div`
   justify-content: center;
   opacity: 0;
   transform: translateX(-8px);
-  transition: all 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 
   svg {
-    font-size: 16px;
+    font-size: 14px;
     color: #a78bfa;
   }
 
-  ${ServiceCard}:hover & {
+  ${BentoCard}:hover & {
     opacity: 1;
     transform: translateX(0);
   }
 
   @media (max-width: 768px) {
-    bottom: 28px;
-    right: 28px;
+    bottom: 24px;
+    right: 24px;
+    width: 36px;
+    height: 36px;
   }
 `;
 
-const mainServices = [
-  {
-    icon: FaLaptopCode,
-    number: '01',
-    title: 'Web Development',
-    description: 'We craft digital experiences that captivate and convert. From blazing-fast landing pages to complex web applications.',
-    tech: ['React', 'Next.js', 'TypeScript', 'Node.js']
-  },
-  {
-    icon: FaMobileAlt,
-    number: '02',
-    title: 'Mobile Apps',
-    description: 'Native performance meets cross-platform efficiency. Apps that feel at home on any device with fluid animations.',
-    tech: ['iOS', 'Android', 'React Native', 'Flutter']
-  }
-];
+const mainServicesData = {
+  en: [
+    {
+      icon: FaLaptopCode,
+      number: '01',
+      title: 'Web Development',
+      description: 'We craft digital experiences that captivate and convert. From blazing-fast landing pages to complex web applications.',
+      tech: ['React', 'Next.js', 'TypeScript', 'Node.js']
+    },
+    {
+      icon: FaMobileAlt,
+      number: '02',
+      title: 'Mobile Apps',
+      description: 'Native performance meets cross-platform efficiency. Apps that feel at home on any device with fluid animations.',
+      tech: ['iOS', 'Android', 'React Native', 'Flutter']
+    }
+  ],
+  ru: [
+    {
+      icon: FaLaptopCode,
+      number: '01',
+      title: 'Веб-разработка',
+      description: 'Создаём цифровые решения, которые привлекают и конвертируют. От быстрых лендингов до сложных веб-приложений.',
+      tech: ['React', 'Next.js', 'TypeScript', 'Node.js']
+    },
+    {
+      icon: FaMobileAlt,
+      number: '02',
+      title: 'Мобильные приложения',
+      description: 'Нативная производительность и кроссплатформенность. Приложения с плавными анимациями для любых устройств.',
+      tech: ['iOS', 'Android', 'React Native', 'Flutter']
+    }
+  ]
+};
 
-const additionalServices = [
-  {
-    icon: FaRobot,
-    title: 'Telegram Bots',
-    description: 'Custom bots for automation, customer service, and business processes'
-  },
-  {
-    icon: FaShoppingCart,
-    title: 'E-commerce',
-    description: 'Full-featured online stores with payment integration'
-  },
-  {
-    icon: FaDatabase,
-    title: 'CRM Systems',
-    description: 'Tailored solutions to streamline your sales'
-  },
-  {
-    icon: FaSearch,
-    title: 'SEO Optimization',
-    description: 'Data-driven strategies to improve rankings'
-  },
-  {
-    icon: FaSync,
-    title: 'Redesign',
-    description: 'Transform outdated websites into modern experiences'
-  },
-  {
-    icon: FaHeadset,
-    title: 'Tech Support',
-    description: 'Ongoing maintenance and 24/7 support'
-  }
-];
+const additionalServicesData = {
+  en: [
+    {
+      icon: FaRobot,
+      title: 'Telegram Bots',
+      description: 'Custom bots for automation, customer service, and business processes'
+    },
+    {
+      icon: FaShoppingCart,
+      title: 'E-commerce',
+      description: 'Full-featured online stores with payment integration'
+    },
+    {
+      icon: FaDatabase,
+      title: 'CRM Systems',
+      description: 'Tailored solutions to streamline your sales'
+    },
+    {
+      icon: FaSearch,
+      title: 'SEO Optimization',
+      description: 'Data-driven strategies to improve rankings'
+    },
+    {
+      icon: FaSync,
+      title: 'Redesign',
+      description: 'Transform outdated websites into modern experiences'
+    },
+    {
+      icon: FaHeadset,
+      title: 'Tech Support',
+      description: 'Ongoing maintenance and 24/7 support'
+    }
+  ],
+  ru: [
+    {
+      icon: FaRobot,
+      title: 'Telegram-боты',
+      description: 'Боты для автоматизации, поддержки клиентов и бизнес-процессов'
+    },
+    {
+      icon: FaShoppingCart,
+      title: 'Интернет-магазины',
+      description: 'Полнофункциональные магазины с интеграцией оплаты'
+    },
+    {
+      icon: FaDatabase,
+      title: 'CRM-системы',
+      description: 'Решения под ваши процессы продаж'
+    },
+    {
+      icon: FaSearch,
+      title: 'SEO-оптимизация',
+      description: 'Стратегии продвижения на основе данных'
+    },
+    {
+      icon: FaSync,
+      title: 'Редизайн',
+      description: 'Превращаем устаревшие сайты в современные'
+    },
+    {
+      icon: FaHeadset,
+      title: 'Техподдержка',
+      description: 'Обслуживание и поддержка 24/7'
+    }
+  ]
+};
 
 const ServiceVisual: React.FC<{ icon: typeof FaLaptopCode }> = ({ icon: Icon }) => {
   const ref = useRef(null);
@@ -687,6 +781,10 @@ const ServiceVisual: React.FC<{ icon: typeof FaLaptopCode }> = ({ icon: Icon }) 
 };
 
 const Services: React.FC = memo(() => {
+  const { language } = useLanguage();
+  const mainServices = mainServicesData[language];
+  const additionalServices = additionalServicesData[language];
+
   return (
     <ServicesSection id="services">
       {/* Hero */}
@@ -697,9 +795,11 @@ const Services: React.FC = memo(() => {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          What we
-          <br />
-          build
+          {language === 'en' ? (
+            <>What we<br />build</>
+          ) : (
+            <>Что мы<br />создаём</>
+          )}
         </HeroTitle>
         <HeroSubtitle
           initial={{ opacity: 0, y: 30 }}
@@ -707,7 +807,9 @@ const Services: React.FC = memo(() => {
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          We turn ambitious ideas into digital products that people actually want to use
+          {language === 'en'
+            ? 'We turn ambitious ideas into digital products that people actually want to use'
+            : 'Превращаем амбициозные идеи в цифровые продукты, которыми хочется пользоваться'}
         </HeroSubtitle>
       </ServicesHero>
 
@@ -743,30 +845,37 @@ const Services: React.FC = memo(() => {
         ))}
       </ServiceShowcase>
 
-      {/* Additional services */}
+      {/* Additional services - Bento Grid */}
       <AdditionalServices>
-        <AdditionalTitle>Plus everything else you need</AdditionalTitle>
-        <ServicesGrid>
-          {additionalServices.map((service, index) => (
-            <ServiceCard
-              key={index}
-              href="#contact"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: index * 0.08 }}
-            >
-              <ServiceCardIcon>
-                <service.icon />
-              </ServiceCardIcon>
-              <ServiceCardTitle>{service.title}</ServiceCardTitle>
-              <ServiceCardDescription>{service.description}</ServiceCardDescription>
-              <ServiceCardArrow>
-                <FaArrowRight />
-              </ServiceCardArrow>
-            </ServiceCard>
-          ))}
-        </ServicesGrid>
+        <AdditionalTitle>
+          {language === 'en' ? 'Plus everything else you need' : 'И всё остальное, что вам нужно'}
+        </AdditionalTitle>
+        <BentoGrid>
+          {additionalServices.map((service, index) => {
+            // Первые 2 карточки большие (занимают 2 колонки)
+            const isLarge = index < 2;
+            return (
+              <BentoCard
+                key={index}
+                href="#contact"
+                $large={isLarge}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5, delay: index * 0.08 }}
+              >
+                <BentoCardIcon $large={isLarge}>
+                  <service.icon />
+                </BentoCardIcon>
+                <BentoCardTitle $large={isLarge}>{service.title}</BentoCardTitle>
+                <BentoCardDescription $large={isLarge}>{service.description}</BentoCardDescription>
+                <BentoCardArrow>
+                  <FaArrowRight />
+                </BentoCardArrow>
+              </BentoCard>
+            );
+          })}
+        </BentoGrid>
       </AdditionalServices>
     </ServicesSection>
   );

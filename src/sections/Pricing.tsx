@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import styled from 'styled-components';
 import { FaCheck, FaArrowRight } from 'react-icons/fa';
+import { useLanguage } from '../context/LanguageContext';
 
 const PricingSection = styled.section`
   padding: 120px 0;
@@ -275,69 +276,123 @@ const CustomButton = styled.a`
   }
 `;
 
-const plans = [
-  {
-    name: 'Starter',
-    description: 'Perfect for landing pages and small projects',
-    price: '$2,500',
-    priceNote: 'Fixed price',
-    features: [
-      'Landing page (up to 5 sections)',
-      'Mobile-responsive design',
-      'Contact form integration',
-      'Basic SEO setup',
-      '2 rounds of revisions',
-      '30-day support'
-    ],
-    featured: false
-  },
-  {
-    name: 'Professional',
-    description: 'For businesses that need more functionality',
-    price: '$5,000',
-    priceNote: 'Starting from',
-    features: [
-      'Multi-page website (up to 10 pages)',
-      'Custom UI/UX design',
-      'CMS integration',
-      'Advanced SEO optimization',
-      'Analytics setup',
-      '60-day support & warranty'
-    ],
-    featured: true
-  },
-  {
-    name: 'Enterprise',
-    description: 'Complex apps and e-commerce solutions',
-    price: '$10,000',
-    priceNote: 'Starting from',
-    features: [
-      'Web application or e-commerce',
-      'Custom functionality',
-      'Payment integration',
-      'Admin dashboard',
-      'API development',
-      '90-day support & warranty'
-    ],
-    featured: false
-  }
-];
+const plansData = {
+  en: [
+    {
+      name: 'Starter',
+      description: 'Perfect for landing pages and small projects',
+      price: '$2,500',
+      priceNote: 'Fixed price',
+      features: [
+        'Landing page (up to 5 sections)',
+        'Mobile-responsive design',
+        'Contact form integration',
+        'Basic SEO setup',
+        '2 rounds of revisions',
+        '30-day support'
+      ],
+      featured: false
+    },
+    {
+      name: 'Professional',
+      description: 'For businesses that need more functionality',
+      price: '$5,000',
+      priceNote: 'Starting from',
+      features: [
+        'Multi-page website (up to 10 pages)',
+        'Custom UI/UX design',
+        'CMS integration',
+        'Advanced SEO optimization',
+        'Analytics setup',
+        '60-day support & warranty'
+      ],
+      featured: true
+    },
+    {
+      name: 'Enterprise',
+      description: 'Complex apps and e-commerce solutions',
+      price: '$10,000',
+      priceNote: 'Starting from',
+      features: [
+        'Web application or e-commerce',
+        'Custom functionality',
+        'Payment integration',
+        'Admin dashboard',
+        'API development',
+        '90-day support & warranty'
+      ],
+      featured: false
+    }
+  ],
+  ru: [
+    {
+      name: 'Стартовый',
+      description: 'Идеально для лендингов и небольших проектов',
+      price: '$2,500',
+      priceNote: 'Фиксированная цена',
+      features: [
+        'Лендинг (до 5 секций)',
+        'Адаптивный дизайн',
+        'Форма обратной связи',
+        'Базовая SEO-настройка',
+        '2 раунда правок',
+        'Поддержка 30 дней'
+      ],
+      featured: false
+    },
+    {
+      name: 'Профессиональный',
+      description: 'Для бизнеса, которому нужно больше функций',
+      price: '$5,000',
+      priceNote: 'От',
+      features: [
+        'Многостраничный сайт (до 10 страниц)',
+        'Уникальный UI/UX дизайн',
+        'Интеграция CMS',
+        'Продвинутая SEO-оптимизация',
+        'Настройка аналитики',
+        'Поддержка и гарантия 60 дней'
+      ],
+      featured: true
+    },
+    {
+      name: 'Корпоративный',
+      description: 'Сложные приложения и e-commerce решения',
+      price: '$10,000',
+      priceNote: 'От',
+      features: [
+        'Веб-приложение или интернет-магазин',
+        'Кастомный функционал',
+        'Интеграция оплаты',
+        'Админ-панель',
+        'Разработка API',
+        'Поддержка и гарантия 90 дней'
+      ],
+      featured: false
+    }
+  ]
+};
 
 const Pricing: React.FC = memo(() => {
+  const { language } = useLanguage();
+  const plans = plansData[language];
+
   return (
     <PricingSection id="pricing">
       <Container>
         <SectionHeader>
-          <SectionTitle>Simple pricing</SectionTitle>
+          <SectionTitle>{language === 'en' ? 'Simple pricing' : 'Простые цены'}</SectionTitle>
           <SectionSubtitle>
-            Transparent pricing with no hidden fees. Choose a plan or get a custom quote.
+            {language === 'en'
+              ? 'Transparent pricing with no hidden fees. Choose a plan or get a custom quote.'
+              : 'Прозрачные цены без скрытых платежей. Выберите план или получите индивидуальное предложение.'}
           </SectionSubtitle>
         </SectionHeader>
 
         <PricingGrid>
           {plans.map((plan, index) => (
             <PricingCard key={index} $featured={plan.featured}>
-              {plan.featured && <PopularBadge>Most Popular</PopularBadge>}
+              {plan.featured && <PopularBadge>{language === 'en' ? 'Most Popular' : 'Популярный'}</PopularBadge>}
               <PlanName>{plan.name}</PlanName>
               <PlanDescription>{plan.description}</PlanDescription>
               <PriceContainer>
@@ -353,19 +408,21 @@ const Pricing: React.FC = memo(() => {
                 ))}
               </FeaturesList>
               <CTAButton href="#contact" $primary={plan.featured}>
-                Get started <FaArrowRight />
+                {language === 'en' ? 'Get started' : 'Начать'} <FaArrowRight />
               </CTAButton>
             </PricingCard>
           ))}
         </PricingGrid>
 
         <CustomSection>
-          <CustomTitle>Need something custom?</CustomTitle>
+          <CustomTitle>{language === 'en' ? 'Need something custom?' : 'Нужно что-то особенное?'}</CustomTitle>
           <CustomDescription>
-            Have a unique project in mind? Let's discuss your requirements and create a tailored solution.
+            {language === 'en'
+              ? "Have a unique project in mind? Let's discuss your requirements and create a tailored solution."
+              : 'Есть уникальный проект? Давайте обсудим ваши требования и создадим индивидуальное решение.'}
           </CustomDescription>
           <CustomButton href="#contact">
-            Contact us <FaArrowRight />
+            {language === 'en' ? 'Contact us' : 'Связаться'} <FaArrowRight />
           </CustomButton>
         </CustomSection>
       </Container>

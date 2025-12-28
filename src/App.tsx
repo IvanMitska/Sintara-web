@@ -8,6 +8,7 @@ import Navigation from './components/Navigation';
 import Hero from './sections/Hero';
 import AIChatWidget from './components/AIChatWidget';
 import StarField from './components/StarField';
+import { LanguageProvider } from './context/LanguageContext';
 
 // Определяем производительность устройства при загрузке
 const isMobile = window.innerWidth < 768;
@@ -53,10 +54,10 @@ const MainLoader = styled.div`
 const Services = lazyLoad(() => import('./sections/Services'));
 const Benefits = lazyLoad(() => import('./sections/Benefits'));
 const WorkProcess = lazyLoad(() => import('./sections/WorkProcess'));
+const Testimonials = lazyLoad(() => import('./sections/Testimonials'));
 const LiveCodeDemo = lazyLoad(() => import('./sections/LiveCodeDemo'));
 const Pricing = lazyLoad(() => import('./sections/Pricing'));
 const Portfolio = lazyLoad(() => import('./sections/Portfolio'));
-const ProjectShowcase = lazyLoad(() => import('./sections/ProjectShowcase'));
 const FAQ = lazyLoad(() => import('./sections/FAQ'));
 const Contact = lazyLoad(() => import('./sections/Contact'));
 const Footer = lazyLoad(() => import('./components/Footer'));
@@ -125,15 +126,15 @@ function HomePage({ isReady }: { isReady: boolean }) {
         </LazyLoadSection>
 
         <LazyLoadSection threshold={isLowEndDevice ? 0.01 : 0.05} rootMargin={isLowEndDevice ? '100px' : '300px'}>
+          <Testimonials />
+        </LazyLoadSection>
+
+        <LazyLoadSection threshold={isLowEndDevice ? 0.01 : 0.05} rootMargin={isLowEndDevice ? '100px' : '300px'}>
           <Pricing />
         </LazyLoadSection>
 
         <LazyLoadSection threshold={isLowEndDevice ? 0.01 : 0.05} rootMargin={isLowEndDevice ? '100px' : '300px'}>
           <LiveCodeDemo />
-        </LazyLoadSection>
-
-        <LazyLoadSection threshold={0.01} rootMargin={isLowEndDevice ? '50px' : '200px'}>
-          <ProjectShowcase />
         </LazyLoadSection>
 
         <LazyLoadSection threshold={0.01} rootMargin={isLowEndDevice ? '50px' : '200px'}>
@@ -195,18 +196,20 @@ function App() {
   }, []);
 
   return (
-    <BrowserRouter>
-      <GlobalStyles />
-      <ErrorBoundary>
-        <Suspense fallback={<MainLoader />}>
-          <Routes>
-            <Route path="/" element={<HomePage isReady={isReady} />} />
-            <Route path="/project/:slug" element={<ProjectDetail />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </ErrorBoundary>
-    </BrowserRouter>
+    <LanguageProvider>
+      <BrowserRouter>
+        <GlobalStyles />
+        <ErrorBoundary>
+          <Suspense fallback={<MainLoader />}>
+            <Routes>
+              <Route path="/" element={<HomePage isReady={isReady} />} />
+              <Route path="/project/:slug" element={<ProjectDetail />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </ErrorBoundary>
+      </BrowserRouter>
+    </LanguageProvider>
   );
 }
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled, { keyframes, css } from 'styled-components';
+import { useLanguage } from '../context/LanguageContext';
 
 const fadeIn = keyframes`
   from {
@@ -134,18 +135,36 @@ const NavLinks = styled.div<{ $isOpen: boolean }>`
 `;
 
 const NavLink = styled.a<{ $index?: number; $isOpen?: boolean }>`
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.65);
   text-decoration: none;
   font-weight: 400;
   font-size: 0.9375rem;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
-  transition: color 0.2s ease;
   letter-spacing: -0.01em;
   padding: 8px 16px;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 16px;
+    right: 16px;
+    height: 1px;
+    background: #a78bfa;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
 
   &:hover {
-    color: white;
+    color: rgba(255, 255, 255, 0.9);
+
+    &::after {
+      opacity: 1;
+    }
   }
+
+  transition: color 0.5s ease;
 
   @media (max-width: 768px) {
     font-size: 1.125rem;
@@ -157,11 +176,15 @@ const NavLink = styled.a<{ $index?: number; $isOpen?: boolean }>`
     position: relative;
     overflow: hidden;
 
+    &::after {
+      display: none;
+    }
+
     opacity: ${props => props.$isOpen ? 1 : 0};
     transform: ${props => props.$isOpen ? 'translateX(0)' : 'translateX(-20px)'};
     transition:
-      color 0.2s ease,
-      background 0.3s ease,
+      color 0.5s ease,
+      background 0.5s ease,
       opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
       transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     transition-delay: ${props => props.$isOpen ? `${(props.$index || 0) * 0.05 + 0.1}s` : '0s'};
@@ -172,7 +195,7 @@ const NavLink = styled.a<{ $index?: number; $isOpen?: boolean }>`
       inset: 0;
       background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(139, 92, 246, 0.05));
       opacity: 0;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.5s ease;
       border-radius: 16px;
     }
 
@@ -182,10 +205,6 @@ const NavLink = styled.a<{ $index?: number; $isOpen?: boolean }>`
       &::before {
         opacity: 1;
       }
-    }
-
-    &:active {
-      transform: scale(0.98);
     }
   }
 `;
@@ -279,6 +298,42 @@ const MobileOverlay = styled.div<{ $isOpen: boolean }>`
   }
 `;
 
+const LanguageToggle = styled.button<{ $isOpen?: boolean }>`
+  background: transparent;
+  border: none;
+  padding: 8px 12px;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  letter-spacing: 0.02em;
+
+  &:hover {
+    color: #ffffff;
+  }
+
+  @media (max-width: 768px) {
+    padding: 14px 20px;
+    font-size: 1rem;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 8px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+
+    opacity: ${props => props.$isOpen ? 1 : 0};
+    transform: ${props => props.$isOpen ? 'translateY(0)' : 'translateY(10px)'};
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: ${props => props.$isOpen ? '0.3s' : '0s'};
+
+    &:hover {
+      background: rgba(124, 58, 237, 0.1);
+    }
+  }
+`;
+
 const MobileMenuButton = styled.button<{ $isOpen: boolean }>`
   display: none;
   background: ${props => props.$isOpen
@@ -354,6 +409,7 @@ const MobileMenuButton = styled.button<{ $isOpen: boolean }>`
 const Navigation: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const { language, toggleLanguage, t } = useLanguage();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -393,13 +449,16 @@ const Navigation: React.FC = () => {
         </Logo>
 
         <NavLinks $isOpen={isOpen}>
-          <NavLink href="#about" onClick={closeMenu} $index={0} $isOpen={isOpen}>About</NavLink>
-          <NavLink href="#services" onClick={closeMenu} $index={1} $isOpen={isOpen}>Our cases</NavLink>
-          <NavLink href="#pricing" onClick={closeMenu} $index={2} $isOpen={isOpen}>Services</NavLink>
-          <NavLink href="#portfolio" onClick={closeMenu} $index={3} $isOpen={isOpen}>Prices</NavLink>
+          <NavLink href="#services" onClick={closeMenu} $index={0} $isOpen={isOpen}>{t('nav.services')}</NavLink>
+          <NavLink href="#process" onClick={closeMenu} $index={1} $isOpen={isOpen}>{t('nav.work')}</NavLink>
+          <NavLink href="#pricing" onClick={closeMenu} $index={2} $isOpen={isOpen}>{t('nav.pricing')}</NavLink>
+          <NavLink href="#contact" onClick={closeMenu} $index={3} $isOpen={isOpen}>{t('nav.contact')}</NavLink>
           <MenuDivider $isOpen={isOpen} />
+          <LanguageToggle onClick={toggleLanguage} $isOpen={isOpen}>
+            {language === 'en' ? 'RU' : 'EN'}
+          </LanguageToggle>
           <CTAButton href="#contact" onClick={closeMenu} $isOpen={isOpen}>
-            Hire us
+            {t('nav.getStarted')}
           </CTAButton>
         </NavLinks>
 

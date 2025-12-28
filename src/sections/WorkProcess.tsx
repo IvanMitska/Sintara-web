@@ -1,5 +1,6 @@
 import React, { memo, useState, useCallback, useRef } from 'react';
 import styled from 'styled-components';
+import { useLanguage } from '../context/LanguageContext';
 
 const ProcessSection = styled.section`
   padding: 120px 0;
@@ -492,65 +493,120 @@ const ProgressText = styled.div`
   text-align: center;
 `;
 
-const steps = [
-  {
-    number: '01',
-    title: 'Discovery call',
-    description: 'We discuss your goals, requirements, and vision. You get a clear understanding of what\'s possible and a rough estimate.',
-    duration: '1-2 days',
-    badge: 'Start'
-  },
-  {
-    number: '02',
-    title: 'Proposal & planning',
-    description: 'Detailed scope, fixed price, and timeline. No surprises. You approve before we write a single line of code.',
-    duration: '2-3 days',
-    badge: 'Planning'
-  },
-  {
-    number: '03',
-    title: 'Design & prototype',
-    description: 'Interactive mockups you can click through. See exactly how your product will look and feel before development.',
-    duration: '5-7 days',
-    badge: 'Design'
-  },
-  {
-    number: '04',
-    title: 'Development',
-    description: 'We build your product with weekly demos. You see progress in real-time and can give feedback along the way.',
-    duration: '2-4 weeks',
-    badge: 'Build'
-  },
-  {
-    number: '05',
-    title: 'Testing & QA',
-    description: 'Rigorous testing across devices and browsers. We catch bugs before your users do.',
-    duration: '3-5 days',
-    badge: 'Quality'
-  },
-  {
-    number: '06',
-    title: 'Launch',
-    description: 'Smooth deployment to production. We handle hosting setup, DNS, SSL — everything technical.',
-    duration: '1-2 days',
-    badge: 'Deploy'
-  },
-  {
-    number: '07',
-    title: 'Support',
-    description: '60-day warranty included. After that, optional maintenance plans available if you need ongoing help.',
-    duration: 'Ongoing',
-    badge: 'Finish'
-  }
-];
+const stepsData = {
+  en: [
+    {
+      number: '01',
+      title: 'Discovery call',
+      description: 'We discuss your goals, requirements, and vision. You get a clear understanding of what\'s possible and a rough estimate.',
+      duration: '1-2 days',
+      badge: 'Start'
+    },
+    {
+      number: '02',
+      title: 'Proposal & planning',
+      description: 'Detailed scope, fixed price, and timeline. No surprises. You approve before we write a single line of code.',
+      duration: '2-3 days',
+      badge: 'Planning'
+    },
+    {
+      number: '03',
+      title: 'Design & prototype',
+      description: 'Interactive mockups you can click through. See exactly how your product will look and feel before development.',
+      duration: '5-7 days',
+      badge: 'Design'
+    },
+    {
+      number: '04',
+      title: 'Development',
+      description: 'We build your product with weekly demos. You see progress in real-time and can give feedback along the way.',
+      duration: '2-4 weeks',
+      badge: 'Build'
+    },
+    {
+      number: '05',
+      title: 'Testing & QA',
+      description: 'Rigorous testing across devices and browsers. We catch bugs before your users do.',
+      duration: '3-5 days',
+      badge: 'Quality'
+    },
+    {
+      number: '06',
+      title: 'Launch',
+      description: 'Smooth deployment to production. We handle hosting setup, DNS, SSL — everything technical.',
+      duration: '1-2 days',
+      badge: 'Deploy'
+    },
+    {
+      number: '07',
+      title: 'Support',
+      description: '60-day warranty included. After that, optional maintenance plans available if you need ongoing help.',
+      duration: 'Ongoing',
+      badge: 'Finish'
+    }
+  ],
+  ru: [
+    {
+      number: '01',
+      title: 'Знакомство',
+      description: 'Обсуждаем ваши цели, требования и видение. Вы получаете понимание возможностей и предварительную оценку.',
+      duration: '1-2 дня',
+      badge: 'Старт'
+    },
+    {
+      number: '02',
+      title: 'Предложение и план',
+      description: 'Детальный план, фиксированная цена и сроки. Без сюрпризов. Вы одобряете до написания кода.',
+      duration: '2-3 дня',
+      badge: 'План'
+    },
+    {
+      number: '03',
+      title: 'Дизайн и прототип',
+      description: 'Интерактивные макеты, которые можно кликать. Увидите, как будет выглядеть продукт до разработки.',
+      duration: '5-7 дней',
+      badge: 'Дизайн'
+    },
+    {
+      number: '04',
+      title: 'Разработка',
+      description: 'Создаём продукт с еженедельными демо. Видите прогресс в реальном времени и даёте обратную связь.',
+      duration: '2-4 недели',
+      badge: 'Код'
+    },
+    {
+      number: '05',
+      title: 'Тестирование',
+      description: 'Тщательное тестирование на всех устройствах и браузерах. Находим баги до ваших пользователей.',
+      duration: '3-5 дней',
+      badge: 'QA'
+    },
+    {
+      number: '06',
+      title: 'Запуск',
+      description: 'Плавный деплой в продакшн. Мы настроим хостинг, DNS, SSL — всю техническую часть.',
+      duration: '1-2 дня',
+      badge: 'Деплой'
+    },
+    {
+      number: '07',
+      title: 'Поддержка',
+      description: 'Гарантия 60 дней включена. После этого — опциональные планы обслуживания при необходимости.',
+      duration: 'Постоянно',
+      badge: 'Финал'
+    }
+  ]
+};
 
 const WorkProcess: React.FC = memo(() => {
+  const { language } = useLanguage();
+  const steps = stepsData[language];
   const [activeIndex, setActiveIndex] = useState(0);
   const touchStartRef = useRef<number | null>(null);
 
   const goToNext = useCallback(() => {
     setActiveIndex(prev => Math.min(prev + 1, steps.length - 1));
-  }, []);
+  }, [steps.length]);
 
   const goToPrev = useCallback(() => {
     setActiveIndex(prev => Math.max(prev - 1, 0));
@@ -597,9 +653,11 @@ const WorkProcess: React.FC = memo(() => {
     <ProcessSection id="process">
       <Container>
         <SectionHeader>
-          <SectionTitle>How we work</SectionTitle>
+          <SectionTitle>{language === 'en' ? 'How we work' : 'Как мы работаем'}</SectionTitle>
           <SectionSubtitle>
-            A transparent process from first call to final delivery
+            {language === 'en'
+              ? 'A transparent process from first call to final delivery'
+              : 'Прозрачный процесс от первого звонка до запуска'}
           </SectionSubtitle>
         </SectionHeader>
 
