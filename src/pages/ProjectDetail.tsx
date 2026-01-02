@@ -15,6 +15,7 @@ import {
   FaMobileAlt,
   FaLaptopCode
 } from 'react-icons/fa';
+import { useLanguage } from '../context/LanguageContext';
 
 const float = keyframes`
   0%, 100% { transform: translateY(0); }
@@ -489,212 +490,411 @@ interface ProjectData {
   categoryIcon: React.ReactNode;
   title: string;
   description: string;
-  stats: { icon: React.ReactNode; value: string; label: string }[];
+  stats: { icon: React.ReactNode; value: string; labelKey: string }[];
   gallery: { title: string; description: string; media?: string }[];
   problem: string[];
   solution: string[];
   techStack: string[];
 }
 
-const projectsData: Record<string, ProjectData> = {
-  'ecommerce-platform': {
-    slug: 'ecommerce-platform',
-    category: 'E-commerce',
-    categoryIcon: <FaGlobe />,
-    title: 'E-commerce Platform',
-    description: 'A full-featured online store with payment integration, inventory management, and analytics dashboard. The platform automated order processing and reduced manual work by 80%.',
-    stats: [
-      { icon: <FaChartLine />, value: '+340%', label: 'Sales increase' },
-      { icon: <FaClock />, value: '80%', label: 'Time saved' },
-      { icon: <FaUsers />, value: '15K+', label: 'Active users' },
-      { icon: <FaRocket />, value: '2 weeks', label: 'Development' },
-    ],
-    gallery: [
-      { title: 'Product Catalog', description: 'Dynamic product grid with filters, search, and sorting capabilities' },
-      { title: 'Shopping Cart', description: 'Real-time cart updates with discount codes and shipping calculator' },
-      { title: 'Admin Dashboard', description: 'Complete order management, analytics, and inventory control' },
-      { title: 'Mobile Experience', description: 'Fully responsive design optimized for mobile shopping' },
-    ],
-    problem: [
-      'Manual order processing taking hours daily',
-      'No real-time inventory tracking',
-      'Poor mobile experience losing customers',
-      'No analytics to understand customer behavior',
-    ],
-    solution: [
-      'Automated order processing with instant notifications',
-      'Real-time inventory sync across all channels',
-      'Mobile-first responsive design',
-      'Comprehensive analytics dashboard with insights',
-    ],
-    techStack: ['React', 'Node.js', 'PostgreSQL', 'Stripe', 'Redis', 'AWS'],
+type Language = 'en' | 'ru';
+
+const projectsData: Record<Language, Record<string, ProjectData>> = {
+  en: {
+    'ecommerce-platform': {
+      slug: 'ecommerce-platform',
+      category: 'E-commerce',
+      categoryIcon: <FaGlobe />,
+      title: 'E-commerce Platform',
+      description: 'A full-featured online store with payment integration, inventory management, and analytics dashboard. The platform automated order processing and reduced manual work by 80%.',
+      stats: [
+        { icon: <FaChartLine />, value: '+340%', labelKey: 'projectDetail.salesIncrease' },
+        { icon: <FaClock />, value: '80%', labelKey: 'projectDetail.timeSaved' },
+        { icon: <FaUsers />, value: '15K+', labelKey: 'projectDetail.activeUsers' },
+        { icon: <FaRocket />, value: '2 weeks', labelKey: 'projectDetail.development' },
+      ],
+      gallery: [
+        { title: 'Product Catalog', description: 'Dynamic product grid with filters, search, and sorting capabilities' },
+        { title: 'Shopping Cart', description: 'Real-time cart updates with discount codes and shipping calculator' },
+        { title: 'Admin Dashboard', description: 'Complete order management, analytics, and inventory control' },
+        { title: 'Mobile Experience', description: 'Fully responsive design optimized for mobile shopping' },
+      ],
+      problem: [
+        'Manual order processing taking hours daily',
+        'No real-time inventory tracking',
+        'Poor mobile experience losing customers',
+        'No analytics to understand customer behavior',
+      ],
+      solution: [
+        'Automated order processing with instant notifications',
+        'Real-time inventory sync across all channels',
+        'Mobile-first responsive design',
+        'Comprehensive analytics dashboard with insights',
+      ],
+      techStack: ['React', 'Node.js', 'PostgreSQL', 'Stripe', 'Redis', 'AWS'],
+    },
+    'booking-bot': {
+      slug: 'booking-bot',
+      category: 'Telegram Bot',
+      categoryIcon: <FaRobot />,
+      title: 'Booking Automation Bot',
+      description: 'Smart Telegram bot for automated appointment booking with CRM integration. The bot handles 500+ bookings daily without human intervention.',
+      stats: [
+        { icon: <FaChartLine />, value: '500+', labelKey: 'projectDetail.dailyBookings' },
+        { icon: <FaClock />, value: '95%', labelKey: 'projectDetail.automationRate' },
+        { icon: <FaUsers />, value: '10K+', labelKey: 'projectDetail.botUsers' },
+        { icon: <FaRocket />, value: '3 weeks', labelKey: 'projectDetail.development' },
+      ],
+      gallery: [
+        { title: 'Booking Flow', description: 'Intuitive step-by-step booking process with date/time selection' },
+        { title: 'Reminders', description: 'Automated reminders 24h and 1h before appointments' },
+        { title: 'Admin Panel', description: 'Web dashboard for managing schedules and viewing analytics' },
+        { title: 'CRM Integration', description: 'Seamless sync with existing CRM systems' },
+      ],
+      problem: [
+        'Staff spending 4+ hours daily on phone bookings',
+        'Double bookings and scheduling conflicts',
+        'No-shows causing revenue loss',
+        'No centralized booking system',
+      ],
+      solution: [
+        '24/7 automated booking without staff involvement',
+        'Smart conflict detection and resolution',
+        'Automated reminders reducing no-shows by 60%',
+        'Centralized system with real-time availability',
+      ],
+      techStack: ['Python', 'Aiogram', 'PostgreSQL', 'Redis', 'FastAPI', 'Docker'],
+    },
+    'saas-dashboard': {
+      slug: 'saas-dashboard',
+      category: 'Web Application',
+      categoryIcon: <FaLaptopCode />,
+      title: 'SaaS Analytics Dashboard',
+      description: 'Comprehensive analytics dashboard with real-time data visualization, custom reports, and team collaboration features. The platform helped clients make data-driven decisions 3x faster.',
+      stats: [
+        { icon: <FaChartLine />, value: '3x', labelKey: 'projectDetail.fasterDecisions' },
+        { icon: <FaClock />, value: '< 1s', labelKey: 'projectDetail.dataRefresh' },
+        { icon: <FaUsers />, value: '200+', labelKey: 'projectDetail.teamsUsing' },
+        { icon: <FaRocket />, value: '5 weeks', labelKey: 'projectDetail.development' },
+      ],
+      gallery: [
+        { title: 'Main Dashboard', description: 'Interactive charts and KPI widgets with drag-and-drop customization' },
+        { title: 'Real-time Analytics', description: 'Live data updates with WebSocket connections' },
+        { title: 'Custom Reports', description: 'Build and export custom reports in multiple formats' },
+        { title: 'Team Collaboration', description: 'Share dashboards and insights with team members' },
+      ],
+      problem: [
+        'Data scattered across multiple tools',
+        'Hours spent creating manual reports',
+        'No real-time visibility into metrics',
+        'Difficult to share insights with team',
+      ],
+      solution: [
+        'Unified dashboard aggregating all data sources',
+        'Automated report generation saving 10+ hours weekly',
+        'Real-time data streaming with instant updates',
+        'Collaborative features with role-based access',
+      ],
+      techStack: ['Next.js', 'TypeScript', 'D3.js', 'PostgreSQL', 'Redis', 'WebSocket'],
+    },
+    'learning-bot': {
+      slug: 'learning-bot',
+      category: 'Telegram Bot',
+      categoryIcon: <FaRobot />,
+      title: 'Educational Platform Bot',
+      description: 'Interactive learning bot with courses, quizzes, progress tracking, and gamification elements. The bot achieved 85% course completion rate, far above industry average.',
+      stats: [
+        { icon: <FaChartLine />, value: '85%', labelKey: 'projectDetail.completionRate' },
+        { icon: <FaClock />, value: '2K+', labelKey: 'projectDetail.lessonsCompleted' },
+        { icon: <FaUsers />, value: '5K+', labelKey: 'projectDetail.activeLearners' },
+        { icon: <FaRocket />, value: '4 weeks', labelKey: 'projectDetail.development' },
+      ],
+      gallery: [
+        { title: 'Course Navigation', description: 'Easy-to-use menu for browsing courses and lessons' },
+        { title: 'Interactive Quizzes', description: 'Engaging quizzes with instant feedback and explanations' },
+        { title: 'Progress Dashboard', description: 'Visual progress tracking with achievements and badges' },
+        { title: 'Leaderboard', description: 'Gamified experience with points and weekly rankings' },
+      ],
+      problem: [
+        'Low engagement with traditional e-learning',
+        'No mobile-friendly learning option',
+        'Difficult to track student progress',
+        'High dropout rates in online courses',
+      ],
+      solution: [
+        'Bite-sized lessons delivered via Telegram',
+        'Learn anytime directly in messenger app',
+        'Detailed analytics for instructors and students',
+        'Gamification increasing completion by 300%',
+      ],
+      techStack: ['Node.js', 'Telegraf', 'MongoDB', 'Redis', 'Express', 'Docker'],
+    },
+    'corporate-website': {
+      slug: 'corporate-website',
+      category: 'Corporate Website',
+      categoryIcon: <FaLaptopCode />,
+      title: 'Tech Company Website',
+      description: 'Modern corporate website with stunning animations, lead generation forms, and CRM integration. The website increased lead conversion by 250%.',
+      stats: [
+        { icon: <FaChartLine />, value: '+250%', labelKey: 'projectDetail.leadConversion' },
+        { icon: <FaClock />, value: '2.5s', labelKey: 'projectDetail.loadTime' },
+        { icon: <FaUsers />, value: '50K+', labelKey: 'projectDetail.monthlyVisitors' },
+        { icon: <FaRocket />, value: '4 weeks', labelKey: 'projectDetail.development' },
+      ],
+      gallery: [
+        { title: 'Hero Section', description: '3D animations and interactive elements that capture attention' },
+        { title: 'Services Showcase', description: 'Dynamic service cards with smooth scroll animations' },
+        { title: 'Contact Forms', description: 'Multi-step forms with validation and CRM integration' },
+        { title: 'Blog Section', description: 'SEO-optimized blog with content management' },
+      ],
+      problem: [
+        'Outdated design losing credibility',
+        'Poor SEO ranking on search engines',
+        'No lead capture or CRM integration',
+        'Slow loading times hurting conversions',
+      ],
+      solution: [
+        'Modern design with premium animations',
+        'Technical SEO optimization for top rankings',
+        'Integrated lead forms with CRM sync',
+        'Performance optimization for fast loading',
+      ],
+      techStack: ['React', 'GSAP', 'Three.js', 'Node.js', 'Sanity CMS', 'Vercel'],
+    },
+    'delivery-app': {
+      slug: 'delivery-app',
+      category: 'Mobile App',
+      categoryIcon: <FaMobileAlt />,
+      title: 'Food Delivery App',
+      description: 'Complete food delivery application with real-time courier tracking, loyalty program, and restaurant management panel.',
+      stats: [
+        { icon: <FaChartLine />, value: '1000+', labelKey: 'projectDetail.dailyOrders' },
+        { icon: <FaClock />, value: '25min', labelKey: 'projectDetail.avgDelivery' },
+        { icon: <FaUsers />, value: '25K+', labelKey: 'projectDetail.appDownloads' },
+        { icon: <FaRocket />, value: '6 weeks', labelKey: 'projectDetail.development' },
+      ],
+      gallery: [
+        { title: 'Restaurant Menu', description: 'Beautiful menu display with categories and customization options' },
+        { title: 'Live Tracking', description: 'Real-time courier location on interactive map' },
+        { title: 'Order Management', description: 'Restaurant panel for managing orders and menu' },
+        { title: 'Loyalty Program', description: 'Points system with rewards and special offers' },
+      ],
+      problem: [
+        'No way to track delivery status',
+        'High customer support calls',
+        'No customer retention strategy',
+        'Manual order management for restaurants',
+      ],
+      solution: [
+        'Real-time GPS tracking for all deliveries',
+        'Automated status updates reducing calls by 70%',
+        'Gamified loyalty program increasing retention',
+        'Digital restaurant panel for easy management',
+      ],
+      techStack: ['React Native', 'Firebase', 'Node.js', 'MongoDB', 'Socket.io', 'Google Maps'],
+    },
   },
-  'booking-bot': {
-    slug: 'booking-bot',
-    category: 'Telegram Bot',
-    categoryIcon: <FaRobot />,
-    title: 'Booking Automation Bot',
-    description: 'Smart Telegram bot for automated appointment booking with CRM integration. The bot handles 500+ bookings daily without human intervention.',
-    stats: [
-      { icon: <FaChartLine />, value: '500+', label: 'Daily bookings' },
-      { icon: <FaClock />, value: '95%', label: 'Automation rate' },
-      { icon: <FaUsers />, value: '10K+', label: 'Bot users' },
-      { icon: <FaRocket />, value: '3 weeks', label: 'Development' },
-    ],
-    gallery: [
-      { title: 'Booking Flow', description: 'Intuitive step-by-step booking process with date/time selection' },
-      { title: 'Reminders', description: 'Automated reminders 24h and 1h before appointments' },
-      { title: 'Admin Panel', description: 'Web dashboard for managing schedules and viewing analytics' },
-      { title: 'CRM Integration', description: 'Seamless sync with existing CRM systems' },
-    ],
-    problem: [
-      'Staff spending 4+ hours daily on phone bookings',
-      'Double bookings and scheduling conflicts',
-      'No-shows causing revenue loss',
-      'No centralized booking system',
-    ],
-    solution: [
-      '24/7 automated booking without staff involvement',
-      'Smart conflict detection and resolution',
-      'Automated reminders reducing no-shows by 60%',
-      'Centralized system with real-time availability',
-    ],
-    techStack: ['Python', 'Aiogram', 'PostgreSQL', 'Redis', 'FastAPI', 'Docker'],
-  },
-  'saas-dashboard': {
-    slug: 'saas-dashboard',
-    category: 'Web Application',
-    categoryIcon: <FaLaptopCode />,
-    title: 'SaaS Analytics Dashboard',
-    description: 'Comprehensive analytics dashboard with real-time data visualization, custom reports, and team collaboration features. The platform helped clients make data-driven decisions 3x faster.',
-    stats: [
-      { icon: <FaChartLine />, value: '3x', label: 'Faster decisions' },
-      { icon: <FaClock />, value: '< 1s', label: 'Data refresh' },
-      { icon: <FaUsers />, value: '200+', label: 'Teams using' },
-      { icon: <FaRocket />, value: '5 weeks', label: 'Development' },
-    ],
-    gallery: [
-      { title: 'Main Dashboard', description: 'Interactive charts and KPI widgets with drag-and-drop customization' },
-      { title: 'Real-time Analytics', description: 'Live data updates with WebSocket connections' },
-      { title: 'Custom Reports', description: 'Build and export custom reports in multiple formats' },
-      { title: 'Team Collaboration', description: 'Share dashboards and insights with team members' },
-    ],
-    problem: [
-      'Data scattered across multiple tools',
-      'Hours spent creating manual reports',
-      'No real-time visibility into metrics',
-      'Difficult to share insights with team',
-    ],
-    solution: [
-      'Unified dashboard aggregating all data sources',
-      'Automated report generation saving 10+ hours weekly',
-      'Real-time data streaming with instant updates',
-      'Collaborative features with role-based access',
-    ],
-    techStack: ['Next.js', 'TypeScript', 'D3.js', 'PostgreSQL', 'Redis', 'WebSocket'],
-  },
-  'learning-bot': {
-    slug: 'learning-bot',
-    category: 'Telegram Bot',
-    categoryIcon: <FaRobot />,
-    title: 'Educational Platform Bot',
-    description: 'Interactive learning bot with courses, quizzes, progress tracking, and gamification elements. The bot achieved 85% course completion rate, far above industry average.',
-    stats: [
-      { icon: <FaChartLine />, value: '85%', label: 'Completion rate' },
-      { icon: <FaClock />, value: '2K+', label: 'Lessons completed' },
-      { icon: <FaUsers />, value: '5K+', label: 'Active learners' },
-      { icon: <FaRocket />, value: '4 weeks', label: 'Development' },
-    ],
-    gallery: [
-      { title: 'Course Navigation', description: 'Easy-to-use menu for browsing courses and lessons' },
-      { title: 'Interactive Quizzes', description: 'Engaging quizzes with instant feedback and explanations' },
-      { title: 'Progress Dashboard', description: 'Visual progress tracking with achievements and badges' },
-      { title: 'Leaderboard', description: 'Gamified experience with points and weekly rankings' },
-    ],
-    problem: [
-      'Low engagement with traditional e-learning',
-      'No mobile-friendly learning option',
-      'Difficult to track student progress',
-      'High dropout rates in online courses',
-    ],
-    solution: [
-      'Bite-sized lessons delivered via Telegram',
-      'Learn anytime directly in messenger app',
-      'Detailed analytics for instructors and students',
-      'Gamification increasing completion by 300%',
-    ],
-    techStack: ['Node.js', 'Telegraf', 'MongoDB', 'Redis', 'Express', 'Docker'],
-  },
-  'corporate-website': {
-    slug: 'corporate-website',
-    category: 'Corporate Website',
-    categoryIcon: <FaLaptopCode />,
-    title: 'Tech Company Website',
-    description: 'Modern corporate website with stunning animations, lead generation forms, and CRM integration. The website increased lead conversion by 250%.',
-    stats: [
-      { icon: <FaChartLine />, value: '+250%', label: 'Lead conversion' },
-      { icon: <FaClock />, value: '2.5s', label: 'Load time' },
-      { icon: <FaUsers />, value: '50K+', label: 'Monthly visitors' },
-      { icon: <FaRocket />, value: '4 weeks', label: 'Development' },
-    ],
-    gallery: [
-      { title: 'Hero Section', description: '3D animations and interactive elements that capture attention' },
-      { title: 'Services Showcase', description: 'Dynamic service cards with smooth scroll animations' },
-      { title: 'Contact Forms', description: 'Multi-step forms with validation and CRM integration' },
-      { title: 'Blog Section', description: 'SEO-optimized blog with content management' },
-    ],
-    problem: [
-      'Outdated design losing credibility',
-      'Poor SEO ranking on search engines',
-      'No lead capture or CRM integration',
-      'Slow loading times hurting conversions',
-    ],
-    solution: [
-      'Modern design with premium animations',
-      'Technical SEO optimization for top rankings',
-      'Integrated lead forms with CRM sync',
-      'Performance optimization for fast loading',
-    ],
-    techStack: ['React', 'GSAP', 'Three.js', 'Node.js', 'Sanity CMS', 'Vercel'],
-  },
-  'delivery-app': {
-    slug: 'delivery-app',
-    category: 'Mobile App',
-    categoryIcon: <FaMobileAlt />,
-    title: 'Food Delivery App',
-    description: 'Complete food delivery application with real-time courier tracking, loyalty program, and restaurant management panel.',
-    stats: [
-      { icon: <FaChartLine />, value: '1000+', label: 'Daily orders' },
-      { icon: <FaClock />, value: '25min', label: 'Avg. delivery' },
-      { icon: <FaUsers />, value: '25K+', label: 'App downloads' },
-      { icon: <FaRocket />, value: '6 weeks', label: 'Development' },
-    ],
-    gallery: [
-      { title: 'Restaurant Menu', description: 'Beautiful menu display with categories and customization options' },
-      { title: 'Live Tracking', description: 'Real-time courier location on interactive map' },
-      { title: 'Order Management', description: 'Restaurant panel for managing orders and menu' },
-      { title: 'Loyalty Program', description: 'Points system with rewards and special offers' },
-    ],
-    problem: [
-      'No way to track delivery status',
-      'High customer support calls',
-      'No customer retention strategy',
-      'Manual order management for restaurants',
-    ],
-    solution: [
-      'Real-time GPS tracking for all deliveries',
-      'Automated status updates reducing calls by 70%',
-      'Gamified loyalty program increasing retention',
-      'Digital restaurant panel for easy management',
-    ],
-    techStack: ['React Native', 'Firebase', 'Node.js', 'MongoDB', 'Socket.io', 'Google Maps'],
+  ru: {
+    'ecommerce-platform': {
+      slug: 'ecommerce-platform',
+      category: 'Интернет-магазин',
+      categoryIcon: <FaGlobe />,
+      title: 'Платформа интернет-магазина',
+      description: 'Полнофункциональный интернет-магазин с интеграцией платежей, управлением запасами и аналитикой. Платформа автоматизировала обработку заказов и сократила ручную работу на 80%.',
+      stats: [
+        { icon: <FaChartLine />, value: '+340%', labelKey: 'projectDetail.salesIncrease' },
+        { icon: <FaClock />, value: '80%', labelKey: 'projectDetail.timeSaved' },
+        { icon: <FaUsers />, value: '15K+', labelKey: 'projectDetail.activeUsers' },
+        { icon: <FaRocket />, value: '2 недели', labelKey: 'projectDetail.development' },
+      ],
+      gallery: [
+        { title: 'Каталог товаров', description: 'Динамичная сетка товаров с фильтрами, поиском и сортировкой' },
+        { title: 'Корзина', description: 'Обновление корзины в реальном времени с промокодами и калькулятором доставки' },
+        { title: 'Админ-панель', description: 'Полное управление заказами, аналитика и контроль запасов' },
+        { title: 'Мобильная версия', description: 'Полностью адаптивный дизайн для мобильных покупок' },
+      ],
+      problem: [
+        'Ручная обработка заказов занимала часы ежедневно',
+        'Отсутствие отслеживания запасов в реальном времени',
+        'Плохой мобильный опыт терял клиентов',
+        'Нет аналитики для понимания поведения покупателей',
+      ],
+      solution: [
+        'Автоматическая обработка заказов с мгновенными уведомлениями',
+        'Синхронизация запасов в реальном времени по всем каналам',
+        'Mobile-first адаптивный дизайн',
+        'Комплексная аналитическая панель с инсайтами',
+      ],
+      techStack: ['React', 'Node.js', 'PostgreSQL', 'Stripe', 'Redis', 'AWS'],
+    },
+    'booking-bot': {
+      slug: 'booking-bot',
+      category: 'Telegram-бот',
+      categoryIcon: <FaRobot />,
+      title: 'Бот автоматизации записи',
+      description: 'Умный Telegram-бот для автоматического бронирования с интеграцией CRM. Бот обрабатывает 500+ записей ежедневно без участия человека.',
+      stats: [
+        { icon: <FaChartLine />, value: '500+', labelKey: 'projectDetail.dailyBookings' },
+        { icon: <FaClock />, value: '95%', labelKey: 'projectDetail.automationRate' },
+        { icon: <FaUsers />, value: '10K+', labelKey: 'projectDetail.botUsers' },
+        { icon: <FaRocket />, value: '3 недели', labelKey: 'projectDetail.development' },
+      ],
+      gallery: [
+        { title: 'Процесс записи', description: 'Интуитивный пошаговый процесс бронирования с выбором даты/времени' },
+        { title: 'Напоминания', description: 'Автоматические напоминания за 24ч и 1ч до визита' },
+        { title: 'Админ-панель', description: 'Веб-панель для управления расписанием и просмотра аналитики' },
+        { title: 'Интеграция с CRM', description: 'Бесшовная синхронизация с существующими CRM-системами' },
+      ],
+      problem: [
+        'Персонал тратил 4+ часа в день на телефонные записи',
+        'Двойные бронирования и конфликты расписания',
+        'Неявки приводили к потере выручки',
+        'Отсутствие централизованной системы записи',
+      ],
+      solution: [
+        'Автоматическая запись 24/7 без участия персонала',
+        'Умное обнаружение и разрешение конфликтов',
+        'Автоматические напоминания снизили неявки на 60%',
+        'Централизованная система с доступностью в реальном времени',
+      ],
+      techStack: ['Python', 'Aiogram', 'PostgreSQL', 'Redis', 'FastAPI', 'Docker'],
+    },
+    'saas-dashboard': {
+      slug: 'saas-dashboard',
+      category: 'Веб-приложение',
+      categoryIcon: <FaLaptopCode />,
+      title: 'SaaS-дашборд аналитики',
+      description: 'Комплексная панель аналитики с визуализацией данных в реальном времени, кастомными отчётами и функциями командной работы. Платформа помогла клиентам принимать решения на основе данных в 3 раза быстрее.',
+      stats: [
+        { icon: <FaChartLine />, value: '3x', labelKey: 'projectDetail.fasterDecisions' },
+        { icon: <FaClock />, value: '< 1с', labelKey: 'projectDetail.dataRefresh' },
+        { icon: <FaUsers />, value: '200+', labelKey: 'projectDetail.teamsUsing' },
+        { icon: <FaRocket />, value: '5 недель', labelKey: 'projectDetail.development' },
+      ],
+      gallery: [
+        { title: 'Главный дашборд', description: 'Интерактивные графики и KPI-виджеты с drag-and-drop настройкой' },
+        { title: 'Аналитика в реальном времени', description: 'Обновление данных через WebSocket' },
+        { title: 'Кастомные отчёты', description: 'Создание и экспорт отчётов в разных форматах' },
+        { title: 'Командная работа', description: 'Обмен дашбордами и инсайтами с коллегами' },
+      ],
+      problem: [
+        'Данные разбросаны по разным инструментам',
+        'Часы на создание ручных отчётов',
+        'Нет видимости метрик в реальном времени',
+        'Сложно делиться инсайтами с командой',
+      ],
+      solution: [
+        'Единая панель, агрегирующая все источники данных',
+        'Автоматическая генерация отчётов экономит 10+ часов в неделю',
+        'Стриминг данных в реальном времени',
+        'Функции совместной работы с ролевым доступом',
+      ],
+      techStack: ['Next.js', 'TypeScript', 'D3.js', 'PostgreSQL', 'Redis', 'WebSocket'],
+    },
+    'learning-bot': {
+      slug: 'learning-bot',
+      category: 'Telegram-бот',
+      categoryIcon: <FaRobot />,
+      title: 'Образовательный бот',
+      description: 'Интерактивный обучающий бот с курсами, тестами, отслеживанием прогресса и геймификацией. Бот достиг 85% завершаемости курсов — значительно выше среднего по отрасли.',
+      stats: [
+        { icon: <FaChartLine />, value: '85%', labelKey: 'projectDetail.completionRate' },
+        { icon: <FaClock />, value: '2K+', labelKey: 'projectDetail.lessonsCompleted' },
+        { icon: <FaUsers />, value: '5K+', labelKey: 'projectDetail.activeLearners' },
+        { icon: <FaRocket />, value: '4 недели', labelKey: 'projectDetail.development' },
+      ],
+      gallery: [
+        { title: 'Навигация по курсам', description: 'Удобное меню для просмотра курсов и уроков' },
+        { title: 'Интерактивные тесты', description: 'Увлекательные тесты с мгновенной обратной связью и пояснениями' },
+        { title: 'Дашборд прогресса', description: 'Визуальное отслеживание прогресса с достижениями и бейджами' },
+        { title: 'Таблица лидеров', description: 'Геймифицированный опыт с баллами и недельными рейтингами' },
+      ],
+      problem: [
+        'Низкая вовлечённость в традиционное e-learning',
+        'Нет мобильного варианта обучения',
+        'Сложно отслеживать прогресс студентов',
+        'Высокий процент отсева на онлайн-курсах',
+      ],
+      solution: [
+        'Короткие уроки в формате Telegram',
+        'Обучение в любое время прямо в мессенджере',
+        'Детальная аналитика для преподавателей и студентов',
+        'Геймификация увеличила завершаемость на 300%',
+      ],
+      techStack: ['Node.js', 'Telegraf', 'MongoDB', 'Redis', 'Express', 'Docker'],
+    },
+    'corporate-website': {
+      slug: 'corporate-website',
+      category: 'Корпоративный сайт',
+      categoryIcon: <FaLaptopCode />,
+      title: 'Сайт IT-компании',
+      description: 'Современный корпоративный сайт с впечатляющими анимациями, формами лидогенерации и интеграцией CRM. Сайт увеличил конверсию лидов на 250%.',
+      stats: [
+        { icon: <FaChartLine />, value: '+250%', labelKey: 'projectDetail.leadConversion' },
+        { icon: <FaClock />, value: '2.5с', labelKey: 'projectDetail.loadTime' },
+        { icon: <FaUsers />, value: '50K+', labelKey: 'projectDetail.monthlyVisitors' },
+        { icon: <FaRocket />, value: '4 недели', labelKey: 'projectDetail.development' },
+      ],
+      gallery: [
+        { title: 'Главный экран', description: '3D-анимации и интерактивные элементы, привлекающие внимание' },
+        { title: 'Витрина услуг', description: 'Динамичные карточки услуг с плавными scroll-анимациями' },
+        { title: 'Формы обратной связи', description: 'Многошаговые формы с валидацией и интеграцией CRM' },
+        { title: 'Блог', description: 'SEO-оптимизированный блог с системой управления контентом' },
+      ],
+      problem: [
+        'Устаревший дизайн терял доверие',
+        'Плохие позиции в поисковых системах',
+        'Нет захвата лидов и интеграции с CRM',
+        'Медленная загрузка снижала конверсию',
+      ],
+      solution: [
+        'Современный дизайн с премиальными анимациями',
+        'Техническая SEO-оптимизация для топовых позиций',
+        'Интегрированные формы с синхронизацией CRM',
+        'Оптимизация производительности для быстрой загрузки',
+      ],
+      techStack: ['React', 'GSAP', 'Three.js', 'Node.js', 'Sanity CMS', 'Vercel'],
+    },
+    'delivery-app': {
+      slug: 'delivery-app',
+      category: 'Мобильное приложение',
+      categoryIcon: <FaMobileAlt />,
+      title: 'Приложение доставки еды',
+      description: 'Полнофункциональное приложение доставки еды с отслеживанием курьера в реальном времени, программой лояльности и панелью управления рестораном.',
+      stats: [
+        { icon: <FaChartLine />, value: '1000+', labelKey: 'projectDetail.dailyOrders' },
+        { icon: <FaClock />, value: '25мин', labelKey: 'projectDetail.avgDelivery' },
+        { icon: <FaUsers />, value: '25K+', labelKey: 'projectDetail.appDownloads' },
+        { icon: <FaRocket />, value: '6 недель', labelKey: 'projectDetail.development' },
+      ],
+      gallery: [
+        { title: 'Меню ресторана', description: 'Красивое отображение меню с категориями и опциями кастомизации' },
+        { title: 'Отслеживание в реальном времени', description: 'Местоположение курьера на интерактивной карте' },
+        { title: 'Управление заказами', description: 'Панель ресторана для управления заказами и меню' },
+        { title: 'Программа лояльности', description: 'Система баллов с наградами и спецпредложениями' },
+      ],
+      problem: [
+        'Невозможно отследить статус доставки',
+        'Много звонков в службу поддержки',
+        'Нет стратегии удержания клиентов',
+        'Ручное управление заказами для ресторанов',
+      ],
+      solution: [
+        'GPS-отслеживание всех доставок в реальном времени',
+        'Автоматические обновления статуса снизили звонки на 70%',
+        'Геймифицированная программа лояльности для удержания',
+        'Цифровая панель ресторана для удобного управления',
+      ],
+      techStack: ['React Native', 'Firebase', 'Node.js', 'MongoDB', 'Socket.io', 'Google Maps'],
+    },
   },
 };
 
 const ProjectDetail: React.FC = memo(() => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const project = slug ? projectsData[slug] : null;
+  const { language, t } = useLanguage();
+  const project = slug ? projectsData[language][slug] : null;
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -705,15 +905,15 @@ const ProjectDetail: React.FC = memo(() => {
       <PageContainer>
         <Container>
           <BackButton to="/#portfolio">
-            <FaArrowLeft /> Back to portfolio
+            <FaArrowLeft /> {t('projectDetail.back')}
           </BackButton>
           <HeroSection>
-            <ProjectTitle>Project not found</ProjectTitle>
+            <ProjectTitle>{t('projectDetail.notFound')}</ProjectTitle>
             <ProjectDescription>
-              The project you're looking for doesn't exist or has been removed.
+              {t('projectDetail.notFoundDesc')}
             </ProjectDescription>
             <CTAButton to="/#portfolio">
-              View all projects <FaArrowRight />
+              {t('projectDetail.viewAll')} <FaArrowRight />
             </CTAButton>
           </HeroSection>
         </Container>
@@ -725,7 +925,7 @@ const ProjectDetail: React.FC = memo(() => {
     <PageContainer>
       <Container>
         <BackButton to="/#portfolio">
-          <FaArrowLeft /> Back to portfolio
+          <FaArrowLeft /> {t('projectDetail.back')}
         </BackButton>
 
         <HeroSection>
@@ -762,7 +962,7 @@ const ProjectDetail: React.FC = memo(() => {
               <StatCard key={index}>
                 <StatIcon>{stat.icon}</StatIcon>
                 <StatValue>{stat.value}</StatValue>
-                <StatLabel>{stat.label}</StatLabel>
+                <StatLabel>{t(stat.labelKey)}</StatLabel>
               </StatCard>
             ))}
           </StatsGrid>
@@ -775,7 +975,7 @@ const ProjectDetail: React.FC = memo(() => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            How it works
+            {t('projectDetail.howItWorks')}
           </SectionTitle>
           <SectionSubtitle
             initial={{ opacity: 0, y: 20 }}
@@ -783,7 +983,7 @@ const ProjectDetail: React.FC = memo(() => {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            Key features and functionality showcase
+            {t('projectDetail.howItWorksSubtitle')}
           </SectionSubtitle>
 
           <GalleryGrid
@@ -806,7 +1006,7 @@ const ProjectDetail: React.FC = memo(() => {
                   ) : (
                     <GalleryPlaceholder>
                       <FaLaptopCode />
-                      <span>Demo GIF</span>
+                      <span>{t('projectDetail.demoGif')}</span>
                     </GalleryPlaceholder>
                   )}
                 </GalleryMedia>
@@ -826,7 +1026,7 @@ const ProjectDetail: React.FC = memo(() => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            Challenge & Solution
+            {t('projectDetail.challenge')}
           </SectionTitle>
           <SectionSubtitle
             initial={{ opacity: 0, y: 20 }}
@@ -834,7 +1034,7 @@ const ProjectDetail: React.FC = memo(() => {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            How we transformed business challenges into results
+            {t('projectDetail.challengeSubtitle')}
           </SectionSubtitle>
 
           <ProblemSolutionGrid>
@@ -849,7 +1049,7 @@ const ProjectDetail: React.FC = memo(() => {
                 <CardIcon $type="problem">
                   <FaClock />
                 </CardIcon>
-                <CardTitle>The Challenge</CardTitle>
+                <CardTitle>{t('projectDetail.theChallenge')}</CardTitle>
               </CardHeader>
               <CardList>
                 {project.problem.map((item, index) => (
@@ -869,7 +1069,7 @@ const ProjectDetail: React.FC = memo(() => {
                 <CardIcon $type="solution">
                   <FaCheck />
                 </CardIcon>
-                <CardTitle>Our Solution</CardTitle>
+                <CardTitle>{t('projectDetail.ourSolution')}</CardTitle>
               </CardHeader>
               <CardList>
                 {project.solution.map((item, index) => (
@@ -887,7 +1087,7 @@ const ProjectDetail: React.FC = memo(() => {
               transition={{ duration: 0.6 }}
               style={{ fontSize: '1.5rem', marginBottom: '20px' }}
             >
-              Tech Stack
+              {t('projectDetail.techStack')}
             </SectionTitle>
             <TechGrid>
               {project.techStack.map((tech, index) => (
@@ -904,12 +1104,12 @@ const ProjectDetail: React.FC = memo(() => {
           transition={{ duration: 0.6 }}
         >
           <CTACard>
-            <CTATitle>Want something similar?</CTATitle>
+            <CTATitle>{t('projectDetail.ctaTitle')}</CTATitle>
             <CTAText>
-              Let's discuss your project and create something amazing together.
+              {t('projectDetail.ctaText')}
             </CTAText>
             <CTAButton to="/#contact">
-              Start a project <FaArrowRight />
+              {t('projectDetail.ctaButton')} <FaArrowRight />
             </CTAButton>
           </CTACard>
         </CTASection>

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaArrowRight, FaCheck } from 'react-icons/fa';
 import IPhoneMockup from '../components/IPhoneMockup';
 import MacBookMockup from '../components/MacBookMockup';
+import { useLanguage } from '../context/LanguageContext';
 
 const glowPulse = keyframes`
   0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
@@ -440,7 +441,22 @@ const projects: Project[] = [
 
 const ProjectShowcase: React.FC = memo(() => {
   const [activeProject, setActiveProject] = useState(0);
-  const currentProject = projects[activeProject];
+  const { t } = useLanguage();
+
+  const getProjectData = (index: number) => ({
+    ...projects[index],
+    category: t(`showcase.project${index + 1}.category`),
+    title: t(`showcase.project${index + 1}.title`),
+    shortDescription: t(`showcase.project${index + 1}.description`),
+    features: [
+      t(`showcase.project${index + 1}.feature1`),
+      t(`showcase.project${index + 1}.feature2`),
+      t(`showcase.project${index + 1}.feature3`),
+      t(`showcase.project${index + 1}.feature4`),
+    ],
+  });
+
+  const currentProject = getProjectData(activeProject);
 
   return (
     <ShowcaseSection id="showcase">
@@ -452,7 +468,7 @@ const ProjectShowcase: React.FC = memo(() => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            Our projects
+            {t('showcase.title')}
           </Title>
           <Subtitle
             initial={{ opacity: 0, y: 20 }}
@@ -460,7 +476,7 @@ const ProjectShowcase: React.FC = memo(() => {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            Real examples of our work — from websites to mobile apps and Telegram bots
+            {t('showcase.subtitle')}
           </Subtitle>
         </SectionHeader>
 
@@ -471,29 +487,32 @@ const ProjectShowcase: React.FC = memo(() => {
           transition={{ duration: 0.6, delay: 0.2 }}
         >
           <ProjectSelector>
-            {projects.map((project, index) => (
-              <ProjectTab
-                key={project.id}
-                $active={activeProject === index}
-                onClick={() => setActiveProject(index)}
-                whileTap={{ scale: 0.98 }}
-              >
-                <ProjectIcon $active={activeProject === index}>
-                  {project.icon}
-                </ProjectIcon>
-                <ProjectTabContent>
-                  <ProjectTabCategory $active={activeProject === index}>
-                    {project.category}
-                  </ProjectTabCategory>
-                  <ProjectTabTitle $active={activeProject === index}>
-                    {project.title}
-                  </ProjectTabTitle>
-                  <ProjectTabDescription $active={activeProject === index}>
-                    {project.shortDescription}
-                  </ProjectTabDescription>
-                </ProjectTabContent>
-              </ProjectTab>
-            ))}
+            {projects.map((project, index) => {
+              const projectData = getProjectData(index);
+              return (
+                <ProjectTab
+                  key={project.id}
+                  $active={activeProject === index}
+                  onClick={() => setActiveProject(index)}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <ProjectIcon $active={activeProject === index}>
+                    {project.icon}
+                  </ProjectIcon>
+                  <ProjectTabContent>
+                    <ProjectTabCategory $active={activeProject === index}>
+                      {projectData.category}
+                    </ProjectTabCategory>
+                    <ProjectTabTitle $active={activeProject === index}>
+                      {projectData.title}
+                    </ProjectTabTitle>
+                    <ProjectTabDescription $active={activeProject === index}>
+                      {projectData.shortDescription}
+                    </ProjectTabDescription>
+                  </ProjectTabContent>
+                </ProjectTab>
+              );
+            })}
           </ProjectSelector>
 
           <DeviceShowcase>
@@ -555,7 +574,7 @@ const ProjectShowcase: React.FC = memo(() => {
           </FeatureGrid>
 
           <CTAButton href="#contact">
-            Order similar project <FaArrowRight />
+            {t('showcase.cta')} <FaArrowRight />
           </CTAButton>
         </ProjectDetails>
       </Container>

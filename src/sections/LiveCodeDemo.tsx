@@ -187,20 +187,7 @@ const CodeContent = styled.div`
   font-size: 0.9rem;
   line-height: 1.7;
   height: 450px;
-  overflow-y: auto;
-
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: rgba(124, 58, 237, 0.3);
-    border-radius: 3px;
-  }
+  overflow: hidden;
 `;
 
 const CodeLine = styled.div<{ $highlight?: boolean }>`

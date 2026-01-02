@@ -31,18 +31,10 @@ const LogoContainer = styled.div`
   margin-bottom: 1.5rem;
 `;
 
-const Logo = styled.h2`
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #fff;
-  
-  span {
-    background: var(--gradient-secondary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    color: transparent;
-  }
+const Logo = styled.img`
+  height: 160px;
+  width: auto;
+  margin-left: -45px;
 `;
 
 const Description = styled.p`
@@ -137,7 +129,7 @@ const Footer: React.FC = () => {
       <FooterContent>
         <FooterColumn>
           <LogoContainer>
-            <Logo>Sintara</Logo>
+            <Logo src="/logo-sintara-futer.png" alt="Sintara" />
           </LogoContainer>
           <Description>
             {language === 'en'

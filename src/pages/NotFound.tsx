@@ -2,6 +2,7 @@ import React, { useState, useEffect, memo } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { motion } from 'framer-motion';
 import { FaHome, FaRedo, FaTerminal } from 'react-icons/fa';
+import { useLanguage } from '../context/LanguageContext';
 
 const glitch = keyframes`
   0%, 100% {
@@ -301,6 +302,7 @@ const FloatingCode = styled.div<{ $top: string; $left: string; $delay: number }>
 
 const NotFound: React.FC = memo(() => {
   const [typedText, setTypedText] = useState('');
+  const { t } = useLanguage();
   const fullText = 'searching_for_page...';
 
   useEffect(() => {
@@ -396,9 +398,9 @@ const NotFound: React.FC = memo(() => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.5 }}
         >
-          Похоже, эта страница ушла на рефакторинг и не вернулась.
+          {t('notFound.message')}
           <br />
-          Но не переживай — мы поможем найти путь домой.
+          {t('notFound.submessage')}
         </Message>
 
         <ButtonsContainer
@@ -407,10 +409,10 @@ const NotFound: React.FC = memo(() => {
           transition={{ duration: 0.5, delay: 0.7 }}
         >
           <Button href="/" $primary>
-            <FaHome /> На главную
+            <FaHome /> {t('notFound.home')}
           </Button>
           <Button onClick={() => window.history.back()}>
-            <FaRedo /> Назад
+            <FaRedo /> {t('notFound.back')}
           </Button>
         </ButtonsContainer>
       </Content>

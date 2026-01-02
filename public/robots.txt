@@ -1,9 +1,28 @@
+# Sintara - IT Studio
+# https://sintara.io
+
 User-agent: *
 Allow: /
 
-# Disallow development files
-Disallow: /*.map$
-Disallow: /assets/
+# Allow all search engines
+User-agent: Googlebot
+Allow: /
 
-# Sitemap location (update with your actual domain)
-Sitemap: https://sv-mitska.netlify.app/sitemap.xml
+User-agent: Bingbot
+Allow: /
+
+User-agent: Yandex
+Allow: /
+
+# Disallow development and build files
+Disallow: /*.map$
+Disallow: /node_modules/
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://sintara.io/sitemap.xml
+
+# Host directive for Yandex
+Host: https://sintara.io

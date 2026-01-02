@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaGlobe, FaRobot, FaExternalLinkAlt, FaArrowRight, FaMobileAlt, FaLaptopCode } from 'react-icons/fa';
+import { useLanguage } from '../context/LanguageContext';
 
 const PortfolioSection = styled.section`
   padding: 100px 0;
@@ -370,10 +371,14 @@ const projects: Project[] = [
 
 const Portfolio: React.FC = memo(() => {
   const [activeFilter, setActiveFilter] = useState<'all' | 'website' | 'bot'>('all');
+  const { t } = useLanguage();
 
   const filteredProjects = activeFilter === 'all'
     ? projects
     : projects.filter(project => project.category === activeFilter);
+
+  const getProjectTitle = (id: number) => t(`portfolio.project${id}.title`);
+  const getProjectDescription = (id: number) => t(`portfolio.project${id}.description`);
 
   return (
     <PortfolioSection id="portfolio">
@@ -385,7 +390,7 @@ const Portfolio: React.FC = memo(() => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            Our work
+            {t('portfolio.title')}
           </Title>
           <Subtitle
             initial={{ opacity: 0, y: 20 }}
@@ -393,7 +398,7 @@ const Portfolio: React.FC = memo(() => {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            Selected projects showcasing our expertise in web development and automation
+            {t('portfolio.subtitle')}
           </Subtitle>
         </SectionHeader>
 
@@ -407,19 +412,19 @@ const Portfolio: React.FC = memo(() => {
             $active={activeFilter === 'all'}
             onClick={() => setActiveFilter('all')}
           >
-            All Projects
+            {t('portfolio.filter.all')}
           </FilterButton>
           <FilterButton
             $active={activeFilter === 'website'}
             onClick={() => setActiveFilter('website')}
           >
-            <FaGlobe /> Websites
+            <FaGlobe /> {t('portfolio.filter.websites')}
           </FilterButton>
           <FilterButton
             $active={activeFilter === 'bot'}
             onClick={() => setActiveFilter('bot')}
           >
-            <FaRobot /> Telegram Bots
+            <FaRobot /> {t('portfolio.filter.bots')}
           </FilterButton>
         </FilterContainer>
 
@@ -448,7 +453,7 @@ const Portfolio: React.FC = memo(() => {
                     )}
                     <ProjectOverlay>
                       <ViewProjectButton>
-                        View Project <FaArrowRight />
+                        {t('portfolio.viewProject')} <FaArrowRight />
                       </ViewProjectButton>
                     </ProjectOverlay>
                   </ProjectImageWrapper>
@@ -456,13 +461,13 @@ const Portfolio: React.FC = memo(() => {
                   <ProjectContent>
                     <ProjectCategory>
                       {project.category === 'website' ? (
-                        <><FaGlobe /> Website</>
+                        <><FaGlobe /> {t('portfolio.category.website')}</>
                       ) : (
-                        <><FaRobot /> Telegram Bot</>
+                        <><FaRobot /> {t('portfolio.category.bot')}</>
                       )}
                     </ProjectCategory>
-                    <ProjectTitle>{project.title}</ProjectTitle>
-                    <ProjectDescription>{project.description}</ProjectDescription>
+                    <ProjectTitle>{getProjectTitle(project.id)}</ProjectTitle>
+                    <ProjectDescription>{getProjectDescription(project.id)}</ProjectDescription>
                     <TechStack>
                       {project.tech.map((tech, i) => (
                         <TechBadge key={i}>{tech}</TechBadge>
@@ -482,7 +487,7 @@ const Portfolio: React.FC = memo(() => {
           transition={{ duration: 0.6, delay: 0.3 }}
         >
           <CTAButton href="#contact">
-            Start your project <FaArrowRight />
+            {t('portfolio.startProject')} <FaArrowRight />
           </CTAButton>
         </CTAContainer>
       </Container>
