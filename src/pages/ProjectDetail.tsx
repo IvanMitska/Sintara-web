@@ -28,6 +28,13 @@ const PageContainer = styled.div`
   position: relative;
   overflow-x: hidden;
 
+  /* Отключаем smooth scroll для нормальной прокрутки */
+  scroll-behavior: auto !important;
+
+  html & {
+    scroll-behavior: auto !important;
+  }
+
   &::before {
     content: '';
     position: fixed;
@@ -299,37 +306,28 @@ const ProblemSolutionGrid = styled.div`
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
 `;
 
 const Card = styled(motion.div)<{ $type?: 'problem' | 'solution' }>`
-  background: linear-gradient(135deg, rgba(20, 10, 40, 0.8) 0%, rgba(10, 5, 20, 0.95) 100%);
-  border: 1px solid ${props => props.$type === 'problem'
-    ? 'rgba(239, 68, 68, 0.2)'
-    : 'rgba(34, 197, 94, 0.2)'};
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 20px;
   padding: 32px;
-  position: relative;
-  overflow: hidden;
+  transition: all 0.3s ease;
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: ${props => props.$type === 'problem'
-      ? 'linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.4), transparent)'
-      : 'linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.4), transparent)'};
+  &:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.1);
   }
 `;
 
 const CardHeader = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 14px;
+  margin-bottom: 24px;
 `;
 
 const CardIcon = styled.div<{ $type?: 'problem' | 'solution' }>`
@@ -337,8 +335,8 @@ const CardIcon = styled.div<{ $type?: 'problem' | 'solution' }>`
   height: 44px;
   border-radius: 12px;
   background: ${props => props.$type === 'problem'
-    ? 'rgba(239, 68, 68, 0.15)'
-    : 'rgba(34, 197, 94, 0.15)'};
+    ? 'rgba(239, 68, 68, 0.1)'
+    : 'rgba(34, 197, 94, 0.1)'};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -351,7 +349,7 @@ const CardIcon = styled.div<{ $type?: 'problem' | 'solution' }>`
 
 const CardTitle = styled.h3`
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: #ffffff;
   margin: 0;
@@ -363,23 +361,28 @@ const CardList = styled.ul`
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 `;
 
-const CardListItem = styled.li`
+const CardListItem = styled.li<{ $type?: 'problem' | 'solution' }>`
   display: flex;
   align-items: flex-start;
   gap: 12px;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 0.95rem;
   color: rgba(255, 255, 255, 0.7);
-  line-height: 1.5;
+  line-height: 1.6;
 
   &::before {
-    content: '•';
-    color: #a78bfa;
-    font-weight: bold;
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: ${props => props.$type === 'problem'
+      ? 'rgba(239, 68, 68, 0.8)'
+      : 'rgba(34, 197, 94, 0.8)'};
     flex-shrink: 0;
+    margin-top: 8px;
   }
 `;
 
@@ -501,6 +504,38 @@ type Language = 'en' | 'ru';
 
 const projectsData: Record<Language, Record<string, ProjectData>> = {
   en: {
+    'kaif-crm': {
+      slug: 'kaif-crm',
+      category: 'Desktop CRM',
+      categoryIcon: <FaLaptopCode />,
+      title: 'KAIF CRM',
+      description: 'Desktop CRM application for managing a multi-profile fitness complex in Phuket, Thailand. The system works offline with automatic cloud backup and Bitrix24 integration.',
+      stats: [
+        { icon: <FaChartLine />, value: '100+', labelKey: 'projectDetail.classesManaged' },
+        { icon: <FaClock />, value: '24/7', labelKey: 'projectDetail.offlineWork' },
+        { icon: <FaUsers />, value: '1000+', labelKey: 'projectDetail.clientsTracked' },
+        { icon: <FaRocket />, value: '4 weeks', labelKey: 'projectDetail.development' },
+      ],
+      gallery: [
+        { title: 'Client Management', description: 'Complete client database with photos, visit history, and membership tracking', media: '/projects/kaif-crm/screen-1.PNG' },
+        { title: 'Check-in System', description: 'Real-time attendance tracking with check-in/check-out functionality', media: '/projects/kaif-crm/screen-2.PNG' },
+        { title: 'Memberships', description: 'Flexible membership system: single visits, monthly passes, and session packages', media: '/projects/kaif-crm/screen-4.PNG' },
+        { title: 'Analytics Dashboard', description: 'Detailed reports on attendance, revenue, and client activity with PIN protection', media: '/projects/kaif-crm/screen-5.PNG' },
+      ],
+      problem: [
+        'No centralized system for multi-profile fitness center',
+        'Unstable internet connection in Thailand causing data loss',
+        'Manual tracking of memberships and visits',
+        'No integration with existing CRM (Bitrix24)',
+      ],
+      solution: [
+        'Unified desktop app managing gym, dance studio, martial arts, and pool',
+        'Offline-first architecture with automatic GitHub/Google Drive backup',
+        'Flexible membership system: single visits, monthly, packages',
+        'Seamless Bitrix24 API integration for lead management',
+      ],
+      techStack: ['Electron', 'React 19', 'TypeScript', 'Tailwind CSS', 'Zustand', 'Recharts', 'Bitrix24 API'],
+    },
     'ecommerce-platform': {
       slug: 'ecommerce-platform',
       category: 'E-commerce',
@@ -695,6 +730,38 @@ const projectsData: Record<Language, Record<string, ProjectData>> = {
     },
   },
   ru: {
+    'kaif-crm': {
+      slug: 'kaif-crm',
+      category: 'Desktop CRM',
+      categoryIcon: <FaLaptopCode />,
+      title: 'KAIF CRM',
+      description: 'Desktop CRM-приложение для управления многопрофильным фитнес-комплексом KAIF на Пхукете, Таиланд. Система работает офлайн с автоматическим облачным бэкапом и интеграцией Bitrix24.',
+      stats: [
+        { icon: <FaChartLine />, value: '100+', labelKey: 'projectDetail.classesManaged' },
+        { icon: <FaClock />, value: '24/7', labelKey: 'projectDetail.offlineWork' },
+        { icon: <FaUsers />, value: '1000+', labelKey: 'projectDetail.clientsTracked' },
+        { icon: <FaRocket />, value: '4 недели', labelKey: 'projectDetail.development' },
+      ],
+      gallery: [
+        { title: 'Управление клиентами', description: 'Полная база клиентов с фото, историей посещений и отслеживанием абонементов', media: '/projects/kaif-crm/screen-1.PNG' },
+        { title: 'Система Check-in', description: 'Отслеживание присутствия в реальном времени с функцией входа/выхода', media: '/projects/kaif-crm/screen-2.PNG' },
+        { title: 'Абонементы', description: 'Гибкая система абонементов: разовые посещения, месячные и пакеты занятий', media: '/projects/kaif-crm/screen-4.PNG' },
+        { title: 'Аналитика и отчёты', description: 'Детальные отчёты по посещаемости, выручке и активности клиентов с PIN-защитой', media: '/projects/kaif-crm/screen-5.PNG' },
+      ],
+      problem: [
+        'Отсутствие централизованной системы для многопрофильного фитнес-центра',
+        'Нестабильный интернет в Таиланде приводит к потере данных',
+        'Ручной учёт абонементов и посещений',
+        'Нет интеграции с существующей CRM (Bitrix24)',
+      ],
+      solution: [
+        'Единое desktop-приложение для зала, танцев, единоборств и бассейна',
+        'Офлайн-архитектура с автоматическим бэкапом в GitHub/Google Drive',
+        'Гибкая система абонементов: разовые, месячные, по занятиям',
+        'Бесшовная интеграция с Bitrix24 API для управления лидами',
+      ],
+      techStack: ['Electron', 'React 19', 'TypeScript', 'Tailwind CSS', 'Zustand', 'Recharts', 'Bitrix24 API'],
+    },
     'ecommerce-platform': {
       slug: 'ecommerce-platform',
       category: 'Интернет-магазин',
@@ -898,6 +965,14 @@ const ProjectDetail: React.FC = memo(() => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+
+    // Отключаем smooth scroll на этой странице
+    document.documentElement.style.scrollBehavior = 'auto';
+
+    return () => {
+      // Восстанавливаем smooth scroll при уходе со страницы
+      document.documentElement.style.scrollBehavior = 'smooth';
+    };
   }, [slug]);
 
   if (!project) {
@@ -1053,7 +1128,7 @@ const ProjectDetail: React.FC = memo(() => {
               </CardHeader>
               <CardList>
                 {project.problem.map((item, index) => (
-                  <CardListItem key={index}>{item}</CardListItem>
+                  <CardListItem key={index} $type="problem">{item}</CardListItem>
                 ))}
               </CardList>
             </Card>
@@ -1073,7 +1148,7 @@ const ProjectDetail: React.FC = memo(() => {
               </CardHeader>
               <CardList>
                 {project.solution.map((item, index) => (
-                  <CardListItem key={index}>{item}</CardListItem>
+                  <CardListItem key={index} $type="solution">{item}</CardListItem>
                 ))}
               </CardList>
             </Card>

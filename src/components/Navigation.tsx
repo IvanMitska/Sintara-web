@@ -114,17 +114,12 @@ const NavLinks = styled.div<{ $isOpen: boolean }>`
     left: 12px;
     right: 12px;
     width: auto;
-    background: linear-gradient(145deg, rgba(15, 10, 35, 0.98), rgba(10, 5, 25, 0.98));
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+    background: linear-gradient(145deg, rgba(15, 10, 35, 0.99), rgba(10, 5, 25, 0.99));
     border: 1px solid rgba(124, 58, 237, 0.2);
     border-radius: 24px;
     padding: 28px 24px;
     gap: 0;
-    box-shadow:
-      0 8px 32px rgba(0, 0, 0, 0.5),
-      0 0 0 1px rgba(124, 58, 237, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     z-index: 999;
 
     opacity: ${props => props.$isOpen ? 1 : 0};
@@ -288,12 +283,10 @@ const MobileOverlay = styled.div<{ $isOpen: boolean }>`
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.8);
     opacity: ${props => props.$isOpen ? 1 : 0};
     visibility: ${props => props.$isOpen ? 'visible' : 'hidden'};
-    transition: opacity 0.4s ease, visibility 0.4s ease;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
     z-index: 998;
   }
 `;
@@ -450,7 +443,7 @@ const Navigation: React.FC = () => {
 
         <NavLinks $isOpen={isOpen}>
           <NavLink href="#services" onClick={closeMenu} $index={0} $isOpen={isOpen}>{t('nav.services')}</NavLink>
-          <NavLink href="#process" onClick={closeMenu} $index={1} $isOpen={isOpen}>{t('nav.work')}</NavLink>
+          <NavLink href="#portfolio" onClick={closeMenu} $index={1} $isOpen={isOpen}>{t('nav.work')}</NavLink>
           <NavLink href="#pricing" onClick={closeMenu} $index={2} $isOpen={isOpen}>{t('nav.pricing')}</NavLink>
           <NavLink href="#contact" onClick={closeMenu} $index={3} $isOpen={isOpen}>{t('nav.contact')}</NavLink>
           <MenuDivider $isOpen={isOpen} />

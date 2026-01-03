@@ -139,7 +139,7 @@ const ProjectCard = styled(motion.div)`
 const ProjectImageWrapper = styled.div`
   position: relative;
   width: 100%;
-  height: 200px;
+  height: 240px;
   overflow: hidden;
   background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(168, 85, 247, 0.05) 100%);
 `;
@@ -306,13 +306,22 @@ type Project = {
   id: number;
   slug: string;
   title: string;
-  category: 'website' | 'bot';
+  category: 'website' | 'bot' | 'crm';
   description: string;
   imageUrl: string;
   tech: string[];
 };
 
 const projects: Project[] = [
+  {
+    id: 7,
+    slug: 'kaif-crm',
+    title: 'KAIF CRM',
+    category: 'crm',
+    description: 'Desktop CRM system for fitness club management with offline mode and cloud sync.',
+    imageUrl: '/projects/kaif-crm/cover.png',
+    tech: ['Electron', 'React', 'TypeScript', 'Tailwind'],
+  },
   {
     id: 1,
     slug: 'ecommerce-platform',
@@ -370,7 +379,7 @@ const projects: Project[] = [
 ];
 
 const Portfolio: React.FC = memo(() => {
-  const [activeFilter, setActiveFilter] = useState<'all' | 'website' | 'bot'>('all');
+  const [activeFilter, setActiveFilter] = useState<'all' | 'website' | 'bot' | 'crm'>('all');
   const { t } = useLanguage();
 
   const filteredProjects = activeFilter === 'all'
@@ -426,6 +435,12 @@ const Portfolio: React.FC = memo(() => {
           >
             <FaRobot /> {t('portfolio.filter.bots')}
           </FilterButton>
+          <FilterButton
+            $active={activeFilter === 'crm'}
+            onClick={() => setActiveFilter('crm')}
+          >
+            <FaLaptopCode /> {t('portfolio.filter.crm')}
+          </FilterButton>
         </FilterContainer>
 
         <ProjectsGrid layout>
@@ -448,7 +463,9 @@ const Portfolio: React.FC = memo(() => {
                       <ProjectImage $imageUrl={project.imageUrl} />
                     ) : (
                       <ProjectPlaceholder>
-                        {project.category === 'website' ? <FaGlobe /> : <FaRobot />}
+                        {project.category === 'website' && <FaGlobe />}
+                        {project.category === 'bot' && <FaRobot />}
+                        {project.category === 'crm' && <FaLaptopCode />}
                       </ProjectPlaceholder>
                     )}
                     <ProjectOverlay>
@@ -460,10 +477,14 @@ const Portfolio: React.FC = memo(() => {
 
                   <ProjectContent>
                     <ProjectCategory>
-                      {project.category === 'website' ? (
+                      {project.category === 'website' && (
                         <><FaGlobe /> {t('portfolio.category.website')}</>
-                      ) : (
+                      )}
+                      {project.category === 'bot' && (
                         <><FaRobot /> {t('portfolio.category.bot')}</>
+                      )}
+                      {project.category === 'crm' && (
+                        <><FaLaptopCode /> {t('portfolio.category.crm')}</>
                       )}
                     </ProjectCategory>
                     <ProjectTitle>{getProjectTitle(project.id)}</ProjectTitle>

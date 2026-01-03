@@ -6,7 +6,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import styled from 'styled-components';
 import Navigation from './components/Navigation';
 import Hero from './sections/Hero';
-import AIChatWidget from './components/AIChatWidget';
+// import AIChatWidget from './components/AIChatWidget'; // Временно отключено
 import StarField from './components/StarField';
 import { LanguageProvider } from './context/LanguageContext';
 
@@ -108,7 +108,7 @@ function HomePage({ isReady }: { isReady: boolean }) {
       <StarField />
 
       <Navigation />
-      <AIChatWidget />
+      {/* <AIChatWidget /> */}
       <Layout>
         <Hero />
 

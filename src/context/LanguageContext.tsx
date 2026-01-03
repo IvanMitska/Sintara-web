@@ -160,8 +160,10 @@ const translations: Record<Language, Record<string, string>> = {
     'portfolio.filter.all': 'All Projects',
     'portfolio.filter.websites': 'Websites',
     'portfolio.filter.bots': 'Telegram Bots',
+    'portfolio.filter.crm': 'CRM',
     'portfolio.category.website': 'Website',
     'portfolio.category.bot': 'Telegram Bot',
+    'portfolio.category.crm': 'CRM System',
     'portfolio.viewProject': 'View Project',
     'portfolio.startProject': 'Start your project',
     'portfolio.project1.title': 'E-commerce Platform',
@@ -176,6 +178,8 @@ const translations: Record<Language, Record<string, string>> = {
     'portfolio.project5.description': 'Modern corporate website with CMS integration and multilingual support.',
     'portfolio.project6.title': 'Delivery Service Bot',
     'portfolio.project6.description': 'Complete delivery management system with driver tracking and notifications.',
+    'portfolio.project7.title': 'KAIF CRM',
+    'portfolio.project7.description': 'Desktop CRM system for fitness club management with offline mode and cloud sync.',
 
     // Project Showcase
     'showcase.title': 'Our projects',
@@ -245,6 +249,9 @@ const translations: Record<Language, Record<string, string>> = {
     'projectDetail.dailyOrders': 'Daily orders',
     'projectDetail.avgDelivery': 'Avg. delivery',
     'projectDetail.appDownloads': 'App downloads',
+    'projectDetail.classesManaged': 'Classes managed',
+    'projectDetail.offlineWork': 'Offline work',
+    'projectDetail.clientsTracked': 'Clients tracked',
 
     // 404 Page
     'notFound.message': 'Looks like this page went for refactoring and never came back.',
@@ -400,8 +407,10 @@ const translations: Record<Language, Record<string, string>> = {
     'portfolio.filter.all': 'Все проекты',
     'portfolio.filter.websites': 'Сайты',
     'portfolio.filter.bots': 'Telegram-боты',
+    'portfolio.filter.crm': 'CRM',
     'portfolio.category.website': 'Сайт',
     'portfolio.category.bot': 'Telegram-бот',
+    'portfolio.category.crm': 'CRM-система',
     'portfolio.viewProject': 'Смотреть проект',
     'portfolio.startProject': 'Начать проект',
     'portfolio.project1.title': 'Интернет-магазин',
@@ -416,6 +425,8 @@ const translations: Record<Language, Record<string, string>> = {
     'portfolio.project5.description': 'Современный корпоративный сайт с CMS и мультиязычностью.',
     'portfolio.project6.title': 'Бот службы доставки',
     'portfolio.project6.description': 'Система управления доставкой с отслеживанием курьеров и уведомлениями.',
+    'portfolio.project7.title': 'KAIF CRM',
+    'portfolio.project7.description': 'Desktop CRM-система для управления фитнес-клубом с офлайн-режимом и облачной синхронизацией.',
 
     // Project Showcase
     'showcase.title': 'Наши проекты',
@@ -485,6 +496,9 @@ const translations: Record<Language, Record<string, string>> = {
     'projectDetail.dailyOrders': 'Заказов в день',
     'projectDetail.avgDelivery': 'Среднее время доставки',
     'projectDetail.appDownloads': 'Скачиваний',
+    'projectDetail.classesManaged': 'Классов под управлением',
+    'projectDetail.offlineWork': 'Офлайн работа',
+    'projectDetail.clientsTracked': 'Клиентов в базе',
 
     // 404 Page
     'notFound.message': 'Похоже, эта страница ушла на рефакторинг и не вернулась.',

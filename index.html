@@ -66,25 +66,39 @@
     {
       "@context": "https://schema.org",
       "@type": "Organization",
+      "@id": "https://sintara.io/#organization",
       "name": "Sintara",
-      "alternateName": ["Синтара", "Sintara IT", "Sintara Studio"],
+      "alternateName": ["Синтара", "Sintara IT", "Sintara Studio", "sintara"],
       "url": "https://sintara.io",
-      "logo": "https://sintara.io/logo.png",
-      "description": "Профессиональная IT-студия веб-разработки. Создаём современные сайты, веб-приложения и Telegram ботов.",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://sintara.io/logo.png",
+        "width": 512,
+        "height": 512,
+        "caption": "Sintara Logo"
+      },
+      "image": {
+        "@type": "ImageObject",
+        "url": "https://sintara.io/og-image.png",
+        "width": 1200,
+        "height": 630
+      },
+      "description": "Sintara — профессиональная IT-студия веб-разработки. Создаём современные сайты, веб-приложения и Telegram ботов.",
+      "slogan": "Создаём цифровые решения для вашего бизнеса",
       "foundingDate": "2024",
+      "email": "sintaradev@gmail.com",
       "sameAs": [
-        "https://t.me/sintara_dev"
+        "https://t.me/IvanMitska",
+        "https://www.instagram.com/sintara_studio/"
       ],
       "contactPoint": {
         "@type": "ContactPoint",
         "contactType": "customer service",
-        "url": "https://t.me/sintara_dev",
+        "email": "sintaradev@gmail.com",
+        "url": "https://t.me/IvanMitska",
         "availableLanguage": ["Russian", "English"]
       },
-      "areaServed": {
-        "@type": "Place",
-        "name": "Worldwide"
-      },
+      "areaServed": "Worldwide",
       "knowsAbout": [
         "Web Development",
         "Telegram Bots",
@@ -93,7 +107,8 @@
         "Node.js",
         "Frontend Development",
         "Backend Development",
-        "UI/UX Design"
+        "UI/UX Design",
+        "CRM Development"
       ]
     }
     </script>
@@ -102,14 +117,19 @@
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
+      "@id": "https://sintara.io/#website",
       "name": "Sintara",
-      "alternateName": "Синтара",
+      "alternateName": ["Синтара", "sintara", "Sintara IT"],
       "url": "https://sintara.io",
-      "description": "IT-студия веб-разработки и Telegram ботов",
+      "description": "IT-студия веб-разработки. Создание сайтов, веб-приложений и Telegram ботов.",
       "inLanguage": ["ru", "en"],
       "publisher": {
-        "@type": "Organization",
-        "name": "Sintara"
+        "@id": "https://sintara.io/#organization"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://sintara.io/?s={search_term_string}",
+        "query-input": "required name=search_term_string"
       }
     }
     </script>

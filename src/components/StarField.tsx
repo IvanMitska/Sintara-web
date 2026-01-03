@@ -94,6 +94,7 @@ const MilkyWay = styled.div`
 `;
 
 // Moving stars layer 1 - slow (200% height for seamless loop)
+// DISABLED ON MOBILE for performance
 const MovingStarsLayer1 = styled.div`
   position: absolute;
   top: 0;
@@ -101,7 +102,6 @@ const MovingStarsLayer1 = styled.div`
   width: 100%;
   height: 200%;
   animation: ${fallingSlow} 35s linear infinite;
-  will-change: transform;
   background-image:
     radial-gradient(1px 1px at 10% 5%, rgba(255,255,255,0.7) 0%, transparent 100%),
     radial-gradient(1.5px 1.5px at 25% 15%, rgba(255,255,255,0.8) 0%, transparent 100%),
@@ -130,11 +130,12 @@ const MovingStarsLayer1 = styled.div`
     radial-gradient(1px 1px at 88% 95%, rgba(255,255,255,0.6) 0%, transparent 100%);
 
   @media (max-width: 768px) {
-    animation-duration: 50s;
+    display: none;
   }
 `;
 
 // Moving stars layer 2 - medium speed (creates parallax)
+// DISABLED ON MOBILE for performance
 const MovingStarsLayer2 = styled.div`
   position: absolute;
   top: 0;
@@ -142,7 +143,6 @@ const MovingStarsLayer2 = styled.div`
   width: 100%;
   height: 200%;
   animation: ${fallingMedium} 25s linear infinite;
-  will-change: transform;
   background-image:
     radial-gradient(1.5px 1.5px at 8% 3%, rgba(255,255,255,0.9) 0%, transparent 100%),
     radial-gradient(2px 2px at 22% 12%, rgba(200,220,255,0.95) 0%, transparent 100%),
@@ -169,11 +169,12 @@ const MovingStarsLayer2 = styled.div`
     radial-gradient(1.5px 1.5px at 95% 88%, rgba(200,220,255,0.85) 0%, transparent 100%);
 
   @media (max-width: 768px) {
-    animation-duration: 35s;
+    display: none;
   }
 `;
 
 // Third layer - slowest for depth (distant stars)
+// DISABLED ON MOBILE for performance
 const MovingStarsLayer3 = styled.div`
   position: absolute;
   top: 0;
@@ -181,7 +182,6 @@ const MovingStarsLayer3 = styled.div`
   width: 100%;
   height: 200%;
   animation: ${fallingDeep} 50s linear infinite;
-  will-change: transform;
   background-image:
     radial-gradient(0.5px 0.5px at 10% 15%, rgba(255,255,255,0.4) 0%, transparent 100%),
     radial-gradient(0.5px 0.5px at 20% 35%, rgba(255,255,255,0.3) 0%, transparent 100%),
@@ -203,11 +203,12 @@ const MovingStarsLayer3 = styled.div`
     radial-gradient(0.5px 0.5px at 95% 75%, rgba(255,255,255,0.4) 0%, transparent 100%);
 
   @media (max-width: 768px) {
-    animation-duration: 70s;
+    display: none;
   }
 `;
 
 // Animated twinkling stars container
+// DISABLED ON MOBILE for performance
 const AnimatedStarsContainer = styled.div<{ $visible: boolean }>`
   position: absolute;
   top: 0;
@@ -216,6 +217,10 @@ const AnimatedStarsContainer = styled.div<{ $visible: boolean }>`
   height: 100%;
   opacity: ${props => props.$visible ? 1 : 0};
   transition: opacity 0.5s ease;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const BrightStar = styled.div<{ $top: number; $left: number; $delay: number }>`

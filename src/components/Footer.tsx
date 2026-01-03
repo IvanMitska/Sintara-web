@@ -140,7 +140,7 @@ const Footer: React.FC = () => {
             <SocialIcon href="https://t.me/IvanMitska" target="_blank" rel="noopener noreferrer">
               <FaTelegram />
             </SocialIcon>
-            <SocialIcon href="https://instagram.com/username" target="_blank" rel="noopener noreferrer">
+            <SocialIcon href="https://www.instagram.com/sintara_studio/" target="_blank" rel="noopener noreferrer">
               <FaInstagram />
             </SocialIcon>
             <SocialIcon href="https://github.com/username" target="_blank" rel="noopener noreferrer">

@@ -799,13 +799,13 @@ const Contact: React.FC = memo(() => {
             transition={{ duration: 0.6, delay: 0.3 }}
           >
             <ContactMethodsGrid>
-              <ContactMethod href="mailto:hello@sintara.dev">
+              <ContactMethod href="mailto:sintaradev@gmail.com">
                 <MethodIcon>
                   <FaEnvelope />
                 </MethodIcon>
                 <MethodContent>
                   <MethodLabel>{language === 'en' ? 'Email us' : 'Напишите нам'}</MethodLabel>
-                  <MethodValue>hello@sintara.dev</MethodValue>
+                  <MethodValue>sintaradev@gmail.com</MethodValue>
                 </MethodContent>
                 <MethodArrow>
                   <FaArrowRight />
