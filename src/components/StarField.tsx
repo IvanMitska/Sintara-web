@@ -176,7 +176,7 @@ const MobileStarsLayer3 = styled.div`
   }
 `;
 
-// Milky way band - static
+// Milky way band - static (hidden on mobile due to visible edges)
 const MilkyWay = styled.div`
   position: absolute;
   top: 0;
@@ -196,6 +196,10 @@ const MilkyWay = styled.div`
     transparent 100%
   );
   transform: rotate(-20deg);
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 // Moving stars layer 1 - slow (200% height for seamless loop)
