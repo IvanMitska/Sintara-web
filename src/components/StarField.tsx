@@ -67,8 +67,14 @@ const NebulaLayer = styled.div`
     radial-gradient(ellipse 400px 600px at 5% 80%, rgba(167, 139, 250, 0.06) 0%, transparent 45%);
 `;
 
-// Static stars for mobile - no animation, just background image
-const MobileStaticStars = styled.div`
+// Soft twinkle animation for mobile - lightweight opacity change only
+const mobileTwinkle = keyframes`
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+`;
+
+// Stars layer 1 for mobile - with gentle twinkle animation
+const MobileStarsLayer1 = styled.div`
   display: none;
 
   @media (max-width: 768px) {
@@ -78,6 +84,8 @@ const MobileStaticStars = styled.div`
     left: 0;
     width: 100%;
     height: 100%;
+    animation: ${mobileTwinkle} 4s ease-in-out infinite;
+    will-change: opacity;
     background-image:
       radial-gradient(1px 1px at 5% 5%, rgba(255,255,255,0.8) 0%, transparent 100%),
       radial-gradient(1.5px 1.5px at 12% 18%, rgba(255,255,255,0.9) 0%, transparent 100%),
@@ -95,7 +103,25 @@ const MobileStaticStars = styled.div`
       radial-gradient(1px 1px at 8% 38%, rgba(255,255,255,0.7) 0%, transparent 100%),
       radial-gradient(1.5px 1.5px at 15% 45%, rgba(255,255,255,0.9) 0%, transparent 100%),
       radial-gradient(1px 1px at 22% 52%, rgba(255,255,255,0.6) 0%, transparent 100%),
-      radial-gradient(1px 1px at 30% 40%, rgba(200,220,255,0.8) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 40%, rgba(200,220,255,0.8) 0%, transparent 100%);
+  }
+`;
+
+// Stars layer 2 for mobile - offset animation for depth
+const MobileStarsLayer2 = styled.div`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    animation: ${mobileTwinkle} 5s ease-in-out infinite;
+    animation-delay: -2s;
+    will-change: opacity;
+    background-image:
       radial-gradient(1.5px 1.5px at 38% 55%, rgba(255,255,255,0.9) 0%, transparent 100%),
       radial-gradient(1px 1px at 45% 48%, rgba(255,255,255,0.7) 0%, transparent 100%),
       radial-gradient(1px 1px at 52% 42%, rgba(255,240,220,0.8) 0%, transparent 100%),
@@ -112,7 +138,25 @@ const MobileStaticStars = styled.div`
       radial-gradient(1px 1px at 40% 75%, rgba(255,255,255,0.8) 0%, transparent 100%),
       radial-gradient(1px 1px at 48% 68%, rgba(255,255,255,0.6) 0%, transparent 100%),
       radial-gradient(1.5px 1.5px at 55% 82%, rgba(255,255,255,0.9) 0%, transparent 100%),
-      radial-gradient(1px 1px at 62% 72%, rgba(220,200,255,0.7) 0%, transparent 100%),
+      radial-gradient(1px 1px at 62% 72%, rgba(220,200,255,0.7) 0%, transparent 100%);
+  }
+`;
+
+// Stars layer 3 for mobile - slowest animation
+const MobileStarsLayer3 = styled.div`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    animation: ${mobileTwinkle} 6s ease-in-out infinite;
+    animation-delay: -4s;
+    will-change: opacity;
+    background-image:
       radial-gradient(1px 1px at 70% 78%, rgba(255,255,255,0.8) 0%, transparent 100%),
       radial-gradient(1.5px 1.5px at 78% 65%, rgba(255,255,255,0.9) 0%, transparent 100%),
       radial-gradient(1px 1px at 85% 75%, rgba(200,220,255,0.6) 0%, transparent 100%),
@@ -336,7 +380,9 @@ const StarField: React.FC = memo(() => {
   return (
     <StarFieldContainer>
       <NebulaLayer />
-      <MobileStaticStars />
+      <MobileStarsLayer1 />
+      <MobileStarsLayer2 />
+      <MobileStarsLayer3 />
       <MilkyWay />
       {showAnimated && (
         <>
