@@ -67,6 +67,71 @@ const NebulaLayer = styled.div`
     radial-gradient(ellipse 400px 600px at 5% 80%, rgba(167, 139, 250, 0.06) 0%, transparent 45%);
 `;
 
+// Static stars for mobile - no animation, just background image
+const MobileStaticStars = styled.div`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+      radial-gradient(1px 1px at 5% 5%, rgba(255,255,255,0.8) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 12% 18%, rgba(255,255,255,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 20% 8%, rgba(255,255,255,0.7) 0%, transparent 100%),
+      radial-gradient(1px 1px at 28% 25%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 35% 12%, rgba(200,220,255,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 42% 32%, rgba(255,255,255,0.7) 0%, transparent 100%),
+      radial-gradient(1px 1px at 50% 5%, rgba(255,255,255,0.8) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 58% 22%, rgba(255,240,220,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 65% 15%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 72% 28%, rgba(255,255,255,0.7) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 80% 8%, rgba(220,200,255,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 88% 18%, rgba(255,255,255,0.8) 0%, transparent 100%),
+      radial-gradient(1px 1px at 95% 25%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 8% 38%, rgba(255,255,255,0.7) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 15% 45%, rgba(255,255,255,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 22% 52%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 40%, rgba(200,220,255,0.8) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 38% 55%, rgba(255,255,255,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 45% 48%, rgba(255,255,255,0.7) 0%, transparent 100%),
+      radial-gradient(1px 1px at 52% 42%, rgba(255,240,220,0.8) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 60% 58%, rgba(255,255,255,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 68% 45%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 75% 52%, rgba(220,200,255,0.8) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 82% 38%, rgba(255,255,255,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 55%, rgba(255,255,255,0.7) 0%, transparent 100%),
+      radial-gradient(1px 1px at 3% 65%, rgba(255,255,255,0.8) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 10% 72%, rgba(200,220,255,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 18% 68%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 25% 78%, rgba(255,255,255,0.7) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 32% 62%, rgba(255,240,220,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 40% 75%, rgba(255,255,255,0.8) 0%, transparent 100%),
+      radial-gradient(1px 1px at 48% 68%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 55% 82%, rgba(255,255,255,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 62% 72%, rgba(220,200,255,0.7) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 78%, rgba(255,255,255,0.8) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 78% 65%, rgba(255,255,255,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 75%, rgba(200,220,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 92% 68%, rgba(255,255,255,0.7) 0%, transparent 100%),
+      radial-gradient(1px 1px at 6% 88%, rgba(255,255,255,0.8) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 14% 92%, rgba(255,240,220,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 22% 85%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 95%, rgba(255,255,255,0.7) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 38% 88%, rgba(255,255,255,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 45% 92%, rgba(220,200,255,0.8) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 85%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 62% 95%, rgba(255,255,255,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 88%, rgba(200,220,255,0.7) 0%, transparent 100%),
+      radial-gradient(1px 1px at 78% 92%, rgba(255,255,255,0.8) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 86% 85%, rgba(255,240,220,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 94% 95%, rgba(255,255,255,0.6) 0%, transparent 100%);
+  }
+`;
+
 // Milky way band - static (hidden on mobile)
 const MilkyWay = styled.div`
   position: absolute;
@@ -271,6 +336,7 @@ const StarField: React.FC = memo(() => {
   return (
     <StarFieldContainer>
       <NebulaLayer />
+      <MobileStaticStars />
       <MilkyWay />
       {showAnimated && (
         <>
