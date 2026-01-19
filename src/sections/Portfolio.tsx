@@ -376,6 +376,15 @@ const projects: Project[] = [
     imageUrl: '',
     tech: ['Python', 'Redis', 'Google Maps API'],
   },
+  {
+    id: 8,
+    slug: '3dlike',
+    title: '3DLike',
+    category: 'website',
+    description: 'Multi-page website for 3D stickers manufacturer with modern animations.',
+    imageUrl: '/projects/3dlike/cover.jpg',
+    tech: ['React', 'Tailwind CSS', 'Framer Motion'],
+  },
 ];
 
 const Portfolio: React.FC = memo(() => {

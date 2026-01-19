@@ -728,6 +728,38 @@ const projectsData: Record<Language, Record<string, ProjectData>> = {
       ],
       techStack: ['React Native', 'Firebase', 'Node.js', 'MongoDB', 'Socket.io', 'Google Maps'],
     },
+    '3dlike': {
+      slug: '3dlike',
+      category: 'Corporate Website',
+      categoryIcon: <FaGlobe />,
+      title: '3DLike',
+      description: 'Multi-page website for 3D stickers manufacturer with modern dark design, smooth animations, and full SEO optimization. Integration with WhatsApp and Telegram for instant customer communication.',
+      stats: [
+        { icon: <FaChartLine />, value: '88+', labelKey: 'projectDetail.lighthouseScore' },
+        { icon: <FaClock />, value: '< 2s', labelKey: 'projectDetail.loadSpeed' },
+        { icon: <FaUsers />, value: '5+', labelKey: 'projectDetail.pagesCreated' },
+        { icon: <FaRocket />, value: '2 weeks', labelKey: 'projectDetail.development' },
+      ],
+      gallery: [
+        { title: 'Hero Section', description: 'Dark blue design with accent green elements and Russo One typography', media: '/projects/3dlike/screen-1.jpeg' },
+        { title: 'Product Showcase', description: 'Interactive product gallery with smooth animations', media: '/projects/3dlike/screen-2.jpeg' },
+        { title: 'Price Calculator', description: 'Interactive calculator for instant cost estimation with format and quantity options', media: '/projects/3dlike/screen-3.jpeg' },
+        { title: 'Product Benefits', description: 'Key advantages presentation with 3D sticker technology explanation', media: '/projects/3dlike/screen-4.jpeg' },
+      ],
+      problem: [
+        'No online presence for the 3D stickers manufacturer',
+        'Needed modern, memorable design to stand out',
+        'Required fast loading for mobile users',
+        'No direct communication channel with customers',
+      ],
+      solution: [
+        'Multi-page React website with unique dark blue design',
+        'Smooth Framer Motion animations throughout the site',
+        'Optimized performance with lazy loading and code splitting',
+        'WhatsApp and Telegram integration for instant contact',
+      ],
+      techStack: ['React 18', 'Vite 5', 'Tailwind CSS', 'React Router v7', 'Framer Motion', 'Netlify'],
+    },
   },
   ru: {
     'kaif-crm': {
@@ -953,6 +985,38 @@ const projectsData: Record<Language, Record<string, ProjectData>> = {
         'Цифровая панель ресторана для удобного управления',
       ],
       techStack: ['React Native', 'Firebase', 'Node.js', 'MongoDB', 'Socket.io', 'Google Maps'],
+    },
+    '3dlike': {
+      slug: '3dlike',
+      category: 'Корпоративный сайт',
+      categoryIcon: <FaGlobe />,
+      title: '3DLike',
+      description: 'Многостраничный сайт для производителя 3D стикеров с современным тёмным дизайном, плавными анимациями и полной SEO-оптимизацией. Интеграция с WhatsApp и Telegram для мгновенной связи с клиентами.',
+      stats: [
+        { icon: <FaChartLine />, value: '88+', labelKey: 'projectDetail.lighthouseScore' },
+        { icon: <FaClock />, value: '< 2с', labelKey: 'projectDetail.loadSpeed' },
+        { icon: <FaUsers />, value: '5+', labelKey: 'projectDetail.pagesCreated' },
+        { icon: <FaRocket />, value: '2 недели', labelKey: 'projectDetail.development' },
+      ],
+      gallery: [
+        { title: 'Главный экран', description: 'Тёмно-синий дизайн с акцентными зелёными элементами и типографикой Russo One', media: '/projects/3dlike/screen-1.jpeg' },
+        { title: 'Витрина продукции', description: 'Интерактивная галерея продуктов с плавными анимациями', media: '/projects/3dlike/screen-2.jpeg' },
+        { title: 'Калькулятор цен', description: 'Интерактивный калькулятор для расчёта стоимости с выбором формата и количества', media: '/projects/3dlike/screen-3.jpeg' },
+        { title: 'Преимущества', description: 'Презентация ключевых преимуществ и технологии 3D-стикеров', media: '/projects/3dlike/screen-4.jpeg' },
+      ],
+      problem: [
+        'Отсутствие онлайн-присутствия у производителя 3D стикеров',
+        'Нужен современный, запоминающийся дизайн для выделения среди конкурентов',
+        'Требовалась быстрая загрузка для мобильных пользователей',
+        'Не было прямого канала связи с клиентами',
+      ],
+      solution: [
+        'Многостраничный React-сайт с уникальным тёмно-синим дизайном',
+        'Плавные анимации Framer Motion по всему сайту',
+        'Оптимизация производительности с lazy loading и code splitting',
+        'Интеграция WhatsApp и Telegram для мгновенной связи',
+      ],
+      techStack: ['React 18', 'Vite 5', 'Tailwind CSS', 'React Router v7', 'Framer Motion', 'Netlify'],
     },
   },
 };

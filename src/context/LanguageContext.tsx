@@ -180,6 +180,8 @@ const translations: Record<Language, Record<string, string>> = {
     'portfolio.project6.description': 'Complete delivery management system with driver tracking and notifications.',
     'portfolio.project7.title': 'KAIF CRM',
     'portfolio.project7.description': 'Desktop CRM system for fitness club management with offline mode and cloud sync.',
+    'portfolio.project8.title': '3DLike',
+    'portfolio.project8.description': '3D stickers manufacturer website with animations and SEO.',
 
     // Project Showcase
     'showcase.title': 'Our projects',
@@ -252,6 +254,9 @@ const translations: Record<Language, Record<string, string>> = {
     'projectDetail.classesManaged': 'Classes managed',
     'projectDetail.offlineWork': 'Offline work',
     'projectDetail.clientsTracked': 'Clients tracked',
+    'projectDetail.lighthouseScore': 'Lighthouse score',
+    'projectDetail.pagesCreated': 'Pages created',
+    'projectDetail.loadSpeed': 'Load speed',
 
     // 404 Page
     'notFound.message': 'Looks like this page went for refactoring and never came back.',
@@ -427,6 +432,8 @@ const translations: Record<Language, Record<string, string>> = {
     'portfolio.project6.description': 'Система управления доставкой с отслеживанием курьеров и уведомлениями.',
     'portfolio.project7.title': 'KAIF CRM',
     'portfolio.project7.description': 'Desktop CRM-система для управления фитнес-клубом с офлайн-режимом и облачной синхронизацией.',
+    'portfolio.project8.title': '3DLike',
+    'portfolio.project8.description': 'Сайт производителя 3D стикеров с анимациями и SEO.',
 
     // Project Showcase
     'showcase.title': 'Наши проекты',
@@ -499,6 +506,9 @@ const translations: Record<Language, Record<string, string>> = {
     'projectDetail.classesManaged': 'Классов под управлением',
     'projectDetail.offlineWork': 'Офлайн работа',
     'projectDetail.clientsTracked': 'Клиентов в базе',
+    'projectDetail.lighthouseScore': 'Lighthouse оценка',
+    'projectDetail.pagesCreated': 'Страниц создано',
+    'projectDetail.loadSpeed': 'Скорость загрузки',
 
     // 404 Page
     'notFound.message': 'Похоже, эта страница ушла на рефакторинг и не вернулась.',
