@@ -760,6 +760,38 @@ const projectsData: Record<Language, Record<string, ProjectData>> = {
       ],
       techStack: ['React 18', 'Vite 5', 'Tailwind CSS', 'React Router v7', 'Framer Motion', 'Netlify'],
     },
+    'unicar': {
+      slug: 'unicar',
+      category: 'CRM System',
+      categoryIcon: <FaLaptopCode />,
+      title: 'UNICAR',
+      description: 'Full-featured CRM system for car rental business in Thailand. Includes interactive dashboard with real-time analytics, fleet management, booking system, customer database, and financial reporting modules.',
+      stats: [
+        { icon: <FaChartLine />, value: '50+', labelKey: 'projectDetail.carsManaged' },
+        { icon: <FaClock />, value: '24/7', labelKey: 'projectDetail.activeRentals' },
+        { icon: <FaUsers />, value: '6+', labelKey: 'projectDetail.modules' },
+        { icon: <FaRocket />, value: '4 weeks', labelKey: 'projectDetail.development' },
+      ],
+      gallery: [
+        { title: 'Dashboard', description: 'Real-time analytics with active rentals, revenue, and car availability stats', media: '/projects/unicar/screen-1.jpeg' },
+        { title: 'Fleet Management', description: 'Car catalog with photos, availability status, and usage history', media: '/projects/unicar/screen-2.jpeg' },
+        { title: 'Booking System', description: 'Full rental cycle management with status tracking', media: '/projects/unicar/screen-3.jpeg' },
+        { title: 'Dark Theme', description: 'Modern dark mode interface for comfortable work', media: '/projects/unicar/screen-4.jpeg' },
+      ],
+      problem: [
+        'Manual tracking of rentals and car availability',
+        'No centralized system for the whole team',
+        'Errors in booking and financial reporting',
+        'Difficult to access data from different devices',
+      ],
+      solution: [
+        'Custom CRM with real-time dashboard and notifications',
+        'Unified system accessible for all team members',
+        'Automated booking with validation and conflict detection',
+        'Responsive design working on any device',
+      ],
+      techStack: ['React 18', 'TypeScript', 'Tailwind CSS', 'React Router', 'React Hook Form', 'Zod', 'Node.js', 'Vite'],
+    },
   },
   ru: {
     'kaif-crm': {
@@ -1017,6 +1049,38 @@ const projectsData: Record<Language, Record<string, ProjectData>> = {
         'Интеграция WhatsApp и Telegram для мгновенной связи',
       ],
       techStack: ['React 18', 'Vite 5', 'Tailwind CSS', 'React Router v7', 'Framer Motion', 'Netlify'],
+    },
+    'unicar': {
+      slug: 'unicar',
+      category: 'CRM-система',
+      categoryIcon: <FaLaptopCode />,
+      title: 'UNICAR',
+      description: 'Полнофункциональная CRM-система для бизнеса по аренде автомобилей в Таиланде. Включает интерактивный дашборд с аналитикой в реальном времени, управление автопарком, системой бронирования, базой клиентов и финансовой отчётностью.',
+      stats: [
+        { icon: <FaChartLine />, value: '50+', labelKey: 'projectDetail.carsManaged' },
+        { icon: <FaClock />, value: '24/7', labelKey: 'projectDetail.activeRentals' },
+        { icon: <FaUsers />, value: '6+', labelKey: 'projectDetail.modules' },
+        { icon: <FaRocket />, value: '4 недели', labelKey: 'projectDetail.development' },
+      ],
+      gallery: [
+        { title: 'Дашборд', description: 'Аналитика в реальном времени: активные аренды, выручка и статус автомобилей', media: '/projects/unicar/screen-1.jpeg' },
+        { title: 'Управление автопарком', description: 'Каталог автомобилей с фото, статусами доступности и историей', media: '/projects/unicar/screen-2.jpeg' },
+        { title: 'Система бронирования', description: 'Полный цикл управления арендами с отслеживанием статусов', media: '/projects/unicar/screen-3.jpeg' },
+        { title: 'Тёмная тема', description: 'Современный тёмный интерфейс для комфортной работы', media: '/projects/unicar/screen-4.jpeg' },
+      ],
+      problem: [
+        'Ручной учёт аренд и доступности автомобилей',
+        'Отсутствие единой системы для всей команды',
+        'Ошибки при оформлении и финансовой отчётности',
+        'Сложный доступ к данным с разных устройств',
+      ],
+      solution: [
+        'Кастомная CRM с дашбордом и уведомлениями в реальном времени',
+        'Единая система с доступом для всей команды',
+        'Автоматизация бронирования с валидацией и проверкой конфликтов',
+        'Адаптивный дизайн для работы с любого устройства',
+      ],
+      techStack: ['React 18', 'TypeScript', 'Tailwind CSS', 'React Router', 'React Hook Form', 'Zod', 'Node.js', 'Vite'],
     },
   },
 };

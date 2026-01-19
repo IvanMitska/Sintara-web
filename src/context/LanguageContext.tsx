@@ -182,6 +182,8 @@ const translations: Record<Language, Record<string, string>> = {
     'portfolio.project7.description': 'Desktop CRM system for fitness club management with offline mode and cloud sync.',
     'portfolio.project8.title': '3DLike',
     'portfolio.project8.description': '3D stickers manufacturer website with animations and SEO.',
+    'portfolio.project9.title': 'UNICAR',
+    'portfolio.project9.description': 'Car rental CRM with dashboard and fleet management.',
 
     // Project Showcase
     'showcase.title': 'Our projects',
@@ -257,6 +259,9 @@ const translations: Record<Language, Record<string, string>> = {
     'projectDetail.lighthouseScore': 'Lighthouse score',
     'projectDetail.pagesCreated': 'Pages created',
     'projectDetail.loadSpeed': 'Load speed',
+    'projectDetail.carsManaged': 'Cars managed',
+    'projectDetail.activeRentals': 'Active rentals',
+    'projectDetail.modules': 'Modules',
 
     // 404 Page
     'notFound.message': 'Looks like this page went for refactoring and never came back.',
@@ -434,6 +439,8 @@ const translations: Record<Language, Record<string, string>> = {
     'portfolio.project7.description': 'Desktop CRM-система для управления фитнес-клубом с офлайн-режимом и облачной синхронизацией.',
     'portfolio.project8.title': '3DLike',
     'portfolio.project8.description': 'Сайт производителя 3D стикеров с анимациями и SEO.',
+    'portfolio.project9.title': 'UNICAR',
+    'portfolio.project9.description': 'CRM для автопроката с дашбордом и управлением автопарком.',
 
     // Project Showcase
     'showcase.title': 'Наши проекты',
@@ -509,6 +516,9 @@ const translations: Record<Language, Record<string, string>> = {
     'projectDetail.lighthouseScore': 'Lighthouse оценка',
     'projectDetail.pagesCreated': 'Страниц создано',
     'projectDetail.loadSpeed': 'Скорость загрузки',
+    'projectDetail.carsManaged': 'Автомобилей',
+    'projectDetail.activeRentals': 'Активных аренд',
+    'projectDetail.modules': 'Модулей',
 
     // 404 Page
     'notFound.message': 'Похоже, эта страница ушла на рефакторинг и не вернулась.',

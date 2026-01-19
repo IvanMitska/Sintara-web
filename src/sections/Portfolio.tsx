@@ -385,6 +385,15 @@ const projects: Project[] = [
     imageUrl: '/projects/3dlike/cover.jpg',
     tech: ['React', 'Tailwind CSS', 'Framer Motion'],
   },
+  {
+    id: 9,
+    slug: 'unicar',
+    title: 'UNICAR',
+    category: 'crm',
+    description: 'Car rental management CRM with dashboard, fleet and booking management.',
+    imageUrl: '/projects/unicar/cover.jpg',
+    tech: ['React', 'TypeScript', 'Tailwind CSS'],
+  },
 ];
 
 const Portfolio: React.FC = memo(() => {
