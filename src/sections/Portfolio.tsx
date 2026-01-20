@@ -247,6 +247,11 @@ const ProjectDescription = styled.p`
   color: rgba(255, 255, 255, 0.5);
   line-height: 1.6;
   margin: 0;
+  min-height: 2.9em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 `;
 
 const TechStack = styled.div`
