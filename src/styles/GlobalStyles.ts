@@ -243,17 +243,18 @@ const GlobalStyles = createGlobalStyle`
   /* Условные стили для устройств с включенной анимацией */
   button, a, .btn {
     cursor: pointer;
-    
+
     &:focus-visible {
       outline: 2px solid var(--color-primary);
       outline-offset: 2px;
     }
-    
-    /* Применяем hover эффекты только если включены анимации */
+  }
+
+  /* Hover эффекты только для ссылок, не для кнопок */
+  a:not(button) {
     @media (hover: hover) and (pointer: fine) {
       &:hover {
         color: var(--color-accent);
-        transform: translateY(calc(-3px * var(--hover-transform-enabled)));
       }
     }
   }

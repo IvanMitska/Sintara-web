@@ -437,7 +437,7 @@ const Navigation: React.FC = () => {
     <>
       <MobileOverlay $isOpen={isOpen} onClick={closeMenu} />
       <NavContainer $isScrolled={isScrolled}>
-        <Logo href="#hero" onClick={closeMenu}>
+        <Logo href="/" onClick={closeMenu}>
           Sintara
         </Logo>
 
@@ -450,8 +450,8 @@ const Navigation: React.FC = () => {
           <LanguageToggle onClick={toggleLanguage} $isOpen={isOpen}>
             {language === 'en' ? 'RU' : 'EN'}
           </LanguageToggle>
-          <CTAButton href="#contact" onClick={closeMenu} $isOpen={isOpen}>
-            {t('nav.getStarted')}
+          <CTAButton href="/brief" onClick={closeMenu} $isOpen={isOpen}>
+            {language === 'en' ? 'Order Product' : 'Заказать продукт'}
           </CTAButton>
         </NavLinks>
 

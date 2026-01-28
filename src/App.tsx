@@ -63,6 +63,7 @@ const Contact = lazyLoad(() => import('./sections/Contact'));
 const Footer = lazyLoad(() => import('./components/Footer'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
+const Brief = lazy(() => import('./pages/Brief'));
 
 function HomePage({ isReady }: { isReady: boolean }) {
   const location = useLocation();
@@ -112,16 +113,20 @@ function HomePage({ isReady }: { isReady: boolean }) {
       <Layout>
         <Hero />
 
-        {/* Остальные секции загружаются лениво при скролле */}
-        <LazyLoadSection threshold={isLowEndDevice ? 0.01 : 0.05} rootMargin={isLowEndDevice ? '100px' : '300px'}>
+        {/* Первые секции загружаются сразу (priority) */}
+        <LazyLoadSection priority>
           <Services />
         </LazyLoadSection>
 
-        <LazyLoadSection threshold={isLowEndDevice ? 0.01 : 0.05} rootMargin={isLowEndDevice ? '100px' : '300px'}>
+        <LazyLoadSection priority>
+          <Portfolio />
+        </LazyLoadSection>
+
+        <LazyLoadSection priority>
           <Benefits />
         </LazyLoadSection>
 
-        <LazyLoadSection threshold={isLowEndDevice ? 0.01 : 0.05} rootMargin={isLowEndDevice ? '100px' : '300px'}>
+        <LazyLoadSection priority>
           <WorkProcess />
         </LazyLoadSection>
 
@@ -135,10 +140,6 @@ function HomePage({ isReady }: { isReady: boolean }) {
 
         <LazyLoadSection threshold={isLowEndDevice ? 0.01 : 0.05} rootMargin={isLowEndDevice ? '100px' : '300px'}>
           <LiveCodeDemo />
-        </LazyLoadSection>
-
-        <LazyLoadSection threshold={0.01} rootMargin={isLowEndDevice ? '50px' : '200px'}>
-          <Portfolio />
         </LazyLoadSection>
 
         <LazyLoadSection threshold={0.01} rootMargin={isLowEndDevice ? '50px' : '200px'}>
@@ -204,6 +205,7 @@ function App() {
             <Routes>
               <Route path="/" element={<HomePage isReady={isReady} />} />
               <Route path="/project/:slug" element={<ProjectDetail />} />
+              <Route path="/brief" element={<Brief />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

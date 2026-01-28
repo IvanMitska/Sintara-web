@@ -51,6 +51,14 @@ const StarFieldContainer = styled.div`
     #02010a 60%,
     #000005 100%
   );
+
+  @media (max-width: 768px) {
+    touch-action: none;
+  }
+
+  * {
+    pointer-events: none;
+  }
 `;
 
 // Static nebula - no animation for better performance

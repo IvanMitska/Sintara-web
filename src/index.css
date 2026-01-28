@@ -103,10 +103,10 @@ body {
 }
 
 /* Оптимизация скролла для мобильных */
-html, body {
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: none;
-  touch-action: pan-y;
+@media (max-width: 768px) {
+  html, body {
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* Отключаем тяжёлые эффекты на мобильных */
