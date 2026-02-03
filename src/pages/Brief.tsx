@@ -495,6 +495,18 @@ const SuccessText = styled.p`
   line-height: 1.6;
 `;
 
+const ErrorMessage = styled(motion.div)`
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.08) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  color: #fca5a5;
+  line-height: 1.5;
+`;
+
 // ============ TYPES ============
 
 interface BriefData {
@@ -561,6 +573,7 @@ const Brief: React.FC = memo(() => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<BriefData>({
     productType: '',
@@ -1051,6 +1064,43 @@ const Brief: React.FC = memo(() => {
     }
   };
 
+  // Split text into chunks respecting Telegram's 4096 char limit
+  const splitIntoChunks = (text: string, maxLength: number = 4000): string[] => {
+    if (text.length <= maxLength) return [text];
+
+    const chunks: string[] = [];
+    const lines = text.split('\n');
+    let currentChunk = '';
+
+    for (const line of lines) {
+      // If single line exceeds max, split it by characters
+      if (line.length > maxLength) {
+        if (currentChunk) {
+          chunks.push(currentChunk.trim());
+          currentChunk = '';
+        }
+        // Split long line into smaller pieces
+        for (let i = 0; i < line.length; i += maxLength - 50) {
+          chunks.push(line.substring(i, i + maxLength - 50));
+        }
+        continue;
+      }
+
+      if ((currentChunk + '\n' + line).length > maxLength) {
+        chunks.push(currentChunk.trim());
+        currentChunk = line;
+      } else {
+        currentChunk = currentChunk ? currentChunk + '\n' + line : line;
+      }
+    }
+
+    if (currentChunk.trim()) {
+      chunks.push(currentChunk.trim());
+    }
+
+    return chunks;
+  };
+
   const formatBriefForTelegram = (): string => {
     const sections = [];
 
@@ -1119,41 +1169,60 @@ const Brief: React.FC = memo(() => {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    setSubmitError(null);
 
     try {
       const message = formatBriefForTelegram();
+      const chunks = splitIntoChunks(message);
 
       // Send to Telegram
       const TELEGRAM_BOT_TOKEN = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || '';
       const TELEGRAM_CHAT_ID = import.meta.env.VITE_TELEGRAM_CHAT_ID || '';
 
       if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
-        const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            chat_id: TELEGRAM_CHAT_ID,
-            text: message,
-            parse_mode: 'Markdown'
-          })
-        });
+        // Send all chunks sequentially
+        for (let i = 0; i < chunks.length; i++) {
+          const chunkText = chunks.length > 1
+            ? `${i === 0 ? '' : `📋 *БРИФ (часть ${i + 1}/${chunks.length})*\n\n`}${chunks[i]}`
+            : chunks[i];
 
-        if (!response.ok) {
-          throw new Error('Failed to send to Telegram');
+          const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              chat_id: TELEGRAM_CHAT_ID,
+              text: chunkText,
+              parse_mode: 'Markdown'
+            })
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('Telegram API error:', errorData);
+            throw new Error(errorData.description || 'Failed to send to Telegram');
+          }
+
+          // Small delay between messages to avoid rate limiting
+          if (i < chunks.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
         }
-      } else {
-        // Fallback: log to console
-        console.log('Brief data:', formData);
-        console.log('Formatted message:', message);
-      }
 
-      setIsSuccess(true);
+        setIsSuccess(true);
+      } else {
+        // No Telegram config - show error
+        console.error('Telegram credentials not configured');
+        setSubmitError(language === 'ru'
+          ? 'Ошибка конфигурации. Пожалуйста, свяжитесь с нами напрямую.'
+          : 'Configuration error. Please contact us directly.');
+      }
     } catch (error) {
       console.error('Error submitting brief:', error);
-      // Still show success for demo purposes
-      setIsSuccess(true);
+      setSubmitError(language === 'ru'
+        ? 'Произошла ошибка при отправке. Пожалуйста, попробуйте ещё раз или свяжитесь с нами напрямую.'
+        : 'An error occurred while sending. Please try again or contact us directly.');
     } finally {
       setIsSubmitting(false);
     }
@@ -1882,6 +1951,16 @@ const Brief: React.FC = memo(() => {
           <AnimatePresence mode="wait">
             {renderStep()}
           </AnimatePresence>
+
+          {submitError && (
+            <ErrorMessage
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+            >
+              {submitError}
+            </ErrorMessage>
+          )}
 
           <NavButtons>
             <NavButton
