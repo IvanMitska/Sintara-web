@@ -1171,9 +1171,51 @@ const Brief: React.FC = memo(() => {
     setIsSubmitting(true);
     setSubmitError(null);
 
+    // Helper to send a single message with retry on rate limit
+    const sendTelegramMessage = async (
+      token: string,
+      chatId: string,
+      text: string,
+      retries = 3
+    ): Promise<void> => {
+      for (let attempt = 0; attempt < retries; attempt++) {
+        const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: text,
+            parse_mode: 'Markdown'
+          })
+        });
+
+        if (response.ok) return;
+
+        const errorData = await response.json().catch(() => ({}));
+
+        // Handle rate limiting (429 Too Many Requests)
+        if (response.status === 429) {
+          const retryAfter = errorData.parameters?.retry_after || 5;
+          console.log(`Rate limited, waiting ${retryAfter}s...`);
+          await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
+          continue;
+        }
+
+        throw new Error(errorData.description || 'Failed to send to Telegram');
+      }
+      throw new Error('Max retries exceeded');
+    };
+
     try {
       const message = formatBriefForTelegram();
-      const chunks = splitIntoChunks(message);
+      let chunks = splitIntoChunks(message);
+
+      // Limit to max 10 parts to avoid extreme cases
+      const MAX_PARTS = 10;
+      if (chunks.length > MAX_PARTS) {
+        chunks = chunks.slice(0, MAX_PARTS);
+        chunks[MAX_PARTS - 1] += '\n\n⚠️ _Сообщение было сокращено из-за большого объёма_';
+      }
 
       // Send to Telegram
       const TELEGRAM_BOT_TOKEN = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || '';
@@ -1186,27 +1228,11 @@ const Brief: React.FC = memo(() => {
             ? `${i === 0 ? '' : `📋 *БРИФ (часть ${i + 1}/${chunks.length})*\n\n`}${chunks[i]}`
             : chunks[i];
 
-          const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              chat_id: TELEGRAM_CHAT_ID,
-              text: chunkText,
-              parse_mode: 'Markdown'
-            })
-          });
+          await sendTelegramMessage(TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, chunkText);
 
-          if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            console.error('Telegram API error:', errorData);
-            throw new Error(errorData.description || 'Failed to send to Telegram');
-          }
-
-          // Small delay between messages to avoid rate limiting
+          // Delay between messages to avoid rate limiting (500ms)
           if (i < chunks.length - 1) {
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 500));
           }
         }
 
