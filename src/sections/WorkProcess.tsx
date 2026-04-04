@@ -59,17 +59,18 @@ const SectionSubtitle = styled.p`
   }
 `;
 
-/* Desktop 3D Carousel */
-const DesktopCarousel = styled.div`
+/* Simple 2D Carousel - no perspective/3D for performance */
+const CarouselContainer = styled.div`
   position: relative;
-  perspective: 1200px;
-  height: 500px;
+  height: 340px;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: visible;
 
   @media (max-width: 768px) {
-    display: none;
+    height: auto;
+    padding: 20px 0;
   }
 `;
 
@@ -77,10 +78,13 @@ const CarouselTrack = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
-  transform-style: preserve-3d;
   display: flex;
   align-items: center;
   justify-content: center;
+
+  @media (max-width: 768px) {
+    height: 380px;
+  }
 `;
 
 const Card = styled.div<{ $offset: number; $isActive: boolean }>`
@@ -96,205 +100,53 @@ const Card = styled.div<{ $offset: number; $isActive: boolean }>`
   border-radius: 24px;
   padding: 32px;
   cursor: pointer;
-  transition: all 0.5s ease-out;
-  transform-style: preserve-3d;
+  transition: transform 0.4s ease, opacity 0.4s ease, box-shadow 0.4s ease;
+  will-change: transform, opacity;
 
   transform: ${props => {
     const offset = props.$offset;
-    if (offset === 0) {
-      return 'translateX(0) translateZ(100px) rotateY(0deg) scale(1)';
-    }
+    if (offset === 0) return 'translateX(0) scale(1)';
     const direction = offset > 0 ? 1 : -1;
     const absOffset = Math.abs(offset);
-    const translateX = direction * absOffset * 320;
-    const translateZ = -absOffset * 150;
-    const rotateY = -direction * Math.min(absOffset * 25, 45);
-    const scale = Math.max(1 - absOffset * 0.15, 0.6);
-    return `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`;
+    const translateX = direction * absOffset * 300;
+    const scale = Math.max(1 - absOffset * 0.12, 0.7);
+    return `translateX(${translateX}px) scale(${scale})`;
   }};
 
   opacity: ${props => {
     const absOffset = Math.abs(props.$offset);
     if (absOffset === 0) return 1;
-    if (absOffset === 1) return 0.7;
-    if (absOffset === 2) return 0.4;
-    return 0.2;
+    if (absOffset === 1) return 0.6;
+    if (absOffset === 2) return 0.3;
+    return 0;
   }};
 
   z-index: ${props => 10 - Math.abs(props.$offset)};
 
   box-shadow: ${props => props.$isActive
-    ? '0 25px 80px rgba(124, 58, 237, 0.3), 0 0 0 1px rgba(124, 58, 237, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
-    : '0 10px 40px rgba(0, 0, 0, 0.3)'};
+    ? '0 20px 60px rgba(124, 58, 237, 0.25)'
+    : '0 10px 30px rgba(0, 0, 0, 0.2)'};
 
-  pointer-events: ${props => Math.abs(props.$offset) <= 2 ? 'auto' : 'none'};
-`;
-
-/* Mobile 3D Carousel */
-const MobileCarouselWrapper = styled.div`
-  display: none;
+  pointer-events: ${props => Math.abs(props.$offset) <= 1 ? 'auto' : 'none'};
 
   @media (max-width: 768px) {
-    display: block;
-    overflow: hidden;
-    width: 100%;
-    margin: 0 -20px;
-    padding: 0 20px;
+    width: calc(100% - 60px);
+    max-width: 340px;
+    min-height: 320px;
+    padding: 24px;
+
+    transform: ${props => {
+      const offset = props.$offset;
+      if (offset === 0) return 'translateX(-50%) scale(1)';
+      const direction = offset > 0 ? 1 : -1;
+      const absOffset = Math.abs(offset);
+      const translatePercent = direction * absOffset * 80;
+      const scale = Math.max(1 - absOffset * 0.1, 0.8);
+      return `translateX(calc(-50% + ${translatePercent}%)) scale(${scale})`;
+    }};
+
+    left: 50%;
   }
-`;
-
-const MobileCarousel = styled.div`
-  @media (max-width: 768px) {
-    position: relative;
-    width: 100%;
-    perspective: 1000px;
-    padding: 20px 0;
-  }
-`;
-
-const MobileTrack = styled.div<{ $activeIndex: number }>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  height: 380px;
-  transform-style: preserve-3d;
-`;
-
-const MobileCard = styled.div<{ $isActive: boolean; $offset: number }>`
-  position: absolute;
-  left: 50%;
-  width: calc(100% - 60px);
-  max-width: 340px;
-  padding: 0;
-  box-sizing: border-box;
-  transition: all 0.5s ease-out;
-  transform-style: preserve-3d;
-
-  transform: ${props => {
-    const offset = props.$offset;
-    if (offset === 0) {
-      return 'translateX(-50%) translateZ(50px) rotateY(0deg) scale(1)';
-    }
-    const direction = offset > 0 ? 1 : -1;
-    const absOffset = Math.abs(offset);
-    const baseTranslate = -50;
-    const offsetTranslate = direction * (absOffset === 1 ? 70 : 100);
-    const translateZ = -absOffset * 80;
-    const rotateY = -direction * Math.min(absOffset * 12, 20);
-    const scale = Math.max(1 - absOffset * 0.12, 0.75);
-    return `translateX(calc(${baseTranslate}% + ${offsetTranslate}%)) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`;
-  }};
-
-  opacity: ${props => {
-    const absOffset = Math.abs(props.$offset);
-    if (absOffset === 0) return 1;
-    if (absOffset === 1) return 0.5;
-    return 0.2;
-  }};
-
-  z-index: ${props => 10 - Math.abs(props.$offset)};
-  pointer-events: ${props => props.$isActive ? 'auto' : 'none'};
-`;
-
-const MobileCardInner = styled.div<{ $isActive: boolean }>`
-  background: ${props => props.$isActive
-    ? 'linear-gradient(145deg, rgba(30, 20, 60, 0.95), rgba(20, 10, 45, 0.95))'
-    : 'rgba(20, 10, 40, 0.7)'};
-  border: 1px solid ${props => props.$isActive
-    ? 'rgba(124, 58, 237, 0.4)'
-    : 'rgba(255, 255, 255, 0.08)'};
-  border-radius: 24px;
-  padding: 24px;
-  min-height: 320px;
-  transition: all 0.5s ease-out;
-  box-shadow: ${props => props.$isActive
-    ? '0 10px 40px rgba(0, 0, 0, 0.4)'
-    : '0 5px 20px rgba(0, 0, 0, 0.3)'};
-`;
-
-const MobileNavigation = styled.div`
-  display: none;
-
-  @media (max-width: 768px) {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    margin-top: 24px;
-    padding: 0 20px;
-  }
-`;
-
-const MobileDot = styled.button<{ $isActive: boolean }>`
-  width: ${props => props.$isActive ? '24px' : '8px'};
-  height: 8px;
-  border-radius: 4px;
-  border: none;
-  background: ${props => props.$isActive
-    ? 'linear-gradient(90deg, #7c3aed, #a78bfa)'
-    : 'rgba(255, 255, 255, 0.2)'};
-  cursor: pointer;
-  transition: all 0.3s ease;
-  padding: 0;
-
-  &:hover {
-    background: ${props => props.$isActive
-      ? 'linear-gradient(90deg, #7c3aed, #a78bfa)'
-      : 'rgba(255, 255, 255, 0.4)'};
-  }
-`;
-
-const MobileArrows = styled.div`
-  display: none;
-
-  @media (max-width: 768px) {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
-    margin-top: 16px;
-  }
-`;
-
-const MobileArrowButton = styled.button<{ $disabled?: boolean }>`
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: ${props => props.$disabled
-    ? 'rgba(255, 255, 255, 0.05)'
-    : 'rgba(124, 58, 237, 0.2)'};
-  border: 1px solid ${props => props.$disabled
-    ? 'rgba(255, 255, 255, 0.05)'
-    : 'rgba(124, 58, 237, 0.3)'};
-  color: ${props => props.$disabled
-    ? 'rgba(255, 255, 255, 0.2)'
-    : '#a78bfa'};
-  cursor: ${props => props.$disabled ? 'not-allowed' : 'pointer'};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s ease, border-color 0.2s ease;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  user-select: none;
-
-  &:active:not(:disabled) {
-    background: rgba(124, 58, 237, 0.4);
-  }
-
-  svg {
-    width: 20px;
-    height: 20px;
-    pointer-events: none;
-  }
-`;
-
-const MobileProgress = styled.div`
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.6);
 `;
 
 const CardInner = styled.div`
@@ -323,10 +175,8 @@ const StepNumber = styled.div<{ $isActive: boolean }>`
   font-size: 1.25rem;
   font-weight: 700;
   color: ${props => props.$isActive ? '#ffffff' : '#a78bfa'};
-  box-shadow: ${props => props.$isActive
-    ? '0 8px 24px rgba(124, 58, 237, 0.4)'
-    : 'none'};
-  transition: all 0.4s ease;
+  box-shadow: ${props => props.$isActive ? '0 8px 24px rgba(124, 58, 237, 0.4)' : 'none'};
+  transition: all 0.3s ease;
 
   @media (max-width: 768px) {
     width: 48px;
@@ -338,12 +188,8 @@ const StepBadge = styled.div<{ $isActive: boolean }>`
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: ${props => props.$isActive
-    ? 'rgba(124, 58, 237, 0.2)'
-    : 'rgba(124, 58, 237, 0.1)'};
-  border: 1px solid ${props => props.$isActive
-    ? 'rgba(124, 58, 237, 0.3)'
-    : 'rgba(124, 58, 237, 0.15)'};
+  background: ${props => props.$isActive ? 'rgba(124, 58, 237, 0.2)' : 'rgba(124, 58, 237, 0.1)'};
+  border: 1px solid ${props => props.$isActive ? 'rgba(124, 58, 237, 0.3)' : 'rgba(124, 58, 237, 0.15)'};
   border-radius: 20px;
   padding: 6px 12px;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -354,57 +200,43 @@ const StepBadge = styled.div<{ $isActive: boolean }>`
   letter-spacing: 0.05em;
 `;
 
-const StepTitle = styled.h3<{ $isActive: boolean }>`
+const StepTitle = styled.h3`
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: ${props => props.$isActive ? '1.5rem' : '1.25rem'};
+  font-size: 1.5rem;
   font-weight: 600;
   color: #ffffff;
   margin-bottom: 12px;
   letter-spacing: -0.01em;
-  transition: font-size 0.4s ease;
 
   @media (max-width: 768px) {
     font-size: 1.375rem;
   }
 `;
 
-const StepDescription = styled.p<{ $isActive: boolean }>`
+const StepDescription = styled.p`
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 0.95rem;
-  color: ${props => props.$isActive ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.5)'};
+  color: rgba(255, 255, 255, 0.7);
   line-height: 1.7;
   margin-bottom: 20px;
-  transition: color 0.4s ease;
 
   @media (max-width: 768px) {
-    color: rgba(255, 255, 255, 0.7);
     font-size: 0.9rem;
   }
 `;
 
-const StepDuration = styled.div<{ $isActive: boolean }>`
+const StepDuration = styled.div`
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: ${props => props.$isActive
-    ? 'rgba(34, 197, 94, 0.15)'
-    : 'rgba(124, 58, 237, 0.1)'};
-  border: 1px solid ${props => props.$isActive
-    ? 'rgba(34, 197, 94, 0.25)'
-    : 'rgba(124, 58, 237, 0.15)'};
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.25);
   border-radius: 8px;
   padding: 8px 14px;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 0.85rem;
   font-weight: 500;
-  color: ${props => props.$isActive ? '#22c55e' : '#a78bfa'};
-  transition: all 0.4s ease;
-
-  @media (max-width: 768px) {
-    background: rgba(34, 197, 94, 0.15);
-    border-color: rgba(34, 197, 94, 0.25);
-    color: #22c55e;
-  }
+  color: #22c55e;
 
   svg {
     width: 16px;
@@ -420,7 +252,8 @@ const NavigationContainer = styled.div`
   margin-top: 48px;
 
   @media (max-width: 768px) {
-    display: none;
+    margin-top: 24px;
+    padding: 0 20px;
   }
 `;
 
@@ -428,34 +261,32 @@ const NavButton = styled.button<{ $disabled?: boolean }>`
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: ${props => props.$disabled
-    ? 'rgba(255, 255, 255, 0.05)'
-    : 'rgba(124, 58, 237, 0.15)'};
-  border: 1px solid ${props => props.$disabled
-    ? 'rgba(255, 255, 255, 0.05)'
-    : 'rgba(124, 58, 237, 0.3)'};
-  color: ${props => props.$disabled
-    ? 'rgba(255, 255, 255, 0.2)'
-    : '#a78bfa'};
+  background: ${props => props.$disabled ? 'rgba(255, 255, 255, 0.05)' : 'rgba(124, 58, 237, 0.15)'};
+  border: 1px solid ${props => props.$disabled ? 'rgba(255, 255, 255, 0.05)' : 'rgba(124, 58, 237, 0.3)'};
+  color: ${props => props.$disabled ? 'rgba(255, 255, 255, 0.2)' : '#a78bfa'};
   cursor: ${props => props.$disabled ? 'not-allowed' : 'pointer'};
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 
   &:hover:not(:disabled) {
     background: rgba(124, 58, 237, 0.25);
-    border-color: rgba(124, 58, 237, 0.5);
-    transform: scale(1.05);
   }
 
-  &:active:not(:disabled) {
-    transform: scale(0.95);
+  @media (max-width: 768px) {
+    width: 48px;
+    height: 48px;
   }
 
   svg {
     width: 24px;
     height: 24px;
+
+    @media (max-width: 768px) {
+      width: 20px;
+      height: 20px;
+    }
   }
 `;
 
@@ -465,23 +296,18 @@ const ProgressDots = styled.div`
   gap: 8px;
 `;
 
-const ProgressDot = styled.button<{ $isActive: boolean; $isPast: boolean }>`
-  width: ${props => props.$isActive ? '32px' : '10px'};
-  height: 10px;
-  border-radius: 5px;
+const ProgressDot = styled.button<{ $isActive: boolean }>`
+  width: ${props => props.$isActive ? '24px' : '8px'};
+  height: 8px;
+  border-radius: 4px;
   border: none;
-  background: ${props => {
-    if (props.$isActive) return 'linear-gradient(90deg, #7c3aed, #a78bfa)';
-    if (props.$isPast) return 'rgba(124, 58, 237, 0.5)';
-    return 'rgba(255, 255, 255, 0.15)';
-  }};
+  background: ${props => props.$isActive ? 'linear-gradient(90deg, #7c3aed, #a78bfa)' : 'rgba(255, 255, 255, 0.2)'};
   cursor: pointer;
   transition: all 0.3s ease;
+  padding: 0;
 
   &:hover {
-    background: ${props => props.$isActive
-      ? 'linear-gradient(90deg, #7c3aed, #a78bfa)'
-      : 'rgba(124, 58, 237, 0.4)'};
+    background: ${props => props.$isActive ? 'linear-gradient(90deg, #7c3aed, #a78bfa)' : 'rgba(255, 255, 255, 0.4)'};
   }
 `;
 
@@ -489,112 +315,28 @@ const ProgressText = styled.div`
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.5);
-  min-width: 60px;
+  min-width: 50px;
   text-align: center;
 `;
 
 const stepsData = {
   en: [
-    {
-      number: '01',
-      title: 'Discovery call',
-      description: 'We discuss your goals, requirements, and vision. You get a clear understanding of what\'s possible and a rough estimate.',
-      duration: '1-2 days',
-      badge: 'Start'
-    },
-    {
-      number: '02',
-      title: 'Proposal & planning',
-      description: 'Detailed scope, fixed price, and timeline. No surprises. You approve before we write a single line of code.',
-      duration: '2-3 days',
-      badge: 'Planning'
-    },
-    {
-      number: '03',
-      title: 'Design & prototype',
-      description: 'Interactive mockups you can click through. See exactly how your product will look and feel before development.',
-      duration: '5-7 days',
-      badge: 'Design'
-    },
-    {
-      number: '04',
-      title: 'Development',
-      description: 'We build your product with weekly demos. You see progress in real-time and can give feedback along the way.',
-      duration: '2-4 weeks',
-      badge: 'Build'
-    },
-    {
-      number: '05',
-      title: 'Testing & QA',
-      description: 'Rigorous testing across devices and browsers. We catch bugs before your users do.',
-      duration: '3-5 days',
-      badge: 'Quality'
-    },
-    {
-      number: '06',
-      title: 'Launch',
-      description: 'Smooth deployment to production. We handle hosting setup, DNS, SSL — everything technical.',
-      duration: '1-2 days',
-      badge: 'Deploy'
-    },
-    {
-      number: '07',
-      title: 'Support',
-      description: '60-day warranty included. After that, optional maintenance plans available if you need ongoing help.',
-      duration: 'Ongoing',
-      badge: 'Finish'
-    }
+    { number: '01', title: 'Discovery call', description: 'We discuss your goals, requirements, and vision. You get a clear understanding of what\'s possible and a rough estimate.', duration: '1-2 days', badge: 'Start' },
+    { number: '02', title: 'Proposal & planning', description: 'Detailed scope, fixed price, and timeline. No surprises. You approve before we write a single line of code.', duration: '2-3 days', badge: 'Planning' },
+    { number: '03', title: 'Design & prototype', description: 'Interactive mockups you can click through. See exactly how your product will look and feel before development.', duration: '5-7 days', badge: 'Design' },
+    { number: '04', title: 'Development', description: 'We build your product with weekly demos. You see progress in real-time and can give feedback along the way.', duration: '2-4 weeks', badge: 'Build' },
+    { number: '05', title: 'Testing & QA', description: 'Rigorous testing across devices and browsers. We catch bugs before your users do.', duration: '3-5 days', badge: 'Quality' },
+    { number: '06', title: 'Launch', description: 'Smooth deployment to production. We handle hosting setup, DNS, SSL — everything technical.', duration: '1-2 days', badge: 'Deploy' },
+    { number: '07', title: 'Support', description: '60-day warranty included. After that, optional maintenance plans available if you need ongoing help.', duration: 'Ongoing', badge: 'Finish' }
   ],
   ru: [
-    {
-      number: '01',
-      title: 'Знакомство',
-      description: 'Обсуждаем ваши цели, требования и видение. Вы получаете понимание возможностей и предварительную оценку.',
-      duration: '1-2 дня',
-      badge: 'Старт'
-    },
-    {
-      number: '02',
-      title: 'Предложение и план',
-      description: 'Детальный план, фиксированная цена и сроки. Без сюрпризов. Вы одобряете до написания кода.',
-      duration: '2-3 дня',
-      badge: 'План'
-    },
-    {
-      number: '03',
-      title: 'Дизайн и прототип',
-      description: 'Интерактивные макеты, которые можно кликать. Увидите, как будет выглядеть продукт до разработки.',
-      duration: '5-7 дней',
-      badge: 'Дизайн'
-    },
-    {
-      number: '04',
-      title: 'Разработка',
-      description: 'Создаём продукт с еженедельными демо. Видите прогресс в реальном времени и даёте обратную связь.',
-      duration: '2-4 недели',
-      badge: 'Код'
-    },
-    {
-      number: '05',
-      title: 'Тестирование',
-      description: 'Тщательное тестирование на всех устройствах и браузерах. Находим баги до ваших пользователей.',
-      duration: '3-5 дней',
-      badge: 'QA'
-    },
-    {
-      number: '06',
-      title: 'Запуск',
-      description: 'Плавный деплой в продакшн. Мы настроим хостинг, DNS, SSL — всю техническую часть.',
-      duration: '1-2 дня',
-      badge: 'Деплой'
-    },
-    {
-      number: '07',
-      title: 'Поддержка',
-      description: 'Гарантия 60 дней включена. После этого — опциональные планы обслуживания при необходимости.',
-      duration: 'Постоянно',
-      badge: 'Финал'
-    }
+    { number: '01', title: 'Знакомство', description: 'Обсуждаем ваши цели, требования и видение. Вы получаете понимание возможностей и предварительную оценку.', duration: '1-2 дня', badge: 'Старт' },
+    { number: '02', title: 'Предложение и план', description: 'Детальный план, фиксированная цена и сроки. Без сюрпризов. Вы одобряете до написания кода.', duration: '2-3 дня', badge: 'План' },
+    { number: '03', title: 'Дизайн и прототип', description: 'Интерактивные макеты, которые можно кликать. Увидите, как будет выглядеть продукт до разработки.', duration: '5-7 дней', badge: 'Дизайн' },
+    { number: '04', title: 'Разработка', description: 'Создаём продукт с еженедельными демо. Видите прогресс в реальном времени и даёте обратную связь.', duration: '2-4 недели', badge: 'Код' },
+    { number: '05', title: 'Тестирование', description: 'Тщательное тестирование на всех устройствах и браузерах. Находим баги до ваших пользователей.', duration: '3-5 дней', badge: 'QA' },
+    { number: '06', title: 'Запуск', description: 'Плавный деплой в продакшн. Мы настроим хостинг, DNS, SSL — всю техническую часть.', duration: '1-2 дня', badge: 'Деплой' },
+    { number: '07', title: 'Поддержка', description: 'Гарантия 60 дней включена. После этого — опциональные планы обслуживания при необходимости.', duration: 'Постоянно', badge: 'Финал' }
   ]
 };
 
@@ -616,38 +358,17 @@ const WorkProcess: React.FC = memo(() => {
     setActiveIndex(index);
   }, []);
 
-  // Simple touch handlers for mobile swipe
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     touchStartRef.current = e.touches[0].clientX;
   }, []);
 
   const onTouchEnd = useCallback((e: React.TouchEvent) => {
     if (touchStartRef.current === null) return;
-
-    const touchEnd = e.changedTouches[0].clientX;
-    const distance = touchStartRef.current - touchEnd;
-
-    if (distance > 50) {
-      goToNext();
-    } else if (distance < -50) {
-      goToPrev();
-    }
-
+    const distance = touchStartRef.current - e.changedTouches[0].clientX;
+    if (distance > 50) goToNext();
+    else if (distance < -50) goToPrev();
     touchStartRef.current = null;
   }, [goToNext, goToPrev]);
-
-  // Button click handlers with event prevention
-  const handlePrevClick = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    goToPrev();
-  }, [goToPrev]);
-
-  const handleNextClick = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    goToNext();
-  }, [goToNext]);
 
   return (
     <ProcessSection id="process">
@@ -661,30 +382,23 @@ const WorkProcess: React.FC = memo(() => {
           </SectionSubtitle>
         </SectionHeader>
 
-        {/* Desktop 3D Carousel */}
-        <DesktopCarousel>
+        <CarouselContainer onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
           <CarouselTrack>
             {steps.map((step, index) => {
               const offset = index - activeIndex;
               const isActive = index === activeIndex;
+              if (Math.abs(offset) > 2) return null;
 
               return (
-                <Card
-                  key={index}
-                  $offset={offset}
-                  $isActive={isActive}
-                  onClick={() => goToStep(index)}
-                >
+                <Card key={index} $offset={offset} $isActive={isActive} onClick={() => goToStep(index)}>
                   <CardInner>
                     <StepIndicator>
                       <StepNumber $isActive={isActive}>{step.number}</StepNumber>
                       <StepBadge $isActive={isActive}>{step.badge}</StepBadge>
                     </StepIndicator>
-                    <StepTitle $isActive={isActive}>{step.title}</StepTitle>
-                    <StepDescription $isActive={isActive}>
-                      {step.description}
-                    </StepDescription>
-                    <StepDuration $isActive={isActive}>
+                    <StepTitle>{step.title}</StepTitle>
+                    <StepDescription>{step.description}</StepDescription>
+                    <StepDuration>
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <circle cx="12" cy="12" r="10" />
                         <polyline points="12 6 12 12 16 14" />
@@ -696,92 +410,10 @@ const WorkProcess: React.FC = memo(() => {
               );
             })}
           </CarouselTrack>
-        </DesktopCarousel>
+        </CarouselContainer>
 
-        {/* Mobile 3D Carousel */}
-        <MobileCarouselWrapper>
-          <MobileCarousel
-            onTouchStart={onTouchStart}
-            onTouchEnd={onTouchEnd}
-          >
-            <MobileTrack $activeIndex={activeIndex}>
-              {steps.map((step, index) => {
-                const offset = index - activeIndex;
-                const isActive = offset === 0;
-                const isVisible = Math.abs(offset) <= 2;
-
-                if (!isVisible) return null;
-
-                return (
-                  <MobileCard key={index} $isActive={isActive} $offset={offset}>
-                    <MobileCardInner $isActive={isActive}>
-                      <CardInner>
-                        <StepIndicator>
-                          <StepNumber $isActive={isActive}>{step.number}</StepNumber>
-                          <StepBadge $isActive={isActive}>{step.badge}</StepBadge>
-                        </StepIndicator>
-                        <StepTitle $isActive={isActive}>{step.title}</StepTitle>
-                        <StepDescription $isActive={isActive}>
-                          {step.description}
-                        </StepDescription>
-                        <StepDuration $isActive={isActive}>
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <circle cx="12" cy="12" r="10" />
-                            <polyline points="12 6 12 12 16 14" />
-                          </svg>
-                          {step.duration}
-                        </StepDuration>
-                      </CardInner>
-                    </MobileCardInner>
-                  </MobileCard>
-                );
-              })}
-            </MobileTrack>
-          </MobileCarousel>
-        </MobileCarouselWrapper>
-
-        {/* Mobile Navigation */}
-        <MobileArrows>
-          <MobileArrowButton
-            onClick={handlePrevClick}
-            $disabled={activeIndex === 0}
-            disabled={activeIndex === 0}
-            type="button"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          </MobileArrowButton>
-
-          <MobileProgress>
-            {activeIndex + 1} / {steps.length}
-          </MobileProgress>
-
-          <MobileArrowButton
-            onClick={handleNextClick}
-            $disabled={activeIndex === steps.length - 1}
-            disabled={activeIndex === steps.length - 1}
-            type="button"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </MobileArrowButton>
-        </MobileArrows>
-
-        <MobileNavigation>
-          {steps.map((_, index) => (
-            <MobileDot
-              key={index}
-              $isActive={index === activeIndex}
-              onClick={() => goToStep(index)}
-            />
-          ))}
-        </MobileNavigation>
-
-        {/* Desktop Navigation */}
         <NavigationContainer>
-          <NavButton onClick={goToPrev} $disabled={activeIndex === 0}>
+          <NavButton onClick={goToPrev} $disabled={activeIndex === 0} disabled={activeIndex === 0}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="15 18 9 12 15 6" />
             </svg>
@@ -789,20 +421,13 @@ const WorkProcess: React.FC = memo(() => {
 
           <ProgressDots>
             {steps.map((_, index) => (
-              <ProgressDot
-                key={index}
-                $isActive={index === activeIndex}
-                $isPast={index < activeIndex}
-                onClick={() => goToStep(index)}
-              />
+              <ProgressDot key={index} $isActive={index === activeIndex} onClick={() => goToStep(index)} />
             ))}
           </ProgressDots>
 
-          <ProgressText>
-            {activeIndex + 1} / {steps.length}
-          </ProgressText>
+          <ProgressText>{activeIndex + 1} / {steps.length}</ProgressText>
 
-          <NavButton onClick={goToNext} $disabled={activeIndex === steps.length - 1}>
+          <NavButton onClick={goToNext} $disabled={activeIndex === steps.length - 1} disabled={activeIndex === steps.length - 1}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="9 18 15 12 9 6" />
             </svg>
