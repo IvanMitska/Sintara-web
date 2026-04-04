@@ -174,6 +174,8 @@ const translations: Record<Language, Record<string, string>> = {
     'portfolio.project9.description': 'Car rental CRM with dashboard and fleet management.',
     'portfolio.project10.title': 'SHIBA CARS Partner System',
     'portfolio.project10.description': 'Partner affiliate system with Telegram bot, Mini App, and real-time analytics.',
+    'portfolio.project11.title': 'KAIF',
+    'portfolio.project11.description': 'Premium wellness complex website with video backgrounds and multilingual support.',
 
     // Project Showcase
     'showcase.title': 'Our projects',
@@ -255,6 +257,8 @@ const translations: Record<Language, Record<string, string>> = {
     'projectDetail.partnersActive': 'Active partners',
     'projectDetail.clicksTracked': 'Clicks tracked',
     'projectDetail.realTimeStats': 'Real-time stats',
+    'projectDetail.languages': 'Languages',
+    'projectDetail.sectionsCreated': 'Sections created',
 
     // 404 Page
     'notFound.message': 'Looks like this page went for refactoring and never came back.',
@@ -424,6 +428,8 @@ const translations: Record<Language, Record<string, string>> = {
     'portfolio.project9.description': 'CRM для автопроката с дашбордом и управлением автопарком.',
     'portfolio.project10.title': 'SHIBA CARS Partner System',
     'portfolio.project10.description': 'Партнёрская система с Telegram-ботом, Mini App и real-time аналитикой.',
+    'portfolio.project11.title': 'KAIF',
+    'portfolio.project11.description': 'Сайт премиального велнес-комплекса с видео-фонами и мультиязычностью.',
 
     // Project Showcase
     'showcase.title': 'Наши проекты',
@@ -505,6 +511,8 @@ const translations: Record<Language, Record<string, string>> = {
     'projectDetail.partnersActive': 'Активных партнёров',
     'projectDetail.clicksTracked': 'Переходов отслежено',
     'projectDetail.realTimeStats': 'Статистика в реальном времени',
+    'projectDetail.languages': 'Языков',
+    'projectDetail.sectionsCreated': 'Секций создано',
 
     // 404 Page
     'notFound.message': 'Похоже, эта страница ушла на рефакторинг и не вернулась.',

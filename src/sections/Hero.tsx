@@ -31,6 +31,7 @@ const HeroSection = styled.section`
   position: relative;
   overflow: hidden;
   padding: 120px 20px 80px;
+  background: transparent;
 
   @media (max-width: 768px) {
     padding: 100px 20px 60px;

@@ -354,6 +354,15 @@ const projects: Project[] = [
     imageUrl: '/projects/shiba-cars/cover.png',
     tech: ['React', 'Node.js', 'Telegram Bot', 'PostgreSQL'],
   },
+  {
+    id: 11,
+    slug: 'kaif',
+    title: 'KAIF',
+    category: 'website',
+    description: 'Premium wellness complex website with video backgrounds, multilingual support, and WhatsApp booking.',
+    imageUrl: '/projects/kaif/cover.jpg',
+    tech: ['React 19', 'Vite 6', 'Framer Motion', 'i18next'],
+  },
 ];
 
 const Portfolio: React.FC = memo(() => {

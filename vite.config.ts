@@ -14,11 +14,12 @@ export default defineConfig({
           vendor: ['react', 'react-dom'],
           animations: ['gsap', 'framer-motion'],
           icons: ['react-icons'],
-          ui: ['styled-components']
+          ui: ['styled-components'],
+          three: ['three', '@react-three/fiber', '@react-three/drei']
         }
       }
     },
-    chunkSizeWarningLimit: 1000
+    chunkSizeWarningLimit: 1200
   },
   server: {
     host: '0.0.0.0',

@@ -6,27 +6,38 @@ import ErrorBoundary from './components/ErrorBoundary';
 import styled from 'styled-components';
 import Navigation from './components/Navigation';
 import Hero from './sections/Hero';
-// import AIChatWidget from './components/AIChatWidget'; // Временно отключено
-import StarField from './components/StarField';
 import { LanguageProvider } from './context/LanguageContext';
+import { planetStations } from './data/cameraPath';
 
-// Определяем производительность устройства при загрузке
-const isMobile = window.innerWidth < 768;
-// Только очень слабые устройства (2 ядра или меньше, менее 2GB RAM)
+// Lazy load 3D scene for better initial load
+const ImmersiveScene = lazy(() => import('./components/3d/ImmersiveScene'));
+
+// Device detection
 const isLowEndDevice =
   navigator.hardwareConcurrency <= 2 ||
   (navigator as any).deviceMemory < 2;
 
-// Минимальный компонент Layout без лишней логики
+// Layout for content sections
 const Layout = styled.div`
-  overflow-x: hidden;
-  background: transparent;
-  min-height: 100vh;
   position: relative;
   z-index: 1;
+  pointer-events: none;
+
+  & > * {
+    pointer-events: auto;
+  }
 `;
 
-// Базовый лоадер для основного контента
+// Scroll zone for each planet station
+const ScrollZone = styled.section<{ $height: string }>`
+  min-height: ${props => props.$height};
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`;
+
+// Main loader
 const MainLoader = styled.div`
   width: 100%;
   height: 100vh;
@@ -50,7 +61,18 @@ const MainLoader = styled.div`
   }
 `;
 
-// Ленивая загрузка остальных секций
+// 3D scene loader background
+const SceneLoader = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #050208;
+  z-index: 0;
+`;
+
+// Lazy loaded sections
 const Services = lazyLoad(() => import('./sections/Services'));
 const Benefits = lazyLoad(() => import('./sections/Benefits'));
 const WorkProcess = lazyLoad(() => import('./sections/WorkProcess'));
@@ -65,97 +87,101 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
 const Brief = lazy(() => import('./pages/Brief'));
 
-function HomePage({ isReady }: { isReady: boolean }) {
+function HomePage() {
   const location = useLocation();
 
-  // Обработка hash для прокрутки к секции
   useEffect(() => {
-    // Если есть hash - прокручиваем к нужной секции
     if (location.hash) {
       const elementId = location.hash.replace('#', '');
+      const stationIndex = planetStations.findIndex(station =>
+        station.sections.includes(elementId)
+      );
 
-      const scrollToElement = (attempts = 0) => {
-        const element = document.getElementById(elementId);
-        if (element) {
-          // Используем setTimeout чтобы дать странице стабилизироваться
+      if (stationIndex >= 0) {
+        const scrollPerStation = window.innerHeight * 1.2;
+        const targetScroll = stationIndex * scrollPerStation;
+
+        setTimeout(() => {
+          window.scrollTo({ top: targetScroll, behavior: 'smooth' });
           setTimeout(() => {
-            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            // Очищаем hash из URL после прокрутки
-            setTimeout(() => {
-              window.history.replaceState(null, '', window.location.pathname);
-            }, 500);
-          }, 50);
-        } else if (attempts < 25) {
-          // Элемент ещё не загружен, прокручиваем вниз чтобы триггернуть lazy loading
-          // Постепенно увеличиваем позицию скролла
-          const scrollProgress = Math.min(0.5 + (attempts * 0.05), 0.95);
-          window.scrollTo({ top: document.body.scrollHeight * scrollProgress, behavior: 'auto' });
-          // Повторяем попытку
-          setTimeout(() => scrollToElement(attempts + 1), 80);
-        }
-      };
-
-      // Начинаем сразу
-      scrollToElement();
+            window.history.replaceState(null, '', window.location.pathname);
+          }, 500);
+        }, 100);
+      }
     } else {
-      // Без hash - прокручиваем к началу страницы
       window.scrollTo(0, 0);
     }
   }, [location.pathname, location.hash]);
 
   return (
     <>
-      {/* Starfield background - показываем на всех устройствах */}
-      <StarField />
+      {/* 3D Background */}
+      <Suspense fallback={<SceneLoader />}>
+        <ImmersiveScene />
+      </Suspense>
 
+      {/* Navigation */}
       <Navigation />
-      {/* <AIChatWidget /> */}
+
+      {/* Content sections */}
       <Layout>
-        <Hero />
+        {/* Station 1: Hero (Moon) */}
+        <ScrollZone id="hero" $height="120vh">
+          <Hero />
+        </ScrollZone>
 
-        {/* Первые секции загружаются сразу (priority) */}
-        <LazyLoadSection priority>
-          <Services />
-        </LazyLoadSection>
+        {/* Station 2: Services (Jupiter) */}
+        <ScrollZone id="services" $height="120vh">
+          <LazyLoadSection priority>
+            <Services />
+          </LazyLoadSection>
+        </ScrollZone>
 
-        <LazyLoadSection priority>
-          <Portfolio />
-        </LazyLoadSection>
+        {/* Station 3: Portfolio (Saturn) */}
+        <ScrollZone id="portfolio" $height="120vh">
+          <LazyLoadSection priority>
+            <Portfolio />
+          </LazyLoadSection>
+        </ScrollZone>
 
-        <LazyLoadSection priority>
-          <Benefits />
-        </LazyLoadSection>
+        {/* Station 4: Benefits & Process (Mars) */}
+        <ScrollZone id="benefits" $height="150vh">
+          <LazyLoadSection priority>
+            <Benefits />
+          </LazyLoadSection>
+          <LazyLoadSection priority>
+            <WorkProcess />
+          </LazyLoadSection>
+        </ScrollZone>
 
-        <LazyLoadSection priority>
-          <WorkProcess />
-        </LazyLoadSection>
+        {/* Station 5: Pricing & Testimonials (Uranus) */}
+        <ScrollZone id="pricing" $height="150vh">
+          <LazyLoadSection threshold={isLowEndDevice ? 0.01 : 0.05}>
+            <Pricing />
+          </LazyLoadSection>
+          <LazyLoadSection threshold={isLowEndDevice ? 0.01 : 0.05}>
+            <Testimonials />
+          </LazyLoadSection>
+        </ScrollZone>
 
-        <LazyLoadSection threshold={isLowEndDevice ? 0.01 : 0.05} rootMargin={isLowEndDevice ? '100px' : '300px'}>
-          <Testimonials />
-        </LazyLoadSection>
+        {/* Station 6: Contact & FAQ (Neptune) */}
+        <ScrollZone id="contact" $height="150vh">
+          <LazyLoadSection threshold={isLowEndDevice ? 0.01 : 0.05}>
+            <LiveCodeDemo />
+          </LazyLoadSection>
+          <LazyLoadSection threshold={0.01}>
+            <FAQ />
+          </LazyLoadSection>
+          <LazyLoadSection threshold={0.01}>
+            <Contact />
+          </LazyLoadSection>
+        </ScrollZone>
 
-        <LazyLoadSection threshold={isLowEndDevice ? 0.01 : 0.05} rootMargin={isLowEndDevice ? '100px' : '300px'}>
-          <Pricing />
-        </LazyLoadSection>
-
-        <LazyLoadSection threshold={isLowEndDevice ? 0.01 : 0.05} rootMargin={isLowEndDevice ? '100px' : '300px'}>
-          <LiveCodeDemo />
-        </LazyLoadSection>
-
-        <LazyLoadSection threshold={0.01} rootMargin={isLowEndDevice ? '50px' : '200px'}>
-          <FAQ />
-        </LazyLoadSection>
-
-        <LazyLoadSection threshold={0.01} rootMargin={isLowEndDevice ? '50px' : '200px'}>
-          <Contact />
+        {/* Footer */}
+        <LazyLoadSection threshold={0.1}>
+          <Footer />
         </LazyLoadSection>
       </Layout>
-
-      {/* Футер */}
-      <LazyLoadSection threshold={0.1} rootMargin={isLowEndDevice ? '10px' : '50px'}>
-        <Footer />
-      </LazyLoadSection>
-
     </>
   );
 }
@@ -164,12 +190,10 @@ function App() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // Отключаем все анимации на слабых устройствах
     if (isLowEndDevice) {
       document.documentElement.classList.add('reduce-motion');
     }
 
-    // Глобальный обработчик ошибок для предотвращения белого экрана
     const handleGlobalError = (event: ErrorEvent) => {
       console.error('Global error:', event.error);
       event.preventDefault();
@@ -184,10 +208,7 @@ function App() {
     window.addEventListener('error', handleGlobalError);
     window.addEventListener('unhandledrejection', handleUnhandledRejection);
 
-    // Предварительное определение размеров для предотвращения CLS
     document.documentElement.style.setProperty('--hero-height', `${window.innerHeight}px`);
-
-    // Устанавливаем статус готовности
     setIsReady(true);
 
     return () => {
@@ -203,7 +224,7 @@ function App() {
         <ErrorBoundary>
           <Suspense fallback={<MainLoader />}>
             <Routes>
-              <Route path="/" element={<HomePage isReady={isReady} />} />
+              <Route path="/" element={<HomePage />} />
               <Route path="/project/:slug" element={<ProjectDetail />} />
               <Route path="/brief" element={<Brief />} />
               <Route path="*" element={<NotFound />} />
