@@ -1,471 +1,808 @@
-import React, { useState, useEffect } from 'react';
-import styled, { keyframes, css } from 'styled-components';
+import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
+import { Link, NavLink, useLocation } from 'react-router-dom';
+import styled, { css, keyframes } from 'styled-components';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 
-const fadeIn = keyframes`
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-`;
+/**
+ * Sintara mega-menu — ported 1:1 from sintara-crm-web.
+ *
+ * Top strip: wordmark on the left, MENU pill on the right. Color follows
+ * the [data-nav-theme] section underneath via IntersectionObserver.
+ *
+ * Overlay: fullscreen, light editorial background. 3D Sintara logo on
+ * the left half (Three.js), giant nav items on the right half with the
+ * "hover-flip" letter effect (front line slides up, violet copy rolls
+ * in from below, with per-letter stagger via --i CSS var). Each nav item
+ * also tints the 3D logo gradient on hover.
+ */
 
-const slideIn = keyframes`
-  from {
-    opacity: 0;
-    transform: translateY(-20px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-`;
+type NavTheme = 'light' | 'dark';
 
-const glowPulse = keyframes`
-  0%, 100% {
-    box-shadow: 0 0 5px rgba(124, 58, 237, 0.3), 0 0 10px rgba(124, 58, 237, 0.2);
-  }
-  50% {
-    box-shadow: 0 0 10px rgba(124, 58, 237, 0.5), 0 0 20px rgba(124, 58, 237, 0.3);
-  }
-`;
+// 3D logo lazy-loaded so Three.js doesn't bloat the initial bundle.
+const SintaraLogo3D = lazy(() => import('./brand/SintaraLogo3D'));
 
-const NavContainer = styled.nav<{ $isScrolled: boolean }>`
+const DEFAULT_LOGO_FROM = '#a855f7';
+const DEFAULT_LOGO_MID = '#0a0419';
+const DEFAULT_LOGO_TO = '#ec4899';
+
+// ─── Top strip ─────────────────────────────────────────────────────────
+
+const Strip = styled.div<{ $theme: NavTheme }>`
   position: fixed;
-  top: ${props => props.$isScrolled ? '12px' : '20px'};
+  top: 0;
   left: 0;
   right: 0;
-  margin: 0 auto;
-  width: ${props => props.$isScrolled ? '95%' : '90%'};
-  max-width: 1200px;
+  z-index: 100;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: ${props => props.$isScrolled ? '12px 24px' : '16px 32px'};
-  z-index: 1000;
-  background: ${props => props.$isScrolled
-    ? 'rgba(10, 5, 25, 0.9)'
-    : 'rgba(10, 5, 25, 0.7)'};
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: ${props => props.$isScrolled ? '20px' : '24px'};
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  transition: top 0.3s ease, width 0.3s ease, padding 0.3s ease, background 0.3s ease, border-radius 0.3s ease;
+  padding: 22px 32px;
+  pointer-events: none;
+  color: ${({ $theme }) => ($theme === 'dark' ? '#fff' : 'var(--ink)')};
+  transition: color 0.5s var(--ease-snap);
 
-  @media (max-width: 768px) {
-    width: calc(100% - 24px);
-    padding: 12px 16px;
-    top: 12px;
+  & > * {
+    pointer-events: auto;
+  }
+
+  @media (max-width: 640px) {
+    padding: 16px 20px;
   }
 `;
 
-const Logo = styled.a`
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-  font-weight: 600;
+const dotPulse = keyframes`
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.35); }
+`;
+
+const Wordmark = styled(Link)`
+  font-family: var(--font-display);
   font-size: 1.375rem;
-  text-decoration: none;
-  color: white;
-  display: flex;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  color: inherit;
+  display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  letter-spacing: -0.02em;
-  position: relative;
-  z-index: 2;
+  line-height: 1;
+  transition: color 0.4s var(--ease-snap);
 
-  span {
-    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  &::after {
-    content: '';
+  .dot {
     display: inline-block;
-    width: 4px;
-    height: 4px;
-    background: #7c3aed;
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
     border-radius: 50%;
-    margin-left: 4px;
-    animation: liquidPulse 3s ease-in-out infinite;
-    box-shadow: 0 0 10px rgba(124, 58, 237, 0.6);
-  }
-
-  @keyframes liquidPulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.3); opacity: 0.7; }
-  }
-`;
-
-const NavLinks = styled.div<{ $isOpen: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  position: relative;
-  z-index: 2;
-
-  @media (max-width: 768px) {
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 90px;
-    left: 12px;
-    right: 12px;
-    width: auto;
-    background: linear-gradient(145deg, rgba(15, 10, 35, 0.99), rgba(10, 5, 25, 0.99));
-    border: 1px solid rgba(124, 58, 237, 0.2);
-    border-radius: 24px;
-    padding: 28px 24px;
-    gap: 0;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    z-index: 999;
-
-    opacity: ${props => props.$isOpen ? 1 : 0};
-    visibility: ${props => props.$isOpen ? 'visible' : 'hidden'};
-    transform: ${props => props.$isOpen ? 'translateY(0) scale(1)' : 'translateY(-20px) scale(0.95)'};
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-`;
-
-const NavLink = styled.a<{ $index?: number; $isOpen?: boolean }>`
-  color: rgba(255, 255, 255, 0.65);
-  text-decoration: none;
-  font-weight: 400;
-  font-size: 0.9375rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
-  letter-spacing: -0.01em;
-  padding: 8px 16px;
-  position: relative;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 4px;
-    left: 16px;
-    right: 16px;
-    height: 1px;
-    background: #a78bfa;
-    opacity: 0;
-    transition: opacity 0.5s ease;
+    margin-left: 8px;
+    transform: translateY(-2px);
+    animation: ${dotPulse} 2.4s ease-in-out infinite;
   }
 
   &:hover {
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--accent);
+  }
+`;
 
-    &::after {
-      opacity: 1;
-    }
+const MenuBtn = styled.button<{ $theme: NavTheme; $open: boolean }>`
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px 0 22px;
+  height: 44px;
+  border-radius: 999px;
+  cursor: pointer;
+  overflow: hidden;
+  font-family: var(--font-grotesk);
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  background: ${({ $open }) => ($open ? 'var(--ink)' : 'transparent')};
+  color: ${({ $open, $theme }) =>
+    $open ? 'var(--bone)' : $theme === 'dark' ? '#fff' : 'var(--ink)'};
+  border: 1px solid
+    ${({ $open, $theme }) =>
+      $open
+        ? 'var(--ink)'
+        : $theme === 'dark'
+        ? 'rgba(255,255,255,0.18)'
+        : 'rgba(10,10,10,0.12)'};
+  transition:
+    color 0.4s var(--ease-snap),
+    background 0.4s var(--ease-snap),
+    border-color 0.4s var(--ease-snap);
+
+  &:hover {
+    border-color: ${({ $open, $theme }) =>
+      $open ? 'var(--ink)' : $theme === 'dark' ? '#fff' : 'var(--ink)'};
   }
 
-  transition: color 0.5s ease;
+  .label {
+    user-select: none;
+    line-height: 1;
+  }
 
-  @media (max-width: 768px) {
-    font-size: 1.125rem;
-    font-weight: 500;
-    padding: 16px 20px;
-    width: 100%;
-    text-align: center;
-    border-radius: 16px;
+  .glyph {
     position: relative;
-    overflow: hidden;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: ${({ $open }) =>
+      $open ? 'var(--bone)' : 'transparent'};
+    color: ${({ $open }) => ($open ? 'var(--ink)' : 'currentColor')};
+    transition: background 0.4s var(--ease-snap),
+      color 0.4s var(--ease-snap);
 
-    &::after {
-      display: none;
+    .line-top,
+    .line-bottom,
+    .line-mid {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      height: 1px;
+      background: currentColor;
+      border-radius: 2px;
+      transform-origin: center;
     }
 
-    opacity: ${props => props.$isOpen ? 1 : 0};
-    transform: ${props => props.$isOpen ? 'translateX(0)' : 'translateX(-20px)'};
-    transition:
-      color 0.5s ease,
-      background 0.5s ease,
-      opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-      transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    transition-delay: ${props => props.$isOpen ? `${(props.$index || 0) * 0.05 + 0.1}s` : '0s'};
+    .line-top {
+      width: 14px;
+      transform: translate(-50%, -3px);
+      transition: transform 0.45s var(--ease-snap);
+    }
 
-    &::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(139, 92, 246, 0.05));
-      opacity: 0;
-      transition: opacity 0.5s ease;
-      border-radius: 16px;
+    .line-bottom {
+      width: 14px;
+      transform: translate(-50%, 3px);
+      transition: transform 0.45s var(--ease-snap);
+    }
+
+    .line-mid {
+      width: 10px;
+      transform: translate(-50%, -50%);
+      transition:
+        width 0.45s var(--ease-snap),
+        opacity 0.45s var(--ease-snap);
+    }
+
+    ${({ $open }) =>
+      $open &&
+      css`
+        .line-top {
+          transform: translate(-50%, -50%) rotate(45deg);
+        }
+        .line-bottom {
+          transform: translate(-50%, -50%) rotate(-45deg);
+        }
+        .line-mid {
+          width: 0;
+          opacity: 0;
+        }
+      `}
+  }
+
+  ${({ $open }) =>
+    !$open &&
+    css`
+      &:hover .glyph .line-mid {
+        width: 14px;
+      }
+    `}
+`;
+
+// ─── Fullscreen overlay ───────────────────────────────────────────────
+
+const Overlay = styled(motion.div)`
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  background: var(--bone);
+  color: var(--ink);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  overflow-y: auto;
+`;
+
+const OverlayTopPad = styled.div`
+  height: 96px;
+
+  @media (max-width: 640px) {
+    height: 72px;
+  }
+`;
+
+const OverlayBody = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 64px;
+  align-items: center;
+  padding: 24px 40px 24px;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 24px 24px 24px;
+  }
+`;
+
+const Logo3DSlot = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 460px;
+
+  @media (max-width: 1024px) {
+    min-height: 280px;
+  }
+`;
+
+const BigNav = styled.nav`
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+`;
+
+const BigNavRow = styled(NavLink)`
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 0;
+  border-top: 1px solid rgba(10, 10, 10, 0.08);
+  color: var(--ink);
+  text-decoration: none;
+  transition: color 0.35s var(--ease-snap);
+
+  &:last-child {
+    border-bottom: 1px solid rgba(10, 10, 10, 0.08);
+  }
+
+  /* hover-flip text container */
+  .hover-flip {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 5.5vw, 4.25rem);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+  }
+
+  .hf-char {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    line-height: 1;
+  }
+
+  .hf-front,
+  .hf-back {
+    display: inline-block;
+    line-height: inherit;
+    transition: transform 0.48s cubic-bezier(0.65, 0.05, 0.36, 1);
+    transition-delay: calc(var(--i, 0) * 24ms);
+    will-change: transform;
+  }
+
+  .hf-back {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    color: var(--menu-accent, var(--accent));
+  }
+
+  &:hover .hf-front,
+  &:focus-visible .hf-front {
+    transform: translateY(-100%);
+  }
+  &:hover .hf-back,
+  &:focus-visible .hf-back {
+    transform: translateY(-100%);
+  }
+
+  /* arrow */
+  .arrow {
+    display: inline-flex;
+    align-items: center;
+    color: var(--menu-accent, var(--accent));
+    opacity: 0;
+    transform: translateX(-12px);
+    transition:
+      opacity 0.22s var(--ease-snap),
+      transform 0.32s var(--ease-expo);
+    pointer-events: none;
+  }
+
+  &:hover .arrow,
+  &:focus-visible .arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  &.active {
+    color: var(--accent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hf-front,
+    .hf-back {
+      transition: none;
+    }
+    &:hover .hf-front,
+    &:focus-visible .hf-front {
+      transform: none;
+      color: var(--menu-accent, var(--accent));
+    }
+    .hf-back {
+      display: none;
+    }
+  }
+`;
+
+const OverlayFoot = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 40px;
+  padding: 28px 40px;
+  border-top: 1px solid rgba(10, 10, 10, 0.08);
+  font-family: var(--font-grotesk);
+  font-size: 0.875rem;
+  color: var(--muted);
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+
+  .group-title {
+    font-family: var(--font-grotesk);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  a {
+    color: var(--ink);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.25s var(--ease-snap);
+
+    &.muted {
+      color: var(--muted);
+    }
+
+    .bar {
+      display: inline-block;
+      width: 0;
+      height: 1px;
+      background: currentColor;
+      transition: width 0.22s var(--ease-snap);
     }
 
     &:hover {
-      color: white;
+      color: var(--accent);
 
-      &::before {
-        opacity: 1;
+      .bar {
+        width: 14px;
+      }
+    }
+
+    &.muted:hover {
+      color: var(--ink);
+    }
+  }
+
+  .cta-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
+  .cta-link {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--ink);
+
+    .arrow {
+      transition: transform 0.25s var(--ease-snap);
+      display: inline-block;
+    }
+
+    &:hover {
+      color: var(--accent);
+
+      .arrow {
+        transform: translateX(4px);
       }
     }
   }
-`;
 
-const MenuDivider = styled.div<{ $isOpen?: boolean }>`
-  display: none;
-
-  @media (max-width: 768px) {
-    display: block;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.3), transparent);
-    margin: 8px 20px;
-    opacity: ${props => props.$isOpen ? 1 : 0};
-    transform: ${props => props.$isOpen ? 'scaleX(1)' : 'scaleX(0)'};
-    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    transition-delay: ${props => props.$isOpen ? '0.3s' : '0s'};
-  }
-`;
-
-const CTAButton = styled.a<{ $isOpen?: boolean }>`
-  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-  color: white;
-  padding: 10px 20px;
-  border-radius: 16px;
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 0.9375rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
-  letter-spacing: -0.01em;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
-  border: none;
-  z-index: 2;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
-    color: white;
-  }
-
-  @media (max-width: 768px) {
-    margin-top: 12px;
-    width: 100%;
-    text-align: center;
-    padding: 16px 20px;
-    font-size: 1.125rem;
-    font-weight: 600;
-    border-radius: 16px;
-    box-shadow:
-      0 4px 20px rgba(124, 58, 237, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
-
-    opacity: ${props => props.$isOpen ? 1 : 0};
-    transform: ${props => props.$isOpen ? 'translateY(0) scale(1)' : 'translateY(10px) scale(0.95)'};
-    transition:
-      opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-      transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-      box-shadow 0.2s ease;
-    transition-delay: ${props => props.$isOpen ? '0.35s' : '0s'};
+  .login-link {
+    font-size: 0.8125rem;
+    color: var(--muted);
 
     &:hover {
-      transform: translateY(-2px) scale(1.02);
-      box-shadow:
-        0 8px 30px rgba(124, 58, 237, 0.5),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      color: var(--ink);
     }
+  }
 
-    &:active {
-      transform: scale(0.98);
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr 1fr;
+
+    .cta-col {
+      grid-column: span 2;
+      align-items: flex-start;
+    }
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 24px 20px;
+
+    .cta-col {
+      grid-column: auto;
     }
   }
 `;
 
-const MobileOverlay = styled.div<{ $isOpen: boolean }>`
-  display: none;
-
-  @media (max-width: 768px) {
-    display: block;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    opacity: ${props => props.$isOpen ? 1 : 0};
-    visibility: ${props => props.$isOpen ? 'visible' : 'hidden'};
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-    z-index: 998;
-  }
-`;
-
-const LanguageToggle = styled.button<{ $isOpen?: boolean }>`
+const LangBtn = styled.button`
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 8px 14px;
+  border: 1px solid rgba(10, 10, 10, 0.12);
   background: transparent;
-  border: none;
-  padding: 8px 12px;
-  color: rgba(255, 255, 255, 0.6);
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
-  font-size: 0.875rem;
-  font-weight: 500;
+  border-radius: 999px;
   cursor: pointer;
-  transition: color 0.2s ease;
-  letter-spacing: 0.02em;
+  transition:
+    color 0.3s,
+    border-color 0.3s,
+    background 0.3s;
 
   &:hover {
-    color: #ffffff;
-  }
-
-  @media (max-width: 768px) {
-    padding: 14px 20px;
-    font-size: 1rem;
-    width: 100%;
-    text-align: center;
-    margin-bottom: 8px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.03);
-
-    opacity: ${props => props.$isOpen ? 1 : 0};
-    transform: ${props => props.$isOpen ? 'translateY(0)' : 'translateY(10px)'};
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    transition-delay: ${props => props.$isOpen ? '0.3s' : '0s'};
-
-    &:hover {
-      background: rgba(124, 58, 237, 0.1);
-    }
+    color: var(--accent);
+    border-color: var(--accent);
   }
 `;
 
-const MobileMenuButton = styled.button<{ $isOpen: boolean }>`
-  display: none;
-  background: ${props => props.$isOpen
-    ? 'rgba(124, 58, 237, 0.3)'
-    : 'rgba(124, 58, 237, 0.15)'};
-  border: 1px solid ${props => props.$isOpen
-    ? 'rgba(124, 58, 237, 0.4)'
-    : 'rgba(255, 255, 255, 0.1)'};
-  border-radius: 12px;
-  cursor: pointer;
-  position: relative;
-  width: 44px;
-  height: 44px;
-  z-index: 1001;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+// ─── Hover-flip text helper (per-letter stagger) ─────────────────────
 
-  ${props => props.$isOpen && css`
-    animation: ${glowPulse} 2s ease-in-out infinite;
-  `}
+function HoverFlipText({ children }: { children: string }): React.ReactElement {
+  const chars = Array.from(children);
+  return (
+    <span className="hover-flip" aria-label={children}>
+      {chars.map((ch, i) => {
+        const display = ch === ' ' ? ' ' : ch;
+        return (
+          <span
+            key={i}
+            className="hf-char"
+            style={{ '--i': i } as CSSProperties}
+            aria-hidden="true"
+          >
+            <span className="hf-front">{display}</span>
+            <span className="hf-back">{display}</span>
+          </span>
+        );
+      })}
+    </span>
+  );
+}
 
-  @media (max-width: 768px) {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+// ─── Component ────────────────────────────────────────────────────────
 
-  &:hover {
-    background: rgba(124, 58, 237, 0.25);
-    border-color: rgba(124, 58, 237, 0.3);
-    transform: scale(1.05);
-  }
+interface NavigationProps {
+  /** Forced theme override (e.g. for pages without tagged sections). */
+  surface?: 'light' | 'dark';
+}
 
-  &:active {
-    transform: scale(0.95);
-  }
+const navItems: {
+  to: string;
+  key: string;
+  from: string;
+  mid: string;
+  to3D: string;
+}[] = [
+  { to: '/work', key: 'nav.work', from: '#d946ef', mid: '#0d041a', to3D: '#f43f5e' },
+  { to: '/services', key: 'nav.services', from: '#06b6d4', mid: '#020817', to3D: '#6366f1' },
+  { to: '/about', key: 'nav.about', from: '#22c55e', mid: '#04140e', to3D: '#06b6d4' },
+  { to: '/contact', key: 'nav.contact', from: '#f59e0b', mid: '#1a0606', to3D: '#ef4444' },
+  { to: '/brief', key: 'nav.getStarted', from: '#0ea5e9', mid: '#04081f', to3D: '#7c3aed' },
+];
 
-  span {
-    position: absolute;
-    left: 50%;
-    width: 18px;
-    height: 2px;
-    background: ${props => props.$isOpen ? '#a78bfa' : 'white'};
-    border-radius: 2px;
-    transition: all 0.4s cubic-bezier(0.68, -0.6, 0.32, 1.6);
-    box-shadow: ${props => props.$isOpen ? '0 0 8px rgba(167, 139, 250, 0.5)' : 'none'};
-
-    &:nth-child(1) {
-      transform: ${props => props.$isOpen
-        ? 'translateX(-50%) rotate(45deg)'
-        : 'translateX(-50%) rotate(0)'};
-      top: ${props => props.$isOpen ? '21px' : '14px'};
-      width: ${props => props.$isOpen ? '20px' : '18px'};
-    }
-
-    &:nth-child(2) {
-      opacity: ${props => props.$isOpen ? '0' : '1'};
-      transform: ${props => props.$isOpen
-        ? 'translateX(-50%) scaleX(0)'
-        : 'translateX(-50%) scaleX(1)'};
-      top: 21px;
-    }
-
-    &:nth-child(3) {
-      transform: ${props => props.$isOpen
-        ? 'translateX(-50%) rotate(-45deg)'
-        : 'translateX(-50%) rotate(0)'};
-      top: ${props => props.$isOpen ? '21px' : '28px'};
-      width: ${props => props.$isOpen ? '20px' : '18px'};
-    }
-  }
-`;
-
-const Navigation: React.FC = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+const Navigation = ({ surface }: NavigationProps) => {
+  const [open, setOpen] = useState(false);
+  const [navTheme, setNavTheme] = useState<NavTheme>(surface || 'light');
   const { language, toggleLanguage, t } = useLanguage();
+  const location = useLocation();
+  const reduced = useReducedMotion();
 
+  // 3D logo color state — shifts on nav hover to give the model a "tint"
+  const [logoFrom, setLogoFrom] = useState(DEFAULT_LOGO_FROM);
+  const [logoMid, setLogoMid] = useState(DEFAULT_LOGO_MID);
+  const [logoTo, setLogoTo] = useState(DEFAULT_LOGO_TO);
+  const logoKickRef = useRef(0);
+
+  // Reset logo color whenever overlay closes
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Lock body scroll when menu is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
+    if (!open) {
+      setLogoFrom(DEFAULT_LOGO_FROM);
+      setLogoMid(DEFAULT_LOGO_MID);
+      setLogoTo(DEFAULT_LOGO_TO);
     }
+  }, [open]);
+
+  // Navigate → close + reset theme to forced surface
+  useEffect(() => {
+    setOpen(false);
+    if (surface) setNavTheme(surface);
+  }, [location.pathname, surface]);
+
+  // Lock body scroll while overlay open
+  useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';
     };
-  }, [isOpen]);
+  }, [open]);
 
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-  };
+  // ESC closes overlay
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
 
-  const closeMenu = () => {
-    setIsOpen(false);
-  };
+  // [data-nav-theme] observer — preserved from previous Navigation
+  useEffect(() => {
+    let observer: IntersectionObserver | null = null;
+
+    const setup = () => {
+      const elements = document.querySelectorAll<HTMLElement>(
+        '[data-nav-theme]',
+      );
+      if (!elements.length) return;
+
+      const navLine = 80;
+      let initial: NavTheme | null = null;
+      elements.forEach((el) => {
+        const r = el.getBoundingClientRect();
+        if (r.top <= navLine && r.bottom > navLine) {
+          initial = el.getAttribute('data-nav-theme') as NavTheme | null;
+        }
+      });
+      if (initial) setNavTheme(initial);
+
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const theme = entry.target.getAttribute(
+                'data-nav-theme',
+              ) as NavTheme | null;
+              if (theme === 'light' || theme === 'dark') {
+                setNavTheme(theme);
+              }
+            }
+          });
+        },
+        {
+          rootMargin: '-80px 0px -99.5% 0px',
+          threshold: 0,
+        },
+      );
+
+      elements.forEach((el) => observer!.observe(el));
+    };
+
+    const timer = window.setTimeout(setup, 50);
+
+    return () => {
+      window.clearTimeout(timer);
+      observer?.disconnect();
+      observer = null;
+    };
+  }, [location.pathname]);
+
+  // While overlay is open, force light header (overlay bg is bone white).
+  const effectiveTheme: NavTheme = open ? 'light' : navTheme;
 
   return (
     <>
-      <MobileOverlay $isOpen={isOpen} onClick={closeMenu} />
-      <NavContainer $isScrolled={isScrolled}>
-        <Logo href="/" onClick={closeMenu}>
+      <Strip $theme={effectiveTheme}>
+        <Wordmark to="/" aria-label="Sintara — home">
           Sintara
-        </Logo>
+          <span className="dot" />
+        </Wordmark>
 
-        <NavLinks $isOpen={isOpen}>
-          <NavLink href="#services" onClick={closeMenu} $index={0} $isOpen={isOpen}>{t('nav.services')}</NavLink>
-          <NavLink href="#portfolio" onClick={closeMenu} $index={1} $isOpen={isOpen}>{t('nav.work')}</NavLink>
-          <NavLink href="#pricing" onClick={closeMenu} $index={2} $isOpen={isOpen}>{t('nav.pricing')}</NavLink>
-          <NavLink href="#contact" onClick={closeMenu} $index={3} $isOpen={isOpen}>{t('nav.contact')}</NavLink>
-          <MenuDivider $isOpen={isOpen} />
-          <LanguageToggle onClick={toggleLanguage} $isOpen={isOpen}>
-            {language === 'en' ? 'RU' : 'EN'}
-          </LanguageToggle>
-          <CTAButton href="/brief" onClick={closeMenu} $isOpen={isOpen}>
-            {language === 'en' ? 'Order Product' : 'Заказать продукт'}
-          </CTAButton>
-        </NavLinks>
-
-        <MobileMenuButton
-          $isOpen={isOpen}
-          onClick={toggleMenu}
-          aria-expanded={isOpen ? 'true' : 'false'}
-          aria-label="Toggle menu"
+        <MenuBtn
+          $theme={effectiveTheme}
+          $open={open}
+          onClick={() => setOpen((v) => !v)}
+          aria-label={open ? t('nav.close') : t('nav.menu')}
+          aria-expanded={open}
         >
-          <span></span>
-          <span></span>
-          <span></span>
-        </MobileMenuButton>
-      </NavContainer>
+          <span className="label">{open ? t('nav.close') : t('nav.menu')}</span>
+          <span className="glyph" aria-hidden>
+            <span className="line-top" />
+            <span className="line-bottom" />
+            <span className="line-mid" />
+          </span>
+        </MenuBtn>
+      </Strip>
+
+      <AnimatePresence>
+        {open && (
+          <Overlay
+            initial={
+              reduced ? { opacity: 0 } : { clipPath: 'inset(0 0 100% 0)' }
+            }
+            animate={
+              reduced ? { opacity: 1 } : { clipPath: 'inset(0 0 0% 0)' }
+            }
+            exit={
+              reduced ? { opacity: 0 } : { clipPath: 'inset(0 0 100% 0)' }
+            }
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            data-surface="light"
+          >
+            <OverlayTopPad />
+
+            <OverlayBody>
+              <Logo3DSlot>
+                <Suspense fallback={null}>
+                  <SintaraLogo3D
+                    size={460}
+                    color={logoFrom}
+                    colorMid={logoMid}
+                    colorTo={logoTo}
+                    envPreset="warehouse"
+                    kickRef={logoKickRef}
+                  />
+                </Suspense>
+              </Logo3DSlot>
+
+              <BigNav>
+                {navItems.map((item) => (
+                  <BigNavRow
+                    key={item.to}
+                    to={item.to}
+                    style={{ '--menu-accent': item.from } as CSSProperties}
+                    onMouseEnter={() => {
+                      setLogoFrom(item.from);
+                      setLogoMid(item.mid);
+                      setLogoTo(item.to3D);
+                      logoKickRef.current++;
+                    }}
+                    onMouseLeave={() => {
+                      setLogoFrom(DEFAULT_LOGO_FROM);
+                      setLogoMid(DEFAULT_LOGO_MID);
+                      setLogoTo(DEFAULT_LOGO_TO);
+                    }}
+                    onFocus={() => {
+                      setLogoFrom(item.from);
+                      setLogoMid(item.mid);
+                      setLogoTo(item.to3D);
+                      logoKickRef.current++;
+                    }}
+                    onBlur={() => {
+                      setLogoFrom(DEFAULT_LOGO_FROM);
+                      setLogoMid(DEFAULT_LOGO_MID);
+                      setLogoTo(DEFAULT_LOGO_TO);
+                    }}
+                    onClick={() => setOpen(false)}
+                  >
+                    <HoverFlipText>{t(item.key)}</HoverFlipText>
+                    <span className="arrow" aria-hidden>
+                      <svg
+                        width="44"
+                        height="14"
+                        viewBox="0 0 44 14"
+                        fill="none"
+                      >
+                        <path
+                          d="M0 7H42M42 7L36 1M42 7L36 13"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                        />
+                      </svg>
+                    </span>
+                  </BigNavRow>
+                ))}
+              </BigNav>
+            </OverlayBody>
+
+            <OverlayFoot>
+              <div>
+                <div className="group-title">/ Sales</div>
+                <ul>
+                  <li>
+                    <a href="mailto:sintaradev@gmail.com">
+                      <span className="bar" aria-hidden />
+                      <span>sintaradev@gmail.com</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="https://t.me/IvanMitska"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <span className="bar" aria-hidden />
+                      <span>@IvanMitska</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <div className="group-title">/ Elsewhere</div>
+                <ul>
+                  <li>
+                    <a
+                      href="https://t.me/IvanMitska"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <span className="bar" aria-hidden />
+                      <span>Telegram</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="https://www.instagram.com/sintara_studio/"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <span className="bar" aria-hidden />
+                      <span>Instagram</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="cta-col">
+                <Link
+                  to="/brief"
+                  className="cta-link"
+                  onClick={() => setOpen(false)}
+                >
+                  <span className="arrow">→</span> {t('nav.getStarted')}
+                </Link>
+                <LangBtn onClick={toggleLanguage}>
+                  {language === 'en' ? 'RU' : 'EN'}
+                </LangBtn>
+              </div>
+            </OverlayFoot>
+          </Overlay>
+        )}
+      </AnimatePresence>
     </>
   );
 };

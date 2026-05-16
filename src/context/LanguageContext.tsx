@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import type { ReactNode } from 'react';
 
 type Language = 'en' | 'ru';
 
@@ -14,11 +15,183 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 const translations: Record<Language, Record<string, string>> = {
   en: {
     // Navigation
+    'nav.home': 'Home',
     'nav.services': 'Services',
     'nav.work': 'Work',
+    'nav.about': 'Studio',
     'nav.pricing': 'Pricing',
     'nav.contact': 'Contact',
-    'nav.getStarted': 'Get Started',
+    'nav.getStarted': 'Start a project',
+    'nav.menu': 'Menu',
+    'nav.close': 'Close',
+
+    // Footer (extended)
+    'footer.navigate': 'Navigate',
+    'footer.elsewhere': 'Elsewhere',
+
+    // Hero (editorial)
+    'home.hero.eyebrow': 'Independent studio · est. 2024',
+    'home.hero.line1': 'Sintara',
+    'home.hero.line2': 'builds digital',
+    'home.hero.line3': 'products.',
+    'home.hero.sub': 'Fixed price. Direct contact. No surprises.',
+    'home.hero.primary': 'Start a project',
+    'home.hero.secondary': 'See selected work',
+    'home.hero.scroll': 'Scroll',
+
+    // Marquee strip
+    'home.marquee.1': 'Web development',
+    'home.marquee.2': 'Product design',
+    'home.marquee.3': 'Telegram bots',
+    'home.marquee.4': 'CRM & dashboards',
+    'home.marquee.5': 'Automation',
+    'home.marquee.6': 'Based everywhere',
+
+    // Manifesto
+    'home.manifesto.eyebrow': 'What we believe',
+    'home.manifesto.body':
+      'We build digital products the way a good tailor cuts a suit — by hand, to fit the body, with room to move. No bloated retainers. No account managers between you and the people writing the code. Just a small team that ships fast, priced fairly, and stands behind its work for 60 days after launch.',
+    'home.manifesto.footnote': '— A note from the founders',
+
+    // Selected work
+    'home.work.eyebrow': 'Selected work',
+    'home.work.title1': 'Real products.',
+    'home.work.title2': 'In the wild.',
+    'home.work.cta': 'All projects',
+    'home.work.deliverables': 'What we delivered',
+    'home.work.openCase': 'Open case',
+
+    // Services teaser
+    'home.services.eyebrow': 'Services',
+    'home.services.title1': 'What we',
+    'home.services.title2': 'build',
+    'home.services.cta': 'Full capabilities',
+    'home.services.subtitle':
+      'Six things we ship better than most. Hover to peek — click to dive into the details.',
+    'home.services.count': 'capabilities',
+    'home.services.1.title': 'Websites',
+    'home.services.1.desc':
+      'Marketing sites, landings and multi-page editorial. From strategy to launch.',
+    'home.services.2.title': 'Web applications',
+    'home.services.2.desc':
+      'SaaS, dashboards, client portals and admin panels built on React and TypeScript.',
+    'home.services.3.title': 'Telegram bots & Mini Apps',
+    'home.services.3.desc':
+      'Custom bots, mini apps, and automation flows that plug straight into your operations.',
+    'home.services.4.title': 'CRMs & back-offices',
+    'home.services.4.desc':
+      'Desktop and web CRMs tailored to the way your team actually works — not the other way round.',
+    'home.services.5.title': 'Redesign & rebuild',
+    'home.services.5.desc':
+      'Take an outdated product and turn it into something you are proud to show clients again.',
+    'home.services.6.title': 'Ongoing support',
+    'home.services.6.desc':
+      'Monthly retainers for teams who want their digital product to keep getting better.',
+
+    // Process
+    'home.process.eyebrow': 'How we work',
+    'home.process.title': 'Four steps. No fluff.',
+    'home.process.1.title': 'Discover',
+    'home.process.1.desc':
+      'We start with your business, not the tech. Goals, audiences, constraints, unknowns — on the table.',
+    'home.process.2.title': 'Design',
+    'home.process.2.desc':
+      'Fast prototypes, tight loops. We converge on a direction before a single production line is written.',
+    'home.process.3.title': 'Build',
+    'home.process.3.desc':
+      'Weekly demos, shared access, zero black boxes. You see progress every step of the way.',
+    'home.process.4.title': 'Ship & support',
+    'home.process.4.desc':
+      'We launch, hand over the keys — and stay on call for 60 days of free bug fixes. After that, only if you want us.',
+
+    // Testimonials
+    'home.testimonials.eyebrow': 'Clients',
+    'home.testimonials.title1': 'Small team.',
+    'home.testimonials.title2': 'Big outcomes.',
+    'home.testimonials.1.quote':
+      'Built our store in 2.5 weeks — faster than Shopify. Conversion was up 34% in the first month.',
+    'home.testimonials.1.name': 'Denis V.',
+    'home.testimonials.1.role': 'Founder, VeloShop',
+    'home.testimonials.2.quote':
+      'The bot handles 400+ orders a day. Eight months in, zero downtime. Paid for itself in three weeks.',
+    'home.testimonials.2.name': 'Anna K.',
+    'home.testimonials.2.role': 'COO, EasyFood',
+    'home.testimonials.3.quote':
+      'They redesigned our 2019 website. Leads doubled, without any ads. Now we are not embarrassed to share the link.',
+    'home.testimonials.3.name': 'Igor P.',
+    'home.testimonials.3.role': 'Director, StroyMaster',
+    'home.testimonials.4.quote':
+      'A custom CRM for our process. Night and day versus Bitrix — managers learned it in a day, not a week.',
+    'home.testimonials.4.name': 'Elena N.',
+    'home.testimonials.4.role': 'Ops lead, AutoTrade',
+
+    // Big CTA
+    'home.cta.line1': 'Let us build',
+    'home.cta.line2': 'something',
+    'home.cta.line3': 'worth shipping.',
+    'home.cta.sub':
+      'Fill in a short brief and you will hear from a real engineer — not a sales bot — within 24 hours.',
+    'home.cta.primary': 'Start a project',
+    'home.cta.secondary': 'sintaradev@gmail.com',
+
+    // Work page
+    'work.eyebrow': 'Selected work · 2024 – 2025',
+    'work.title1': 'The work',
+    'work.title2': 'so far.',
+    'work.sub':
+      'A selection of recent projects across product, web, and automation. New case studies get added as we ship them.',
+    'work.viewCase': 'View case',
+
+    // Services page
+    'services.page.eyebrow': 'Capabilities',
+    'services.page.title1': 'Everything',
+    'services.page.title2': 'digital.',
+    'services.page.sub':
+      'From first landing page to full product platform — a focused menu, not an endless list.',
+    'services.page.priceFrom': 'From',
+
+    // About
+    'about.eyebrow': 'The studio',
+    'about.title1': 'Small studio.',
+    'about.title2': 'Serious work.',
+    'about.lead':
+      'Sintara is an independent digital studio founded in 2024. We partner with founders, operators and marketing teams who care about the details — and want to ship without the usual agency overhead.',
+    'about.block1.title': 'Why we exist',
+    'about.block1.body':
+      'Most software shops either sell time (and drag projects out) or sell templates (and ship the same thing to everyone). We wanted a third option: bespoke products, delivered fast, at a fixed price — with the people writing the code sitting one message away from the client.',
+    'about.block2.title': 'How we think',
+    'about.block2.body':
+      'Every project starts with the business, not the tech. We ask what has to be true for the product to succeed — then work backwards to the simplest thing that can ship. Good software is not the one with the most features. It is the one you actually use.',
+    'about.principles.eyebrow': 'How we operate',
+    'about.principles.title': 'Principles',
+    'about.principles.1.t': 'Fixed price, fixed scope',
+    'about.principles.1.d':
+      'We agree the number before we start. No hourly bills, no surprise invoices halfway through.',
+    'about.principles.2.t': 'You own it all',
+    'about.principles.2.d':
+      'Source code, design files, documentation, credentials. Nothing is held hostage.',
+    'about.principles.3.t': 'Direct access',
+    'about.principles.3.d':
+      'You talk to the developer, not a layer of project managers with broken telephone.',
+    'about.principles.4.t': '60-day warranty',
+    'about.principles.4.d':
+      'Something broken after launch? We fix it. No invoice, no drama, no questions.',
+
+    // Contact
+    'contact.page.eyebrow': 'Get in touch',
+    'contact.page.title1': 'Tell us what',
+    'contact.page.title2': 'to build.',
+    'contact.page.sub':
+      'Project in mind? Rough idea? Half a sketch? Whatever shape it is in, we want to hear about it.',
+    'contact.page.brief': 'Fill out the brief',
+    'contact.page.email': 'Write to us',
+    'contact.page.telegram': 'Telegram',
+    'contact.page.response': 'Usually responds within 24h',
+    'contact.brief.detail': '6 questions · about 5 minutes',
+    'contact.channels.title': 'Or reach us directly',
+    'contact.email.meta': 'Best for detailed briefs and files',
+    'contact.telegram.meta': 'Fastest reply — usually within minutes',
+    'contact.instagram.meta': 'See how we work, day to day',
 
     // Hero
     'hero.badge': 'Available for new projects',
@@ -164,6 +337,7 @@ const translations: Record<Language, Record<string, string>> = {
     'portfolio.category.website': 'Website',
     'portfolio.category.bot': 'Telegram Bot',
     'portfolio.category.crm': 'CRM System',
+    'portfolio.category.saas': 'SaaS Product',
     'portfolio.viewProject': 'View Project',
     'portfolio.startProject': 'Start your project',
     'portfolio.project7.title': 'KAIF CRM',
@@ -265,14 +439,187 @@ const translations: Record<Language, Record<string, string>> = {
     'notFound.submessage': 'But don\'t worry — we\'ll help you find your way home.',
     'notFound.home': 'Go home',
     'notFound.back': 'Go back',
+    'notFound.eyebrow': 'Error 404 — page not found',
   },
   ru: {
     // Navigation
+    'nav.home': 'Главная',
     'nav.services': 'Услуги',
     'nav.work': 'Работы',
+    'nav.about': 'Студия',
     'nav.pricing': 'Цены',
     'nav.contact': 'Контакты',
     'nav.getStarted': 'Начать проект',
+    'nav.menu': 'Меню',
+    'nav.close': 'Закрыть',
+
+    // Footer (extended)
+    'footer.navigate': 'Навигация',
+    'footer.elsewhere': 'Контакты',
+
+    // Hero (editorial)
+    'home.hero.eyebrow': 'Независимая студия · с 2024',
+    'home.hero.line1': 'Sintara',
+    'home.hero.line2': 'делает цифровые',
+    'home.hero.line3': 'продукты.',
+    'home.hero.sub': 'Фиксированная цена. Прямой контакт. Без сюрпризов.',
+    'home.hero.primary': 'Начать проект',
+    'home.hero.secondary': 'Избранные работы',
+    'home.hero.scroll': 'Листайте',
+
+    // Marquee strip
+    'home.marquee.1': 'Веб-разработка',
+    'home.marquee.2': 'Продуктовый дизайн',
+    'home.marquee.3': 'Telegram-боты',
+    'home.marquee.4': 'CRM и дашборды',
+    'home.marquee.5': 'Автоматизация',
+    'home.marquee.6': 'Работаем глобально',
+
+    // Manifesto
+    'home.manifesto.eyebrow': 'Во что мы верим',
+    'home.manifesto.body':
+      'Мы делаем цифровые продукты как хороший портной шьёт костюм — вручную, по фигуре, с запасом для движения. Без раздутых абонементов. Без аккаунт-менеджеров между вами и людьми, которые пишут код. Маленькая команда, которая запускает быстро, берёт честно и отвечает за работу 60 дней после запуска.',
+    'home.manifesto.footnote': '— От основателей',
+
+    // Selected work
+    'home.work.eyebrow': 'Избранные работы',
+    'home.work.title1': 'Настоящие продукты.',
+    'home.work.title2': 'В бою.',
+    'home.work.cta': 'Все проекты',
+    'home.work.deliverables': 'Что сделали',
+    'home.work.openCase': 'Открыть кейс',
+
+    // Services teaser
+    'home.services.eyebrow': 'Услуги',
+    'home.services.title1': 'Что мы',
+    'home.services.title2': 'делаем',
+    'home.services.cta': 'Полный список',
+    'home.services.subtitle':
+      'Шесть вещей, которые мы делаем лучше большинства. Наведите — увидите превью, кликните — откроется кейс.',
+    'home.services.count': 'направлений',
+    'home.services.1.title': 'Сайты',
+    'home.services.1.desc':
+      'Маркетинговые сайты, лендинги и многостраничные продуктовые сайты — от стратегии до запуска.',
+    'home.services.2.title': 'Веб-приложения',
+    'home.services.2.desc':
+      'SaaS, дашборды, клиентские кабинеты и админ-панели на React и TypeScript.',
+    'home.services.3.title': 'Telegram-боты и Mini Apps',
+    'home.services.3.desc':
+      'Кастомные боты, Mini Apps и сценарии автоматизации, встроенные прямо в ваши процессы.',
+    'home.services.4.title': 'CRM и бэк-офисы',
+    'home.services.4.desc':
+      'Десктопные и веб-CRM, собранные под то, как реально работает ваша команда — а не наоборот.',
+    'home.services.5.title': 'Редизайн',
+    'home.services.5.desc':
+      'Берём устаревший продукт и превращаем его в то, что снова не стыдно показывать клиентам.',
+    'home.services.6.title': 'Поддержка',
+    'home.services.6.desc':
+      'Месячные абонементы для команд, у которых продукт должен постоянно расти.',
+
+    // Process
+    'home.process.eyebrow': 'Как мы работаем',
+    'home.process.title': 'Четыре шага. Без воды.',
+    'home.process.1.title': 'Discover',
+    'home.process.1.desc':
+      'Начинаем с бизнеса, а не с технологий. Цели, аудитория, ограничения и неизвестные — всё на столе.',
+    'home.process.2.title': 'Дизайн',
+    'home.process.2.desc':
+      'Быстрые прототипы, плотные итерации. Сходимся на направлении ещё до первой строчки в проде.',
+    'home.process.3.title': 'Разработка',
+    'home.process.3.desc':
+      'Еженедельные демо, общий доступ, ноль чёрных ящиков. Вы видите прогресс каждый день.',
+    'home.process.4.title': 'Запуск и поддержка',
+    'home.process.4.desc':
+      'Запускаем, передаём ключи и остаёмся на связи 60 дней бесплатных правок. Дальше — только если вы захотите.',
+
+    // Testimonials
+    'home.testimonials.eyebrow': 'Клиенты',
+    'home.testimonials.title1': 'Маленькая команда.',
+    'home.testimonials.title2': 'Большие результаты.',
+    'home.testimonials.1.quote':
+      'Собрали магазин за 2.5 недели — быстрее, чем на Shopify. Конверсия +34% в первый месяц.',
+    'home.testimonials.1.name': 'Денис В.',
+    'home.testimonials.1.role': 'Founder, VeloShop',
+    'home.testimonials.2.quote':
+      'Бот обрабатывает 400+ заказов в день. Восемь месяцев — ноль сбоев. Окупился за три недели.',
+    'home.testimonials.2.name': 'Анна К.',
+    'home.testimonials.2.role': 'COO, EasyFood',
+    'home.testimonials.3.quote':
+      'Переделали наш сайт 2019 года. Заявки удвоились без единой рекламы. Теперь не стыдно делиться ссылкой.',
+    'home.testimonials.3.name': 'Игорь П.',
+    'home.testimonials.3.role': 'Директор, StroyMaster',
+    'home.testimonials.4.quote':
+      'CRM под наши процессы. Небо и земля по сравнению с Битрикс — менеджеры освоили за день, а не за неделю.',
+    'home.testimonials.4.name': 'Елена Н.',
+    'home.testimonials.4.role': 'Ops lead, АвтоТрейд',
+
+    // Big CTA
+    'home.cta.line1': 'Давайте сделаем',
+    'home.cta.line2': 'то, что',
+    'home.cta.line3': 'стоит запускать.',
+    'home.cta.sub':
+      'Заполните короткий бриф — и в течение суток с вами свяжется живой разработчик, а не продающий бот.',
+    'home.cta.primary': 'Начать проект',
+    'home.cta.secondary': 'sintaradev@gmail.com',
+
+    // Work page
+    'work.eyebrow': 'Избранные работы · 2024 – 2025',
+    'work.title1': 'Наши',
+    'work.title2': 'работы.',
+    'work.sub':
+      'Подборка свежих проектов в продукте, вебе и автоматизации. Новые кейсы появляются по мере того, как мы их запускаем.',
+    'work.viewCase': 'Смотреть кейс',
+
+    // Services page
+    'services.page.eyebrow': 'Возможности',
+    'services.page.title1': 'Всё',
+    'services.page.title2': 'цифровое.',
+    'services.page.sub':
+      'От первого лендинга до полноценной продуктовой платформы — собранное меню, а не бесконечный список.',
+    'services.page.priceFrom': 'от',
+
+    // About
+    'about.eyebrow': 'Студия',
+    'about.title1': 'Маленькая студия.',
+    'about.title2': 'Серьёзная работа.',
+    'about.lead':
+      'Sintara — независимая цифровая студия, основанная в 2024 году. Мы работаем с фаундерами, операционными и маркетинговыми командами, которые заботятся о деталях и хотят запускаться без типичного агентского накладного жира.',
+    'about.block1.title': 'Зачем мы существуем',
+    'about.block1.body':
+      'Большинство студий либо продают время (и растягивают проекты), либо продают шаблоны (и отгружают одно и то же всем подряд). Нам нужен был третий вариант: авторские продукты, быстрый запуск, фиксированная цена — и люди, которые пишут код, в одном сообщении от клиента.',
+    'about.block2.title': 'Как мы думаем',
+    'about.block2.body':
+      'Каждый проект начинается с бизнеса, а не с технологий. Мы спрашиваем: что должно быть истиной, чтобы продукт сработал — и движемся обратным ходом к самой простой версии, которую можно запустить. Хороший софт — это не тот, где больше всего фич. Это тот, которым реально пользуются.',
+    'about.principles.eyebrow': 'Как мы работаем',
+    'about.principles.title': 'Принципы',
+    'about.principles.1.t': 'Фиксированная цена, фиксированный объём',
+    'about.principles.1.d':
+      'Цифру согласовываем до старта. Без почасовки, без внезапных счетов посреди проекта.',
+    'about.principles.2.t': 'Всё ваше',
+    'about.principles.2.d':
+      'Исходники, макеты, документация, доступы. Ничего не удерживается в заложниках.',
+    'about.principles.3.t': 'Прямой доступ',
+    'about.principles.3.d':
+      'Вы общаетесь с разработчиком, а не со слоем менеджеров и испорченным телефоном.',
+    'about.principles.4.t': 'Гарантия 60 дней',
+    'about.principles.4.d':
+      'Что-то сломалось после запуска? Исправим. Без счёта, драмы и вопросов.',
+
+    // Contact
+    'contact.page.eyebrow': 'Связаться',
+    'contact.page.title1': 'Расскажите,',
+    'contact.page.title2': 'что делаем.',
+    'contact.page.sub':
+      'Есть проект? Идея? Половинка эскиза? В каком бы виде она ни была — мы хотим о ней услышать.',
+    'contact.page.brief': 'Заполнить бриф',
+    'contact.page.email': 'Написать нам',
+    'contact.page.telegram': 'Telegram',
+    'contact.page.response': 'Обычно отвечаем в течение суток',
+    'contact.brief.detail': '6 вопросов · около 5 минут',
+    'contact.channels.title': 'Или напишите напрямую',
+    'contact.email.meta': 'Удобно для подробных брифов и файлов',
+    'contact.telegram.meta': 'Отвечаем быстрее всего — обычно за минуты',
+    'contact.instagram.meta': 'Смотрите, как мы работаем каждый день',
 
     // Hero
     'hero.badge': 'Открыты для новых проектов',
@@ -418,6 +765,7 @@ const translations: Record<Language, Record<string, string>> = {
     'portfolio.category.website': 'Сайт',
     'portfolio.category.bot': 'Telegram-бот',
     'portfolio.category.crm': 'CRM-система',
+    'portfolio.category.saas': 'SaaS-продукт',
     'portfolio.viewProject': 'Смотреть проект',
     'portfolio.startProject': 'Начать проект',
     'portfolio.project7.title': 'KAIF CRM',
@@ -519,6 +867,7 @@ const translations: Record<Language, Record<string, string>> = {
     'notFound.submessage': 'Но не переживай — мы поможем найти путь домой.',
     'notFound.home': 'На главную',
     'notFound.back': 'Назад',
+    'notFound.eyebrow': 'Ошибка 404 — страница не найдена',
   }
 };
 
@@ -544,8 +893,13 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     return translations[language][key] || key;
   }, [language]);
 
+  const value = useMemo(
+    () => ({ language, toggleLanguage, t }),
+    [language, toggleLanguage, t],
+  );
+
   return (
-    <LanguageContext.Provider value={{ language, toggleLanguage, t }}>
+    <LanguageContext.Provider value={value}>
       {children}
     </LanguageContext.Provider>
   );

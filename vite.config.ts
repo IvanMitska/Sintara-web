@@ -11,11 +11,14 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom'],
-          animations: ['gsap', 'framer-motion'],
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          animations: ['framer-motion'],
           icons: ['react-icons'],
           ui: ['styled-components'],
-          three: ['three', '@react-three/fiber', '@react-three/drei']
+          // Three.js + r3f + drei isolated so non-3D pages don't pay
+          // for ~900KB of WebGL code. Loaded only when SintaraLogo3D
+          // mounts (Navigation overlay or ServicesTeaser watermark).
+          three: ['three', '@react-three/fiber', '@react-three/drei'],
         }
       }
     },

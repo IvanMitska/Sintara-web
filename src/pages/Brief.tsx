@@ -1,22 +1,22 @@
-import React, { useState, memo } from 'react';
-import styled from 'styled-components';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef, memo } from 'react';
+import styled, { keyframes } from 'styled-components';
+import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
   FaArrowLeft, FaArrowRight, FaPaperPlane, FaCheck,
   FaBuilding, FaUsers, FaBullseye, FaSitemap, FaPalette,
-  FaFileAlt, FaCog, FaCalendarAlt, FaCommentAlt, FaLaptopCode
+  FaCog, FaCalendarAlt, FaCommentAlt, FaLaptopCode
 } from 'react-icons/fa';
 import { useLanguage } from '../context/LanguageContext';
 import Navigation from '../components/Navigation';
-import StarField from '../components/StarField';
 
 // ============ STYLED COMPONENTS ============
 
 const PageWrapper = styled.div`
   min-height: 100vh;
   height: auto;
-  background: transparent;
+  background: #fff;
+  color: var(--ink);
   position: relative;
 
   @media (max-width: 768px) {
@@ -25,192 +25,499 @@ const PageWrapper = styled.div`
   }
 `;
 
-const BriefContainer = styled.div`
-  max-width: 900px;
+/**
+ * Top hero strip — full-width editorial header with the page title.
+ * Sits above the working two-column area so the title can breathe big
+ * across the entire viewport without competing with the form.
+ */
+const BriefHero = styled.div`
+  max-width: 1480px;
   margin: 0 auto;
-  padding: 120px 24px 80px;
+  padding: 140px 40px 56px;
+
+  @media (max-width: 768px) {
+    padding: 108px 20px 40px;
+  }
+`;
+
+const BriefContainer = styled.div`
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 0 40px 120px;
   position: relative;
   z-index: 1;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 80px;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 240px 1fr;
+    gap: 48px;
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 0 20px 80px;
+  }
 `;
 
 const BackButton = styled(motion.button)`
-  display: inline-flex;
+  display: flex;
+  width: fit-content;
   align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 12px 20px;
-  color: rgba(255, 255, 255, 0.7);
-  font-family: 'Inter', sans-serif;
-  font-size: 0.9rem;
+  gap: 10px;
+  background: transparent;
+  border: 1px solid var(--bone-line);
+  border-radius: 999px;
+  padding: 10px 18px;
+  color: var(--ink);
+  font-family: var(--font-grotesk);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.3s ease;
-  margin-bottom: 40px;
+  transition:
+    background 0.3s var(--ease-snap),
+    color 0.3s var(--ease-snap),
+    border-color 0.3s var(--ease-snap);
+  margin-bottom: 56px;
 
   &:hover {
-    background: rgba(124, 58, 237, 0.1);
-    border-color: rgba(124, 58, 237, 0.3);
+    background: var(--ink);
+    border-color: var(--ink);
     color: #fff;
   }
 `;
 
-const Header = styled.div`
-  text-align: center;
-  margin-bottom: 48px;
-`;
-
 const Logo = styled.div`
-  font-family: 'Inter', sans-serif;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 16px;
-  letter-spacing: -0.02em;
-`;
-
-const Title = styled(motion.h1)`
-  font-family: 'Inter', sans-serif;
-  font-size: clamp(2rem, 5vw, 3rem);
-  font-weight: 700;
-  background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin: 0 0 16px;
-`;
-
-const Subtitle = styled(motion.p)`
-  font-family: 'Inter', sans-serif;
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.5);
-  max-width: 600px;
-  margin: 0 auto;
-  line-height: 1.6;
-`;
-
-// Progress
-const ProgressContainer = styled.div`
-  margin-bottom: 48px;
-`;
-
-const ProgressBar = styled.div`
-  height: 4px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 2px;
-  overflow: hidden;
+  font-family: var(--font-grotesk);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--muted);
   margin-bottom: 24px;
-`;
-
-const ProgressFill = styled(motion.div)<{ $progress: number }>`
-  height: 100%;
-  background: linear-gradient(90deg, #7c3aed 0%, #a78bfa 100%);
-  border-radius: 2px;
-`;
-
-const StepsContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  overflow-x: auto;
-  padding: 4px 0 8px;
-
-  &::-webkit-scrollbar {
-    height: 4px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: rgba(124, 58, 237, 0.3);
-    border-radius: 2px;
-  }
-`;
-
-const StepItem = styled.button<{ $active: boolean; $completed: boolean }>`
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background: ${props => props.$active
-    ? 'linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(124, 58, 237, 0.1) 100%)'
-    : props.$completed
-      ? 'rgba(124, 58, 237, 0.1)'
-      : 'rgba(255, 255, 255, 0.03)'};
-  border: 1px solid ${props => props.$active
-    ? 'rgba(124, 58, 237, 0.4)'
-    : props.$completed
-      ? 'rgba(124, 58, 237, 0.2)'
-      : 'rgba(255, 255, 255, 0.08)'};
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-  flex-shrink: 0;
-
-  svg {
-    font-size: 14px;
-    color: ${props => props.$active || props.$completed ? '#a78bfa' : 'rgba(255, 255, 255, 0.3)'};
-  }
-
-  span {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.85rem;
-    color: ${props => props.$active ? '#fff' : props.$completed ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.4)'};
-  }
-
-  &:hover {
-    border-color: rgba(124, 58, 237, 0.3);
-    background: rgba(124, 58, 237, 0.1);
-  }
-`;
-
-// Form Card
-const FormCard = styled(motion.div)`
-  background: linear-gradient(135deg, rgba(20, 10, 40, 0.8) 0%, rgba(10, 5, 20, 0.95) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 28px;
-  padding: 40px;
-  position: relative;
-  overflow: hidden;
+  gap: 10px;
 
   &::before {
     content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+`;
+
+const Title = styled(motion.h1)`
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 9.5vw, 8.5rem);
+  font-weight: 700;
+  line-height: 0.88;
+  letter-spacing: -0.05em;
+  color: var(--ink);
+  margin: 0 0 28px;
+  text-transform: none;
+`;
+
+const Subtitle = styled(motion.p)`
+  font-family: var(--font-grotesk);
+  font-size: clamp(1.0625rem, 1.3vw, 1.25rem);
+  color: var(--muted);
+  max-width: 620px;
+  margin: 0;
+  line-height: 1.55;
+`;
+
+// ─── Sidebar ────────────────────────────────────────────────────────
+
+const Sidebar = styled.aside`
+  position: relative;
+
+  @media (max-width: 900px) {
+    display: contents;
+  }
+`;
+
+/**
+ * Sticky frame so the step navigation always reads while scrolling
+ * the form. On small viewports it falls back to a horizontal pill row
+ * pinned under the hero (see SidebarStrip below — used by JSX as the
+ * mobile fallback).
+ */
+const SidebarSticky = styled.div`
+  position: sticky;
+  top: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+
+  @media (max-width: 900px) {
+    display: none;
+  }
+`;
+
+/**
+ * Big editorial step counter — the single most prominent element of
+ * the sidebar. Tells the reader where they are at a glance.
+ */
+const StepCounter = styled.div`
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--bone-line);
+`;
+
+const BigNumber = styled.div`
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 7vw, 6rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--ink);
+`;
+
+const NumberMeta = styled.div`
+  font-family: var(--font-grotesk);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .of {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+  }
+`;
+
+const SidebarProgress = styled.div<{ $progress: number }>`
+  position: relative;
+  height: 2px;
+  background: var(--bone-line);
+  overflow: hidden;
+
+  &::after {
+    content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.4), transparent);
+    inset: 0;
+    background: var(--accent);
+    transform: scaleX(${({ $progress }) => $progress / 100});
+    transform-origin: left;
+    transition: transform 0.6s var(--ease-expo);
+  }
+`;
+
+const StepNav = styled.nav`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+`;
+
+/**
+ * Vertical step row — number / dot / icon + label. Shows three states:
+ * completed (purple dot), current (accent bg pill), upcoming (muted).
+ */
+const NavStep = styled.button<{ $active: boolean; $completed: boolean }>`
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px;
+  margin: 0 -12px;
+  background: ${({ $active }) => ($active ? '#EFE4FF' : 'transparent')};
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-grotesk);
+  transition: background 0.25s var(--ease-snap);
+
+  &:hover {
+    background: ${({ $active }) => ($active ? '#EFE4FF' : '#fafafa')};
+  }
+
+  .marker {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: ${({ $active, $completed }) =>
+      $active ? 'var(--accent)' : $completed ? 'var(--accent)' : 'var(--muted)'};
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .check {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    display: inline-grid;
+    place-items: center;
+    font-size: 8px;
+  }
+
+  .body {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.875rem;
+    font-weight: ${({ $active }) => ($active ? 600 : 500)};
+    color: ${({ $active, $completed }) =>
+      $active ? 'var(--ink)' : $completed ? 'var(--ink)' : 'var(--muted)'};
+  }
+
+  .body svg {
+    font-size: 12px;
+    color: ${({ $active, $completed }) =>
+      $active ? 'var(--accent)' : $completed ? 'var(--accent)' : 'var(--muted)'};
+    opacity: ${({ $active, $completed }) => ($active || $completed ? 1 : 0.6)};
+  }
+`;
+
+const Estimate = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #fafafa;
+  border: 1px solid var(--bone-line);
+  border-radius: 999px;
+  font-family: var(--font-grotesk);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  align-self: flex-start;
+
+  strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
+  }
+`;
+
+/**
+ * Horizontal scroll strip used only on small screens — falls back from
+ * the vertical sidebar nav. Same chips as before but compact.
+ */
+const SidebarStrip = styled.div`
+  display: none;
+
+  @media (max-width: 900px) {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 0 12px;
+    margin-bottom: 4px;
+
+    &::-webkit-scrollbar {
+      height: 3px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: var(--bone-line);
+      border-radius: 2px;
+    }
+  }
+`;
+
+const StripItem = styled.button<{ $active: boolean; $completed: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: ${({ $active, $completed }) =>
+    $active ? 'var(--accent)' : $completed ? '#EFE4FF' : '#fff'};
+  border: 1px solid
+    ${({ $active, $completed }) =>
+      $active ? 'var(--accent)' : $completed ? '#EFE4FF' : 'var(--bone-line)'};
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: var(--font-grotesk);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: ${({ $active, $completed }) =>
+    $active ? '#fff' : $completed ? 'var(--accent)' : 'var(--muted)'};
+  transition:
+    background 0.25s var(--ease-snap),
+    color 0.25s var(--ease-snap),
+    border-color 0.25s var(--ease-snap);
+
+  svg {
+    font-size: 11px;
+  }
+`;
+
+// ─── Form Card ─────────────────────────────────────────────────────
+
+/**
+ * Form card. Editorial paper feel — ink hairline border, no shadow,
+ * generous internal padding, and a giant background step number that
+ * acts as a watermark behind the question. On hover-free desktop it
+ * reads as the chapter mark of the page.
+ *
+ * Two CSS-only flourishes:
+ *  • A radial cursor glow follows the mouse (driven by --cursor-x/y
+ *    set via onMouseMove on the JSX side). Premium "live" feel.
+ *  • CSS counters number every Label inside the card automatically —
+ *    `Q01 ─── Company name`. Resets per step. No JSX changes needed.
+ */
+const FormCard = styled(motion.div)`
+  background: #fff;
+  border: 1px solid var(--bone-line);
+  border-radius: 12px;
+  padding: 56px 56px 48px;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  counter-reset: q;
+
+  /* cursor-follow purple haze — only on viewports with a real pointer */
+  &::before {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    inset: 0;
+    background: radial-gradient(
+      420px circle at var(--cursor-x, 50%) var(--cursor-y, 50%),
+      rgba(124, 58, 237, 0.08),
+      transparent 55%
+    );
+    opacity: 0;
+    transition: opacity 0.4s var(--ease-snap);
+    z-index: 0;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+
+  @media (hover: none) {
+    &::before {
+      display: none;
+    }
   }
 
   @media (max-width: 768px) {
-    padding: 24px;
+    padding: 32px 24px 28px;
+    border-radius: 8px;
+  }
+`;
+
+const CardHeader = styled.div`
+  position: relative;
+  margin-bottom: 40px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--bone-line);
+
+  @media (max-width: 768px) {
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+  }
+`;
+
+const CardEyebrow = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-grotesk);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 16px;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
   }
 `;
 
 const SectionTitle = styled.h2`
-  font-family: 'Inter', sans-serif;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #fff;
-  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  color: var(--ink);
+  margin: 0 0 14px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 
+  /* Hide legacy inline icons — we now use the editorial eyebrow above */
   svg {
-    color: #a78bfa;
+    display: none;
   }
 `;
 
 const SectionSubtitle = styled.p`
-  font-family: 'Inter', sans-serif;
-  font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.5);
-  margin: 0 0 32px;
+  font-family: var(--font-grotesk);
+  font-size: 1rem;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.55;
+  max-width: 56ch;
+`;
+
+/**
+ * Background watermark — gigantic faded step number anchored to the
+ * card's bottom-right. Brand-purple, 4% opacity. Pure editorial flair.
+ */
+const CardWatermark = styled.div`
+  position: absolute;
+  right: -20px;
+  bottom: -60px;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+  font-family: var(--font-display);
+  font-size: clamp(14rem, 28vw, 26rem);
+  font-weight: 800;
+  line-height: 0.8;
+  letter-spacing: -0.07em;
+  color: var(--accent);
+  opacity: 0.04;
+
+  @media (max-width: 768px) {
+    right: -10px;
+    bottom: -30px;
+    font-size: 18rem;
+  }
+`;
+
+const CardBody = styled.div`
+  position: relative;
+  z-index: 1;
 `;
 
 // Form Elements
 const FormGroup = styled.div`
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 `;
 
 const FormRow = styled.div`
@@ -223,65 +530,126 @@ const FormRow = styled.div`
   }
 `;
 
+/**
+ * Editorial label — auto-numbered via CSS counters (resets per step
+ * inside the FormCard). Renders as `Q01 ─── COMPANY NAME` — adds
+ * rhythm and gives the user a sense of being walked through.
+ */
 const Label = styled.label`
-  display: block;
-  font-family: 'Inter', sans-serif;
-  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-grotesk);
+  font-size: 0.6875rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink);
+  margin-bottom: 14px;
+  counter-increment: q;
+
+  &::before {
+    content: 'Q' counter(q, decimal-leading-zero);
+    font-feature-settings: 'tnum';
+    color: var(--accent);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+  }
+
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--bone-line);
+  }
 `;
 
 const RequiredMark = styled.span`
-  color: #ef4444;
-  margin-left: 4px;
+  color: var(--accent);
+  margin-left: 2px;
 `;
 
+/**
+ * Underline-only input — feels like writing in a notebook rather than
+ * filling a form. The static bone-line rail is the bottom border; on
+ * focus an accent gradient "scribes" from left to right over it via
+ * background-size animation. Keeps a single element for the JSX.
+ */
 const Input = styled.input`
   width: 100%;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 14px 18px;
-  font-family: 'Inter', sans-serif;
-  font-size: 1rem;
-  color: #ffffff;
-  transition: all 0.3s ease;
+  background-color: transparent;
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-size: 0% 1.5px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  border: 0;
+  border-bottom: 1.5px solid var(--bone-line);
+  border-radius: 0;
+  padding: 14px 2px;
+  font-family: var(--font-grotesk);
+  font-size: 1.0625rem;
+  color: var(--ink);
+  caret-color: var(--accent);
+  transition:
+    border-color 0.25s var(--ease-snap),
+    background-size 0.6s var(--ease-expo);
 
   &::placeholder {
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--muted);
+    opacity: 0.55;
+    transition: opacity 0.3s var(--ease-snap);
+  }
+
+  &:hover {
+    border-color: var(--ink);
   }
 
   &:focus {
     outline: none;
-    border-color: rgba(124, 58, 237, 0.5);
-    background: rgba(124, 58, 237, 0.05);
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+    background-size: 100% 1.5px;
+  }
+
+  &:focus::placeholder {
+    opacity: 0.35;
   }
 `;
 
+/**
+ * Boxed textarea — for multi-line answers. Same hairline aesthetic as
+ * Input but framed so it visually invites a longer answer.
+ */
 const Textarea = styled.textarea`
   width: 100%;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 14px 18px;
-  font-family: 'Inter', sans-serif;
+  background: #fafafa;
+  border: 1px solid var(--bone-line);
+  border-radius: 8px;
+  padding: 16px 18px;
+  font-family: var(--font-grotesk);
   font-size: 1rem;
-  color: #ffffff;
-  transition: all 0.3s ease;
+  color: var(--ink);
+  transition:
+    border-color 0.25s var(--ease-snap),
+    background 0.25s var(--ease-snap),
+    box-shadow 0.25s var(--ease-snap);
   resize: vertical;
-  min-height: 120px;
+  min-height: 132px;
+  line-height: 1.55;
 
   &::placeholder {
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--muted);
+    opacity: 0.55;
+  }
+
+  &:hover {
+    border-color: var(--ink);
+    background: #fff;
   }
 
   &:focus {
     outline: none;
-    border-color: rgba(124, 58, 237, 0.5);
-    background: rgba(124, 58, 237, 0.05);
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+    border-color: var(--accent);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
   }
 `;
 
@@ -289,7 +657,7 @@ const Textarea = styled.textarea`
 const CheckboxGrid = styled.div<{ $columns?: number }>`
   display: grid;
   grid-template-columns: repeat(${props => props.$columns || 2}, 1fr);
-  gap: 12px;
+  gap: 10px;
 
   @media (max-width: 600px) {
     grid-template-columns: 1fr;
@@ -301,17 +669,22 @@ const CheckboxItem = styled.label<{ $checked: boolean }>`
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  background: ${props => props.$checked
-    ? 'linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(124, 58, 237, 0.08) 100%)'
-    : 'rgba(255, 255, 255, 0.03)'};
-  border: 1px solid ${props => props.$checked ? 'rgba(124, 58, 237, 0.4)' : 'rgba(255, 255, 255, 0.1)'};
-  border-radius: 12px;
+  background: ${props => (props.$checked ? '#EFE4FF' : '#fff')};
+  border: 1px solid ${props => (props.$checked ? 'var(--accent)' : 'var(--bone-line)')};
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  position: relative;
+  z-index: 1;
+  transition:
+    background 0.25s var(--ease-snap),
+    border-color 0.25s var(--ease-snap),
+    transform 0.4s var(--ease-expo),
+    box-shadow 0.4s var(--ease-expo);
 
   &:hover {
-    border-color: rgba(124, 58, 237, 0.3);
-    background: rgba(124, 58, 237, 0.08);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -8px rgba(124, 58, 237, 0.25);
   }
 
   input {
@@ -320,35 +693,38 @@ const CheckboxItem = styled.label<{ $checked: boolean }>`
 `;
 
 const Checkbox = styled.div<{ $checked: boolean }>`
-  width: 20px;
-  height: 20px;
-  border-radius: 5px;
-  border: 2px solid ${props => props.$checked ? '#7c3aed' : 'rgba(255, 255, 255, 0.2)'};
-  background: ${props => props.$checked ? 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)' : 'transparent'};
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1.5px solid ${props => (props.$checked ? 'var(--accent)' : 'var(--bone-line)')};
+  background: ${props => (props.$checked ? 'var(--accent)' : '#fff')};
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition:
+    background 0.2s var(--ease-snap),
+    border-color 0.2s var(--ease-snap);
   flex-shrink: 0;
 
   svg {
     font-size: 10px;
-    color: white;
-    opacity: ${props => props.$checked ? 1 : 0};
+    color: #fff;
+    opacity: ${props => (props.$checked ? 1 : 0)};
   }
 `;
 
 const CheckboxLabel = styled.span`
-  font-family: 'Inter', sans-serif;
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.8);
+  font-family: var(--font-grotesk);
+  font-size: 0.9375rem;
+  color: var(--ink);
+  line-height: 1.4;
 `;
 
 // Radio Group
 const RadioGroup = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
 `;
 
 const RadioItem = styled.label<{ $checked: boolean }>`
@@ -356,16 +732,22 @@ const RadioItem = styled.label<{ $checked: boolean }>`
   align-items: center;
   gap: 10px;
   padding: 12px 18px;
-  background: ${props => props.$checked
-    ? 'linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(124, 58, 237, 0.08) 100%)'
-    : 'rgba(255, 255, 255, 0.03)'};
-  border: 1px solid ${props => props.$checked ? 'rgba(124, 58, 237, 0.4)' : 'rgba(255, 255, 255, 0.1)'};
-  border-radius: 12px;
+  background: ${props => (props.$checked ? '#EFE4FF' : '#fff')};
+  border: 1px solid ${props => (props.$checked ? 'var(--accent)' : 'var(--bone-line)')};
+  border-radius: 999px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  position: relative;
+  z-index: 1;
+  transition:
+    background 0.25s var(--ease-snap),
+    border-color 0.25s var(--ease-snap),
+    transform 0.4s var(--ease-expo),
+    box-shadow 0.4s var(--ease-expo);
 
   &:hover {
-    border-color: rgba(124, 58, 237, 0.3);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -8px rgba(124, 58, 237, 0.25);
   }
 
   input {
@@ -377,134 +759,260 @@ const Radio = styled.div<{ $checked: boolean }>`
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  border: 2px solid ${props => props.$checked ? '#7c3aed' : 'rgba(255, 255, 255, 0.2)'};
+  border: 1.5px solid ${props => (props.$checked ? 'var(--accent)' : 'var(--bone-line)')};
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s var(--ease-snap);
 
   &::after {
     content: '';
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #7c3aed;
-    opacity: ${props => props.$checked ? 1 : 0};
-    transform: ${props => props.$checked ? 'scale(1)' : 'scale(0)'};
-    transition: all 0.2s ease;
+    background: var(--accent);
+    opacity: ${props => (props.$checked ? 1 : 0)};
+    transform: ${props => (props.$checked ? 'scale(1)' : 'scale(0)')};
+    transition: all 0.2s var(--ease-snap);
   }
 `;
 
 const RadioLabel = styled.span`
-  font-family: 'Inter', sans-serif;
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.8);
+  font-family: var(--font-grotesk);
+  font-size: 0.9375rem;
+  color: var(--ink);
 `;
 
 // Navigation Buttons
 const NavButtons = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 16px;
-  margin-top: 40px;
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid var(--bone-line);
+
+  @media (max-width: 480px) {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
 `;
 
 const NavButton = styled.button<{ $primary?: boolean }>`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 16px 32px;
-  border-radius: 14px;
-  font-family: 'Inter', sans-serif;
-  font-size: 1rem;
+  gap: 12px;
+  padding: 18px 32px;
+  border-radius: 999px;
+  font-family: var(--font-grotesk);
+  font-size: 0.8125rem;
   font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
   cursor: pointer;
-  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  transition:
+    background 0.35s var(--ease-snap),
+    color 0.35s var(--ease-snap),
+    border-color 0.35s var(--ease-snap),
+    padding 0.5s var(--ease-expo),
+    transform 0.3s var(--ease-snap);
 
-  ${props => props.$primary ? `
-    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-    color: white;
-    border: none;
-    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+  svg {
+    font-size: 12px;
+    transition: transform 0.4s var(--ease-expo);
+  }
 
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(124, 58, 237, 0.4);
-      color: white;
+  ${props =>
+    props.$primary
+      ? `
+    background: var(--ink);
+    color: #fff;
+    border: 1.5px solid var(--ink);
+    box-shadow: 0 4px 24px rgba(10, 10, 10, 0.08);
+
+    &:hover:not(:disabled) {
+      background: var(--accent);
+      border-color: var(--accent);
+      padding: 18px 38px;
+      box-shadow: 0 6px 28px rgba(124, 58, 237, 0.32);
     }
-  ` : `
-    background: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    &:hover:not(:disabled) svg {
+      transform: translateX(6px);
+    }
+    &:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+  `
+      : `
+    background: transparent;
+    color: var(--ink);
+    border: 1.5px solid var(--bone-line);
 
-    &:hover {
-      background: rgba(124, 58, 237, 0.1);
-      border-color: rgba(124, 58, 237, 0.3);
-      color: #fff;
+    &:hover:not(:disabled) {
+      border-color: var(--ink);
+    }
+    &:hover:not(:disabled) svg {
+      transform: translateX(-4px);
     }
   `}
 
   &:disabled {
-    opacity: 0.5;
+    opacity: 0.35;
     cursor: not-allowed;
-    transform: none !important;
-  }
-
-  svg {
-    font-size: 14px;
   }
 `;
 
 // Success Screen
 const SuccessScreen = styled(motion.div)`
   text-align: center;
-  padding: 60px 40px;
+  padding: 64px 40px;
 `;
 
 const SuccessIcon = styled(motion.div)`
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.1) 100%);
-  border: 2px solid rgba(34, 197, 94, 0.4);
+  background: #EFE4FF;
+  border: 2px solid var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 24px;
+  margin: 0 auto 28px;
 
   svg {
-    font-size: 32px;
-    color: #22c55e;
+    font-size: 30px;
+    color: var(--accent);
   }
 `;
 
 const SuccessTitle = styled.h2`
-  font-family: 'Inter', sans-serif;
-  font-size: 2rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3.4vw, 2.5rem);
   font-weight: 700;
-  color: #fff;
+  letter-spacing: -0.03em;
+  color: var(--ink);
   margin: 0 0 16px;
 `;
 
 const SuccessText = styled.p`
-  font-family: 'Inter', sans-serif;
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.6);
-  margin: 0 0 32px;
-  line-height: 1.6;
+  font-family: var(--font-grotesk);
+  font-size: 1.0625rem;
+  color: var(--muted);
+  margin: 0 0 36px;
+  line-height: 1.55;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
 `;
 
 const ErrorMessage = styled(motion.div)`
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.08) 100%);
-  border: 1px solid rgba(239, 68, 68, 0.4);
-  border-radius: 12px;
-  padding: 16px 20px;
-  margin-bottom: 20px;
-  font-family: 'Inter', sans-serif;
-  font-size: 0.95rem;
-  color: #fca5a5;
+  background: #fff5f5;
+  border: 1px solid #fecaca;
+  border-left: 3px solid #dc2626;
+  border-radius: 6px;
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  font-family: var(--font-grotesk);
+  font-size: 0.9375rem;
+  color: #991b1b;
   line-height: 1.5;
+`;
+
+// ─── Premium flourishes ────────────────────────────────────────────
+
+/**
+ * Top-of-viewport reading-progress bar — fills as the user advances
+ * through steps. Sits above everything, fixed. The hairline divider
+ * underneath grounds it to the page.
+ */
+const TopProgress = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 90;
+  background: rgba(230, 230, 230, 0.6);
+  pointer-events: none;
+`;
+
+const TopProgressFill = styled(motion.div)`
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--accent) 0%,
+    #a78bfa 50%,
+    var(--accent) 100%
+  );
+  background-size: 200% 100%;
+  transform-origin: left;
+  box-shadow: 0 0 12px rgba(124, 58, 237, 0.4);
+`;
+
+const pulse = keyframes`
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.4); }
+`;
+
+/**
+ * Auto-save pill — flashes "Saving…" briefly on each form change,
+ * settles to "Saved · just now". Builds trust that nothing is lost.
+ */
+const AutoSave = styled(motion.div)`
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  margin-top: 28px;
+  border: 1px solid var(--bone-line);
+  border-radius: 999px;
+  font-family: var(--font-grotesk);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: rgba(250, 250, 250, 0.6);
+  backdrop-filter: blur(6px);
+
+  .pulse {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: ${pulse} 2.4s var(--ease-snap) infinite;
+  }
+
+  &.saving .pulse {
+    background: #f59e0b;
+  }
+
+  strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+`;
+
+/**
+ * Container for the BIG editorial step number that animates between
+ * steps with a slot-machine y-slide. Each digit inside gets keyed
+ * by its character so AnimatePresence can run an enter/exit per
+ * digit — very studio-tier detail.
+ */
+const NumberSlot = styled.div`
+  display: inline-flex;
+  overflow: hidden;
+  height: 0.85em;
+  line-height: 0.85;
+`;
+
+const NumberDigit = styled(motion.span)`
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
 `;
 
 // ============ TYPES ============
@@ -575,6 +1083,39 @@ const Brief: React.FC = memo(() => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  // Auto-save indicator state — flips to "saving" briefly after each
+  // form mutation, then settles back to "saved". Pure UI signal — the
+  // data lives in component state (no real persistence yet).
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving'>('saved');
+
+  // Cursor position inside FormCard for the radial-glow effect.
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = cardRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    el.style.setProperty('--cursor-x', `${e.clientX - rect.left}px`);
+    el.style.setProperty('--cursor-y', `${e.clientY - rect.top}px`);
+  };
+
+  // Magnetic NEXT button — gentle tilt + translate toward the cursor.
+  // Damped via spring so it never feels jumpy.
+  const magnetX = useMotionValue(0);
+  const magnetY = useMotionValue(0);
+  const springX = useSpring(magnetX, { stiffness: 220, damping: 18 });
+  const springY = useSpring(magnetY, { stiffness: 220, damping: 18 });
+  const handleMagnetMove = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    magnetX.set((e.clientX - cx) * 0.25);
+    magnetY.set((e.clientY - cy) * 0.4);
+  };
+  const handleMagnetLeave = () => {
+    magnetX.set(0);
+    magnetY.set(0);
+  };
+
   const [formData, setFormData] = useState<BriefData>({
     productType: '',
     companyName: '',
@@ -613,12 +1154,20 @@ const Brief: React.FC = memo(() => {
   });
 
   const t = language === 'ru' ? {
-    back: 'Назад',
+    back: 'На главную',
     title: 'Бриф на разработку',
     subtitle: 'Заполните форму, чтобы мы могли лучше понять ваш проект и подготовить точную оценку',
     next: 'Далее',
     prev: 'Назад',
     submit: 'Отправить бриф',
+    stepEyebrow: 'Шаг',
+    stepOf: 'из',
+    estimatePrefix: '≈',
+    estimateUnit: 'мин',
+    estimateRemaining: 'осталось',
+    requiredMark: '*',
+    optionalLabel: 'Необязательно',
+    sectionRoman: ['Один', 'Два', 'Три', 'Четыре', 'Пять', 'Шесть', 'Семь', 'Восемь', 'Девять'],
 
     // Steps
     step1: 'Продукт',
@@ -817,12 +1366,20 @@ const Brief: React.FC = memo(() => {
     successText: 'Спасибо за заполнение брифа. Мы свяжемся с вами в ближайшее время для обсуждения деталей проекта.',
     backToHome: 'Вернуться на главную'
   } : {
-    back: 'Back',
+    back: 'Home',
     title: 'Project Brief',
     subtitle: 'Fill out the form so we can better understand your project and provide an accurate estimate',
     next: 'Next',
     prev: 'Back',
     submit: 'Submit Brief',
+    stepEyebrow: 'Step',
+    stepOf: 'of',
+    estimatePrefix: '≈',
+    estimateUnit: 'min',
+    estimateRemaining: 'remaining',
+    requiredMark: '*',
+    optionalLabel: 'Optional',
+    sectionRoman: ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'],
 
     // Steps
     step1: 'Product',
@@ -1055,14 +1612,46 @@ const Brief: React.FC = memo(() => {
   const nextStep = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(prev => prev + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const prevStep = () => {
     if (currentStep > 0) {
       setCurrentStep(prev => prev - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
+
+  // Flash the auto-save indicator briefly whenever the user mutates
+  // the form. The first render is skipped so it doesn't fire on mount.
+  const isFirstRender = useRef(true);
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    setSaveStatus('saving');
+    const id = window.setTimeout(() => setSaveStatus('saved'), 700);
+    return () => window.clearTimeout(id);
+  }, [formData]);
+
+  // Keyboard shortcut: Cmd/Ctrl+Enter advances to the next step from
+  // anywhere on the page (including textarea focus). Power-user nicety.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        if (currentStep < steps.length - 1) {
+          setCurrentStep(prev => prev + 1);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStep]);
 
   // Split text into chunks respecting Telegram's 4096 char limit
   const splitIntoChunks = (text: string, maxLength: number = 4000): string[] => {
@@ -1912,11 +2501,31 @@ const Brief: React.FC = memo(() => {
     );
   }
 
+  const stepNumber = String(currentStep + 1).padStart(2, '0');
+  const totalSteps = String(steps.length).padStart(2, '0');
+  const progressPct = ((currentStep + 1) / steps.length) * 100;
+  const minutesLeft = Math.max(1, Math.ceil((steps.length - currentStep) * 0.6));
+
   return (
     <PageWrapper>
-      <StarField />
       <Navigation />
-      <BriefContainer>
+
+      {/* Top reading-progress bar — fills as the user advances */}
+      <TopProgress>
+        <TopProgressFill
+          initial={false}
+          animate={{
+            width: `${progressPct}%`,
+            backgroundPosition: ['0% 0%', '200% 0%'],
+          }}
+          transition={{
+            width: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+            backgroundPosition: { duration: 6, ease: 'linear', repeat: Infinity },
+          }}
+        />
+      </TopProgress>
+
+      <BriefHero>
         <BackButton
           onClick={() => navigate('/')}
           whileHover={{ x: -4 }}
@@ -1925,87 +2534,193 @@ const Brief: React.FC = memo(() => {
           <FaArrowLeft /> {t.back}
         </BackButton>
 
-        <Header>
-          <Logo>SINTARA</Logo>
-          <Title
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            {t.title}
-          </Title>
-          <Subtitle
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            {t.subtitle}
-          </Subtitle>
-        </Header>
+        <Logo>SINTARA · BRIEF</Logo>
+        <Title
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {t.title}
+        </Title>
+        <Subtitle
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {t.subtitle}
+        </Subtitle>
 
-        <ProgressContainer>
-          <ProgressBar>
-            <ProgressFill
-              $progress={(currentStep + 1) / steps.length * 100}
-              initial={{ width: 0 }}
-              animate={{ width: `${(currentStep + 1) / steps.length * 100}%` }}
-              transition={{ duration: 0.3 }}
-            />
-          </ProgressBar>
-          <StepsContainer>
+        <AutoSave
+          className={saveStatus === 'saving' ? 'saving' : ''}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <span className="pulse" />
+          {saveStatus === 'saving' ? (
+            language === 'ru' ? <>Сохраняю…</> : <>Saving…</>
+          ) : (
+            language === 'ru' ? <><strong>Сохранено</strong> · только что</> : <><strong>Saved</strong> · just now</>
+          )}
+        </AutoSave>
+      </BriefHero>
+
+      <BriefContainer>
+        <Sidebar>
+          {/* Mobile horizontal strip */}
+          <SidebarStrip>
             {steps.map((step, index) => (
-              <StepItem
+              <StripItem
                 key={index}
                 $active={index === currentStep}
                 $completed={index < currentStep}
                 onClick={() => setCurrentStep(index)}
+                aria-label={`Step ${index + 1}: ${step.label}`}
               >
                 <step.icon />
-                <span>{step.label}</span>
-              </StepItem>
+                {step.label}
+              </StripItem>
             ))}
-          </StepsContainer>
-        </ProgressContainer>
+          </SidebarStrip>
+
+          <SidebarSticky>
+            <StepCounter>
+              <BigNumber>
+                <NumberSlot aria-label={`Step ${stepNumber}`}>
+                  <AnimatePresence mode="popLayout">
+                    {stepNumber.split('').map((digit, i) => (
+                      <NumberDigit
+                        key={`${i}-${digit}`}
+                        initial={{ y: '100%', opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: '-100%', opacity: 0 }}
+                        transition={{
+                          duration: 0.55,
+                          ease: [0.16, 1, 0.3, 1],
+                          delay: i * 0.04,
+                        }}
+                      >
+                        {digit}
+                      </NumberDigit>
+                    ))}
+                  </AnimatePresence>
+                </NumberSlot>
+              </BigNumber>
+              <NumberMeta>
+                <span>{t.stepEyebrow}</span>
+                <span className="of">{t.stepOf} {totalSteps}</span>
+              </NumberMeta>
+            </StepCounter>
+
+            <SidebarProgress $progress={progressPct} aria-hidden="true" />
+
+            <StepNav>
+              {steps.map((step, index) => {
+                const active = index === currentStep;
+                const completed = index < currentStep;
+                return (
+                  <NavStep
+                    key={index}
+                    $active={active}
+                    $completed={completed}
+                    onClick={() => setCurrentStep(index)}
+                  >
+                    <span className="marker">
+                      {completed ? (
+                        <motion.span
+                          className="check"
+                          initial={{ scale: 0, rotate: -90 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                        >
+                          <FaCheck />
+                        </motion.span>
+                      ) : (
+                        String(index + 1).padStart(2, '0')
+                      )}
+                    </span>
+                    <span className="body">
+                      <step.icon />
+                      {step.label}
+                    </span>
+                  </NavStep>
+                );
+              })}
+            </StepNav>
+
+            <Estimate>
+              <span className="dot" />
+              {t.estimatePrefix} <strong>{minutesLeft} {t.estimateUnit}</strong> {t.estimateRemaining}
+            </Estimate>
+          </SidebarSticky>
+        </Sidebar>
 
         <FormCard
           key={currentStep}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.3 }}
+          ref={cardRef}
+          onMouseMove={handleCardMouseMove}
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -16 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         >
-          <AnimatePresence mode="wait">
-            {renderStep()}
-          </AnimatePresence>
+          <CardWatermark aria-hidden="true">{stepNumber}</CardWatermark>
 
-          {submitError && (
-            <ErrorMessage
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-            >
-              {submitError}
-            </ErrorMessage>
-          )}
+          <CardHeader>
+            <CardEyebrow>
+              {t.stepEyebrow} {stepNumber} / {totalSteps} — {steps[currentStep].label}
+            </CardEyebrow>
+          </CardHeader>
 
-          <NavButtons>
-            <NavButton
-              onClick={prevStep}
-              disabled={currentStep === 0}
-            >
-              <FaArrowLeft /> {t.prev}
-            </NavButton>
+          <CardBody>
+            <AnimatePresence mode="wait">
+              {renderStep()}
+            </AnimatePresence>
 
-            {currentStep === steps.length - 1 ? (
-              <NavButton $primary onClick={handleSubmit} disabled={isSubmitting}>
-                {isSubmitting ? '...' : t.submit} <FaPaperPlane />
-              </NavButton>
-            ) : (
-              <NavButton $primary onClick={nextStep}>
-                {t.next} <FaArrowRight />
-              </NavButton>
+            {submitError && (
+              <ErrorMessage
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+              >
+                {submitError}
+              </ErrorMessage>
             )}
-          </NavButtons>
+
+            <NavButtons>
+              <NavButton
+                onClick={prevStep}
+                disabled={currentStep === 0}
+              >
+                <FaArrowLeft /> {t.prev}
+              </NavButton>
+
+              {currentStep === steps.length - 1 ? (
+                <NavButton
+                  as={motion.button}
+                  $primary
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  onMouseMove={handleMagnetMove}
+                  onMouseLeave={handleMagnetLeave}
+                  style={{ x: springX, y: springY }}
+                >
+                  {isSubmitting ? '...' : t.submit} <FaPaperPlane />
+                </NavButton>
+              ) : (
+                <NavButton
+                  as={motion.button}
+                  $primary
+                  onClick={nextStep}
+                  onMouseMove={handleMagnetMove}
+                  onMouseLeave={handleMagnetLeave}
+                  style={{ x: springX, y: springY }}
+                >
+                  {t.next} <FaArrowRight />
+                </NavButton>
+              )}
+            </NavButtons>
+          </CardBody>
         </FormCard>
       </BriefContainer>
     </PageWrapper>
