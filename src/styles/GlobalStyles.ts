@@ -6,16 +6,22 @@ const GlobalStyles = createGlobalStyle`
     --bone: ${colors.bone};
     --bone-dim: ${colors.boneDim};
     --bone-line: ${colors.boneLine};
+    --paper: ${colors.paper};
+    --white: ${colors.white};
     --ink: ${colors.ink};
     --ink-soft: ${colors.inkSoft};
     --ink-line: ${colors.inkLine};
+    --black: ${colors.black};
     --muted: ${colors.muted};
     --muted-dark: ${colors.mutedDark};
-    /* Brand purple — single accent across the whole site */
+
+    /* Accent — electric blue everywhere */
     --accent: ${colors.accent};
-    /* Darker purple — pressed / active state only */
     --accent-hover: ${colors.accentHover};
     --accent-soft: ${colors.accentSoft};
+    --blue: ${colors.accent};
+    --cyan: ${colors.cyan};
+    --cyan-soft: ${colors.cyanSoft};
 
     --font-display: ${fonts.display};
     --font-grotesk: ${fonts.grotesk};
@@ -40,7 +46,22 @@ const GlobalStyles = createGlobalStyle`
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     scroll-behavior: auto;
-    background: var(--bone);
+    background: var(--paper);
+  }
+
+  /* Lenis smooth scroll */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+  .lenis.lenis-stopped {
+    overflow: hidden;
   }
 
   body {
@@ -49,25 +70,27 @@ const GlobalStyles = createGlobalStyle`
     font-size: 1rem;
     line-height: 1.5;
     color: var(--ink);
-    background: var(--bone);
+    background: var(--paper);
     overflow-x: hidden;
     min-height: 100vh;
-    font-feature-settings: 'ss01', 'cv11';
     letter-spacing: ${tracking.normal};
   }
 
+  /* #root sits above the fixed GlobalCanvas (z-index 0) so the DOM
+     paints over the WebGL layer; transparent sections reveal it. */
   #root {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
     width: 100%;
     position: relative;
+    z-index: 1;
+    background: transparent;
   }
 
-  /* Reset default typography — we style explicitly per component */
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-grotesk);
-    font-weight: 400;
+    font-family: var(--font-display);
+    font-weight: 500;
     line-height: 1;
     color: inherit;
   }
@@ -95,57 +118,55 @@ const GlobalStyles = createGlobalStyle`
     color: inherit;
   }
 
-  img, svg, video {
+  img, svg, video, canvas {
     display: block;
     max-width: 100%;
   }
 
   ::selection {
     background: var(--accent);
-    color: var(--bone);
+    color: #fff;
   }
 
-  /* Single-accent system: --accent is brand purple everywhere, no
-     per-hover override. Hover states pick up the brand purple directly. */
+  /* Custom cursor — hide native pointer on fine-pointer devices */
+  @media (hover: hover) and (pointer: fine) {
+    html.has-cursor,
+    html.has-cursor * {
+      cursor: none !important;
+    }
+  }
 
-  /* Focus ring — keyboard only */
   :focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 4px;
     border-radius: 2px;
   }
 
-  /* Scrollbar — minimal editorial */
+  /* Scrollbar — minimal */
   ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 9px;
+    height: 9px;
   }
-
   ::-webkit-scrollbar-track {
-    background: var(--bone);
+    background: transparent;
   }
-
   ::-webkit-scrollbar-thumb {
-    background: var(--bone-line);
-    border: 2px solid var(--bone);
+    background: rgba(10, 10, 12, 0.22);
+    border-radius: 99px;
   }
-
   ::-webkit-scrollbar-thumb:hover {
     background: var(--ink);
   }
 
-  /* Utility: dark section inversion */
   [data-surface='dark'] {
     background: var(--ink);
-    color: var(--bone);
+    color: #fff;
   }
-
   [data-surface='dark'] ::selection {
-    background: var(--accent);
+    background: var(--cyan);
     color: var(--ink);
   }
 
-  /* Reduced motion */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -163,7 +184,6 @@ const GlobalStyles = createGlobalStyle`
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-
 `;
 
 export default GlobalStyles;

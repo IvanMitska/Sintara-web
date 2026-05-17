@@ -4,6 +4,12 @@ import styled from 'styled-components';
 import GlobalStyles from './styles/GlobalStyles';
 import ErrorBoundary from './components/ErrorBoundary';
 import { LanguageProvider } from './context/LanguageContext';
+import { AmbientAudioProvider } from './components/audio/AmbientAudio';
+import SmoothScroll from './components/SmoothScroll';
+import Cursor from './components/Cursor';
+
+// WebGL layer is heavy (three.js) — keep it out of the initial bundle.
+const GlobalCanvas = lazy(() => import('./webgl/GlobalCanvas'));
 
 // Home is eager — first paint matters
 import Home from './pages/Home';
@@ -69,11 +75,17 @@ const App = () => {
 
   return (
     <LanguageProvider>
-      <BrowserRouter>
-        <GlobalStyles />
-        <ErrorBoundary>
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
+      <AmbientAudioProvider>
+        <BrowserRouter>
+          <GlobalStyles />
+          <SmoothScroll />
+          <Suspense fallback={null}>
+            <GlobalCanvas />
+          </Suspense>
+          <Cursor />
+          <ErrorBoundary>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/work" element={<Work />} />
               <Route path="/work/:slug" element={<ProjectDetail />} />
@@ -84,10 +96,11 @@ const App = () => {
               <Route path="/contact" element={<Contact />} />
               <Route path="/brief" element={<Brief />} />
               <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </ErrorBoundary>
-      </BrowserRouter>
+              </Routes>
+            </Suspense>
+          </ErrorBoundary>
+        </BrowserRouter>
+      </AmbientAudioProvider>
     </LanguageProvider>
   );
 };

@@ -1,389 +1,254 @@
-import { useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import {
-  motion,
-  useMotionValue,
-  useReducedMotion,
-  useScroll,
-  useSpring,
-  useTransform,
-} from 'framer-motion';
+import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
-import SplitWords from '../../components/ui/SplitWords';
+import Crosshair from '../../components/ui/Crosshair';
+import { flux } from '../../webgl/flux';
 
 /**
- * Hero — type-led, on the site's white / ink / purple system.
- * Composition is two-zone: the headline holds the left, the numbered
- * service index runs as a column on the right, value line + CTAs below.
+ * Cinematic hero — a DOM layer over the persistent GlobalCanvas. The
+ * black hole renders in WebGL behind. The wordmark is real, crisp type
+ * (this DOM layer); on scroll it hands off to the WebGL particle system,
+ * which disintegrates it and streams it into the hole.
  */
 
 const Shell = styled.section`
   position: relative;
-  padding: 132px 32px 56px;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  background: #fff;
-  color: var(--ink);
-  overflow: clip;
-
-  @media (max-width: 640px) {
-    padding: 104px 20px 40px;
-  }
+  height: 320vh;
+  background: transparent;
+  color: #fff;
 `;
 
-const TopRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 24px;
-  padding-bottom: 22px;
-  border-bottom: 1px solid var(--bone-line);
-  font-family: var(--font-grotesk);
-  font-size: 0.8125rem;
-  font-weight: 500;
+const Sticky = styled.div`
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  min-height: 600px;
+  overflow: hidden;
+`;
 
-  .studio {
-    color: var(--muted);
-    letter-spacing: -0.005em;
-  }
+const Overlay = styled.div`
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+`;
 
-  .status {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--ink);
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    font-size: 0.6875rem;
+const Wordmark = styled(motion.h1)`
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(46px, 9.5vh, 124px);
+  margin: 0;
+  text-align: center;
+  pointer-events: none;
+  z-index: 3;
+  transform-origin: 50% 30%;
+  will-change: transform, opacity, filter;
+
+  .word {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(3rem, 14.5vw, 16rem);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: #fff;
     white-space: nowrap;
   }
 
-  @media (max-width: 560px) {
-    font-size: 0.75rem;
-    .status {
-      font-size: 0.625rem;
-      letter-spacing: 0.1em;
-    }
+  .ch {
+    display: inline-block;
+    will-change: transform, opacity;
   }
 `;
 
-const Dot = styled.span`
-  position: relative;
-  width: 7px;
-  height: 7px;
-  flex: none;
-  border-radius: 50%;
-  background: var(--accent);
+const Tagline = styled(motion.p)`
+  position: absolute;
+  left: 50%;
+  top: clamp(116px, 21vh, 232px);
+  transform: translateX(-50%);
+  text-align: center;
+  font-size: clamp(0.7rem, 1vw, 0.8125rem);
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.62);
+  margin: 0;
+  white-space: nowrap;
+`;
 
-  &::after {
+const ScrollCue = styled(motion.div)`
+  position: absolute;
+  right: clamp(20px, 4vw, 56px);
+  bottom: clamp(24px, 4vh, 48px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+
+  .track {
+    position: relative;
+    width: 48px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.25);
+    overflow: hidden;
+  }
+  .track::after {
     content: '';
     position: absolute;
     inset: 0;
-    border-radius: 50%;
-    background: var(--accent);
-    animation: heroPing 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+    width: 40%;
+    background: var(--cyan);
+    animation: cueSlide 2.1s var(--ease-expo) infinite;
   }
-
-  @keyframes heroPing {
-    0% {
-      transform: scale(1);
-      opacity: 0.55;
-    }
-    70%,
-    100% {
-      transform: scale(3);
-      opacity: 0;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    &::after {
-      animation: none;
-    }
+  @keyframes cueSlide {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(250%); }
   }
 `;
 
-const Mid = styled.div`
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 56px;
-  align-items: start;
-  padding: 44px 0;
-
-  @media (max-width: 900px) {
-    grid-template-columns: 1fr;
-    gap: 36px;
-    padding: 36px 0;
-  }
-`;
-
-const Headline = styled(motion.h1)`
-  font-family: var(--font-display);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.035em;
-  font-size: clamp(2.5rem, 9vw, 12rem);
-  margin: 0;
-  color: var(--ink);
-  will-change: transform;
-
-  @media (max-width: 640px) {
-    font-size: clamp(2.5rem, 12vw, 5rem);
-    letter-spacing: -0.03em;
-  }
-`;
-
-const Line = styled.span`
-  display: block;
-  white-space: nowrap;
-
-  @media (max-width: 768px) {
-    white-space: normal;
-  }
-`;
-
-const AccentLine = styled(Line)`
-  color: var(--accent);
-`;
-
-const ServiceIndex = styled(motion.ul)`
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  min-width: 232px;
-
-  li {
-    display: flex;
-    align-items: baseline;
-    gap: 14px;
-    padding: 15px 0;
-    border-top: 1px solid var(--bone-line);
-    font-family: var(--font-grotesk);
-    font-size: 0.8125rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--ink);
-  }
-
-  li:last-child {
-    border-bottom: 1px solid var(--bone-line);
-  }
-
-  .num {
-    color: var(--accent);
-    font-variant-numeric: tabular-nums;
-    font-size: 0.6875rem;
-  }
-
-  @media (max-width: 900px) {
-    min-width: 0;
-  }
-`;
-
-const Lower = styled.div`
-  display: grid;
-  grid-template-columns: 1.4fr 1fr;
-  gap: 48px;
-  align-items: end;
-  padding-top: 32px;
-  border-top: 1px solid var(--bone-line);
-
-  @media (max-width: 900px) {
-    grid-template-columns: 1fr;
-    gap: 28px;
-  }
-`;
-
-const Value = styled.p`
-  font-family: var(--font-grotesk);
-  font-size: clamp(1.0625rem, 1.35vw, 1.25rem);
-  line-height: 1.45;
-  font-weight: 400;
-  color: var(--ink);
-  max-width: 460px;
-  letter-spacing: -0.005em;
-`;
-
-const Ctas = styled.div`
-  display: flex;
-  gap: 14px;
-  justify-self: end;
-  flex-wrap: wrap;
-
-  @media (max-width: 900px) {
-    justify-self: start;
-  }
-`;
-
-const Primary = styled(Link)`
-  display: inline-flex;
-  align-items: center;
-  gap: 14px;
-  padding: 22px 36px;
-  background: var(--ink);
-  color: #fff;
-  font-family: var(--font-grotesk);
-  font-size: 0.9375rem;
-  font-weight: 500;
+const Edge = styled(motion.div)`
+  position: absolute;
+  left: clamp(20px, 4vw, 56px);
+  bottom: clamp(24px, 4vh, 48px);
+  z-index: 2;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  border-radius: 999px;
-  border: 1.5px solid var(--ink);
-  transition:
-    background 0.3s var(--ease-snap),
-    color 0.3s var(--ease-snap),
-    border-color 0.3s var(--ease-snap);
-
-  &::after {
-    content: '→';
-    transition: transform 0.4s var(--ease-expo);
-    font-size: 1.125rem;
-  }
-
-  &:hover {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #fff;
-
-    &::after {
-      transform: translateX(6px);
-    }
-  }
+  color: rgba(255, 255, 255, 0.55);
+  max-width: 220px;
+  line-height: 1.7;
 `;
 
-const Secondary = styled(Link)`
-  display: inline-flex;
-  align-items: center;
-  gap: 14px;
-  padding: 22px 32px;
-  background: transparent;
-  color: var(--ink);
-  font-family: var(--font-grotesk);
-  font-size: 0.9375rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  border-radius: 999px;
-  border: 1.5px solid var(--ink);
-  transition: background 0.3s var(--ease-snap), color 0.3s var(--ease-snap);
+const WORD = 'SINTARA';
 
-  &:hover {
-    background: var(--ink);
-    color: #fff;
-  }
-`;
-
-const Hero = () => {
-  const { t, language } = useLanguage();
+const Hero = ({ ready }: { ready: boolean }) => {
+  const { language } = useLanguage();
   const reduced = useReducedMotion();
   const shellRef = useRef<HTMLElement>(null);
 
-  const services =
-    language === 'ru'
-      ? ['Сайты', 'Веб-приложения', 'Telegram-боты', 'CRM-системы']
-      : ['Websites', 'Web apps', 'Telegram bots', 'Custom CRMs'];
-
-  // One gentle, unified parallax on the headline
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const smX = useSpring(mouseX, { stiffness: 90, damping: 22, mass: 0.55 });
-  const smY = useSpring(mouseY, { stiffness: 90, damping: 22, mass: 0.55 });
-
   const { scrollYProgress } = useScroll({
     target: shellRef,
-    offset: ['start start', 'end start'],
+    offset: ['start start', 'end end'],
   });
-  const smScroll = useSpring(scrollYProgress, { stiffness: 80, damping: 24 });
 
-  const headX = useTransform(smX, (x) => (reduced ? 0 : x * 8));
-  const headY = useTransform<number, number>(
-    [smY, smScroll],
-    ([y, s]) => (reduced ? 0 : y * 5 - s * 55),
+  const uiOpacity = useTransform(scrollYProgress, [0, 0.22], [1, 0]);
+  // the wordmark holds, then drifts up toward the hole and fades
+  const wordOpacity = useTransform(scrollYProgress, [0, 0.5, 0.82], [1, 1, 0]);
+  const wordY = useTransform(scrollYProgress, [0, 0.42, 0.85], [0, 0, -210]);
+  const wordScale = useTransform(scrollYProgress, [0, 0.42, 0.85], [1, 1, 1.16]);
+  const wordBlur = useTransform(
+    scrollYProgress,
+    [0.5, 0.82],
+    ['blur(0px)', 'blur(13px)'],
   );
 
-  const onMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-    if (reduced) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    mouseX.set(((e.clientX - rect.left) / rect.width) * 2 - 1);
-    mouseY.set(((e.clientY - rect.top) / rect.height) * 2 - 1);
-  };
+  // Feed hero scroll progress + visibility into the WebGL layer.
+  useEffect(() => {
+    flux.heroVisible = true;
+    const unsub = scrollYProgress.on('change', (v) => {
+      flux.heroProgress = v;
+      flux.heroVisible = v < 0.999;
+    });
+    return () => {
+      unsub();
+      flux.heroVisible = false;
+    };
+  }, [scrollYProgress]);
 
-  const onMouseLeave = () => {
-    mouseX.set(0);
-    mouseY.set(0);
-  };
+  useEffect(() => {
+    flux.heroReady = ready;
+    return () => {
+      flux.heroReady = false;
+    };
+  }, [ready]);
+
+  const isRu = language === 'ru';
 
   return (
-    <Shell
-      ref={shellRef}
-      data-nav-theme="light"
-      onMouseMove={onMouseMove}
-      onMouseLeave={onMouseLeave}
-    >
-      <TopRow>
-        <span className="studio">
-          {language === 'ru'
-            ? 'Независимая цифровая студия'
-            : 'Independent digital studio'}
-        </span>
-        <span className="status">
-          <Dot aria-hidden="true" />
-          {language === 'ru' ? 'Открыты для заказов' : 'Taking new work'}
-        </span>
-      </TopRow>
+    <Shell ref={shellRef} data-nav-theme="dark">
+      <Sticky>
+        <Overlay>
+          <motion.div style={{ opacity: reduced ? 1 : uiOpacity }}>
+            <Crosshair
+              style={{ top: '24%', left: '14%' }}
+              $size={14}
+              $color="rgba(255,255,255,0.4)"
+            />
+            <Crosshair
+              style={{ top: '34%', right: '11%' }}
+              $size={16}
+              $color="rgba(255,255,255,0.35)"
+            />
+            <Crosshair
+              style={{ bottom: '34%', left: '22%' }}
+              $size={12}
+              $color="rgba(255,255,255,0.3)"
+            />
 
-      <Mid>
-        <Headline style={{ x: headX, y: headY }}>
-          <Line>
-            <SplitWords as="span" text={t('home.hero.line1')} delay={0.1} />
-          </Line>
-          <Line>
-            <SplitWords as="span" text={t('home.hero.line2')} delay={0.3} />
-          </Line>
-          <AccentLine>
-            <SplitWords as="span" text={t('home.hero.line3')} delay={0.52} />
-          </AccentLine>
-        </Headline>
+            <Tagline
+              initial={{ opacity: 0, y: 12 }}
+              animate={ready ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {isRu
+                ? 'Сайты · Веб-приложения · Telegram-боты'
+                : 'Websites · Web apps · Telegram bots'}
+            </Tagline>
 
-        <ServiceIndex
-          initial={reduced ? { opacity: 1 } : { opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.85, ease: [0.16, 1, 0.3, 1] }}
-        >
-          {services.map((service, i) => (
-            <li key={service}>
-              <span className="num">{String(i + 1).padStart(2, '0')}</span>
-              <span>{service}</span>
-            </li>
-          ))}
-        </ServiceIndex>
-      </Mid>
+            <ScrollCue
+              initial={{ opacity: 0 }}
+              animate={ready ? { opacity: 1 } : {}}
+              transition={{ duration: 0.8, delay: 0.9 }}
+            >
+              {isRu ? 'Листайте' : 'Scroll to explore'}
+              <span className="track" />
+            </ScrollCue>
+          </motion.div>
 
-      <Lower>
-        <motion.div
-          initial={reduced ? { opacity: 1 } : { opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.95, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <Value>{t('home.hero.sub')}</Value>
-        </motion.div>
-        <motion.div
-          initial={reduced ? { opacity: 1 } : { opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 1.05, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <Ctas>
-            <Primary to="/brief">{t('home.hero.primary')}</Primary>
-            <Secondary to="/work">{t('home.hero.secondary')}</Secondary>
-          </Ctas>
-        </motion.div>
-      </Lower>
+          <Wordmark
+            aria-label="Sintara"
+            style={
+              reduced
+                ? { opacity: 1 }
+                : {
+                    opacity: wordOpacity,
+                    y: wordY,
+                    scale: wordScale,
+                    filter: wordBlur,
+                  }
+            }
+          >
+            <span className="word" aria-hidden="true">
+              {WORD.split('').map((c, i) => (
+                <motion.span
+                  className="ch"
+                  key={i}
+                  initial={reduced ? false : { y: '0.42em', opacity: 0 }}
+                  animate={ready ? { y: 0, opacity: 1 } : {}}
+                  transition={{
+                    duration: 0.95,
+                    delay: 0.3 + i * 0.06,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                >
+                  {c}
+                </motion.span>
+              ))}
+            </span>
+          </Wordmark>
+        </Overlay>
+
+        <Edge style={{ opacity: reduced ? 1 : uiOpacity }}>
+          {isRu ? '⌖ Независимая студия' : '⌖ Independent studio'}
+        </Edge>
+      </Sticky>
     </Shell>
   );
 };

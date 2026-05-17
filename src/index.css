@@ -2,10 +2,9 @@
 /* Anti-flash background before React mounts */
 html,
 body {
-  background-color: #FFFFFF;
+  background-color: #000000;
 }
 
 #root {
   min-height: 100vh;
-  background-color: #FFFFFF;
 }

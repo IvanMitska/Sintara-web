@@ -1,101 +1,110 @@
+import { useRef } from 'react';
 import styled from 'styled-components';
-import { motion, useReducedMotion } from 'framer-motion';
-import Eyebrow from '../../components/ui/Eyebrow';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import type { MotionValue } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
 
-const Shell = styled.section`
-  padding: 160px 32px;
-  background: #fff;
-  color: var(--ink);
-
-  @media (max-width: 900px) {
-    padding: 96px 20px;
-  }
-`;
-
-const Layout = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 3fr;
-  gap: 64px;
-  align-items: start;
-  max-width: 1680px;
-  margin: 0 auto;
-
-  @media (max-width: 900px) {
-    grid-template-columns: 1fr;
-    gap: 32px;
-  }
-`;
-
-const Body = styled.p`
-  font-family: var(--font-display);
-  font-size: clamp(1.75rem, 3.4vw, 3rem);
-  line-height: 1.18;
-  letter-spacing: -0.03em;
-  font-weight: 500;
-  color: var(--ink);
-  text-transform: none;
-
-  .accent {
-    color: var(--accent);
-  }
-`;
-
-const Footnote = styled.p`
-  margin-top: 40px;
-  font-family: var(--font-grotesk);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: var(--muted);
-`;
-
 /**
- * Word-by-word scroll reveal. Each word starts gray and "lights up"
- * as the section scrolls into view. A more Red-Collar-ish move than
- * a static serif paragraph.
+ * Manifesto — a single oversized paragraph whose words ignite from muted
+ * to ink as the section scrolls through the viewport.
  */
+
+const Shell = styled.section`
+  background: var(--paper);
+  color: var(--ink);
+  padding: clamp(100px, 18vh, 260px) clamp(20px, 5vw, 80px);
+`;
+
+const Inner = styled.div`
+  max-width: 1340px;
+  margin: 0 auto;
+`;
+
+const Eyebrow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: clamp(28px, 5vh, 56px);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+
+  &::before {
+    content: '';
+    width: 36px;
+    height: 1px;
+    background: var(--accent);
+  }
+`;
+
+const Para = styled.p`
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.75rem, 4.6vw, 4.5rem);
+  line-height: 1.18;
+  letter-spacing: -0.035em;
+`;
+
+const Word = styled(motion.span)`
+  display: inline-block;
+  margin-right: 0.26em;
+  white-space: pre;
+`;
+
+const AnimatedWord = ({
+  children,
+  progress,
+  range,
+}: {
+  children: string;
+  progress: MotionValue<number>;
+  range: [number, number];
+}) => {
+  const opacity = useTransform(progress, range, [0.16, 1]);
+  const color = useTransform(progress, range, [
+    '#9A9AA8',
+    children.includes('—') ? '#3D37F2' : '#0A0A0C',
+  ]);
+  return <Word style={{ opacity, color }}>{children}</Word>;
+};
+
 const Manifesto = () => {
-  const { t } = useLanguage();
-  const reduced = useReducedMotion();
-  const words = t('home.manifesto.body').split(' ');
+  const { language } = useLanguage();
+  const ref = useRef<HTMLDivElement>(null);
+  const isRu = language === 'ru';
+
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start 0.85', 'end 0.4'],
+  });
+
+  const text = isRu
+    ? 'Sintara — независимая цифровая студия. Мы проектируем и создаём сайты, веб-приложения и Telegram-ботов — продукты, которые выглядят остро, двигаются красиво и выходят в срок.'
+    : 'Sintara is an independent digital studio. We design and build websites, web apps and Telegram bots — products that feel sharp, move beautifully and ship on time.';
+  const words = text.split(' ');
 
   return (
     <Shell data-nav-theme="light">
-      <Layout>
-        <div>
-          <Eyebrow>{t('home.manifesto.eyebrow')}</Eyebrow>
-        </div>
-
-        <div>
-          <Body>
-            {reduced ? (
-              <span>{t('home.manifesto.body')}</span>
-            ) : (
-              words.map((word, i) => (
-                <motion.span
-                  key={`${word}-${i}`}
-                  initial={{ opacity: 0.12 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true, amount: 0.6 }}
-                  transition={{
-                    duration: 0.55,
-                    delay: i * 0.022,
-                    ease: [0.16, 1, 0.3, 1],
-                  }}
-                  style={{
-                    display: 'inline-block',
-                    marginRight: '0.25em',
-                  }}
-                >
-                  {word}
-                </motion.span>
-              ))
-            )}
-          </Body>
-          <Footnote>{t('home.manifesto.footnote')}</Footnote>
-        </div>
-      </Layout>
+      <Inner ref={ref}>
+        <Eyebrow>{isRu ? '(01) — Студия' : '(01) — The studio'}</Eyebrow>
+        <Para>
+          {words.map((word, i) => {
+            const start = i / words.length;
+            const end = start + 1 / words.length;
+            return (
+              <AnimatedWord
+                key={`${word}-${i}`}
+                progress={scrollYProgress}
+                range={[start, end]}
+              >
+                {word}
+              </AnimatedWord>
+            );
+          })}
+        </Para>
+      </Inner>
     </Shell>
   );
 };

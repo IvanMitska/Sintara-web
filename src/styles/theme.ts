@@ -1,63 +1,67 @@
-// Editorial design tokens — Sintara redesign
-// Palette: warm bone cream vs. deep ink, tomato accent
-// Typography: Instrument Serif (display) + Inter Tight (grotesk)
+// Design tokens — Sintara v2 (Lusion-inspired editorial relaunch)
+// Palette: lavender paper, deep ink, electric blue, cyan ribbon accent.
+// Typography: Schibsted Grotesk — one tight neo-grotesk for everything.
 
 export const colors = {
-  // Keep the "bone" token name for backwards compat inside the codebase,
-  // but the value is now pure white.
-  bone: '#FFFFFF',         // primary background
-  boneDim: '#F5F5F5',      // subtle surface variant
-  boneLine: '#E6E6E6',     // hairlines on white
-  ink: '#0A0A0A',          // primary foreground
-  inkSoft: '#141414',      // alt dark bg
-  inkLine: '#262626',      // hairlines on dark
-  muted: '#6B6B6B',        // secondary text on white
-  mutedDark: '#8C8C8C',    // secondary text on dark
+  // Surfaces
+  bone: '#ECEBF3',         // primary background — lavender paper
+  boneDim: '#E3E2ED',      // subtle surface variant
+  boneLine: '#D2D1DE',     // hairlines on lavender
+  paper: '#ECEBF3',        // alias of bone
+  white: '#FFFFFF',
 
-  // ─── Single accent system ─────────────────────────────────────────
-  //  accent        : Sintara brand purple. Used everywhere: wordmark
-  //                  dot, eyebrow dots, hero line accent, BigCta,
-  //                  hover states, etc.
-  //  accentHover   : Slightly darker purple for pressed / active states.
-  accent: '#7C3AED',       // brand purple
-  accentHover: '#6D28D9',  // darker purple (pressed)
-  accentSoft: '#EFE4FF',   // purple tint
+  // Ink / dark
+  ink: '#0A0A0C',          // primary foreground — near-black
+  inkSoft: '#101014',      // alt dark surface
+  inkLine: '#23232A',      // hairlines on dark
+  black: '#000000',        // cinematic hero background
+
+  muted: '#6A6A78',        // secondary text on lavender
+  mutedDark: '#8E8E9C',    // secondary text on dark
+
+  // ─── Accent system ────────────────────────────────────────────────
+  //  accent  : electric blue — wordmark dot, CTAs, hover, blue sections.
+  //  cyan    : turquoise ribbon accent.
+  accent: '#3D37F2',       // electric blue
+  accentHover: '#2B26D8',  // pressed blue
+  accentSoft: '#DEDDFB',   // blue tint
+  cyan: '#7ED4DC',         // cyan ribbon
+  cyanSoft: '#D5F0F2',
   success: '#1F6B3A',
 } as const;
 
 export const fonts = {
-  // Single tight grotesk family for everything — no more serif italic.
-  // Display uses the same face, just bigger and heavier.
   display:
-    "'Inter Tight', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, sans-serif",
+    "'Schibsted Grotesk', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif",
   grotesk:
-    "'Inter Tight', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, sans-serif",
-  mono: "'JetBrains Mono', 'IBM Plex Mono', monospace",
+    "'Schibsted Grotesk', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif",
+  mono: "'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace",
 } as const;
 
 export const fontSize = {
-  // fluid display — for massive editorial headlines
-  displayXxl: 'clamp(4.5rem, 16vw, 18rem)',
-  displayXl: 'clamp(3.75rem, 12vw, 13rem)',
-  displayLg: 'clamp(3rem, 9vw, 8.5rem)',
-  displayMd: 'clamp(2.5rem, 7vw, 6rem)',
-  displaySm: 'clamp(2rem, 5.5vw, 4.5rem)',
+  // fluid display — massive editorial headlines
+  displayXxl: 'clamp(4.5rem, 17vw, 19rem)',
+  displayXl: 'clamp(3.5rem, 12vw, 13rem)',
+  displayLg: 'clamp(2.75rem, 8.5vw, 8.5rem)',
+  displayMd: 'clamp(2.25rem, 6vw, 5.5rem)',
+  displaySm: 'clamp(1.875rem, 4.5vw, 3.75rem)',
   // editorial body
   h1: 'clamp(2rem, 4.5vw, 3.75rem)',
   h2: 'clamp(1.75rem, 3.5vw, 2.75rem)',
   h3: 'clamp(1.375rem, 2.25vw, 2rem)',
-  bodyLg: 'clamp(1.125rem, 1.35vw, 1.375rem)',
+  bodyLg: 'clamp(1.0625rem, 1.2vw, 1.3125rem)',
   body: '1rem',
   small: '0.875rem',
   caption: '0.75rem',
+  micro: '0.6875rem',
 } as const;
 
 export const tracking = {
-  tight: '-0.04em',
-  displayTight: '-0.035em',
-  normal: '-0.01em',
-  wide: '0.02em',
-  widest: '0.18em',
+  tight: '-0.045em',
+  displayTight: '-0.04em',
+  normal: '-0.011em',
+  wide: '0.04em',
+  widest: '0.2em',
 } as const;
 
 export const space = {
@@ -91,7 +95,7 @@ export const motion = {
   mid: '0.5s',
   slow: '0.85s',
   slower: '1.2s',
-  // "Expo out" — our signature ease for reveals
+  // "Expo out" — signature ease for reveals
   expo: 'cubic-bezier(0.16, 1, 0.3, 1)',
   // Sharp — for button presses
   snap: 'cubic-bezier(0.4, 0, 0.2, 1)',
@@ -127,7 +131,9 @@ export const zIndex = {
   raised: 10,
   nav: 100,
   overlay: 500,
+  cursor: 900,
   modal: 1000,
+  preloader: 9000,
   toast: 2000,
 } as const;
 
