@@ -41,10 +41,10 @@ const Head = styled.div`
   }
   h2 {
     font-family: var(--font-display);
-    font-weight: 800;
+    font-weight: 400;
     font-size: clamp(2.5rem, 7vw, 7rem);
     line-height: 0.95;
-    letter-spacing: -0.05em;
+    letter-spacing: -0.02em;
     margin-top: 14px;
   }
   p {
@@ -77,9 +77,9 @@ const Row = styled(Link)`
 
   .name {
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 600;
     font-size: clamp(1.75rem, 4.5vw, 4rem);
-    letter-spacing: -0.04em;
+    letter-spacing: -0.025em;
     line-height: 1;
     transition: transform 0.5s var(--ease-expo), color 0.4s var(--ease-snap);
   }

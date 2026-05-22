@@ -12,7 +12,9 @@ import PillLink from '../../components/ui/PillLink';
  */
 
 const Shell = styled.section`
-  background: var(--paper);
+  position: relative;
+  z-index: 1;
+  background: transparent;
   color: var(--ink);
   padding: clamp(80px, 11vh, 150px) clamp(20px, 5vw, 80px)
     clamp(90px, 13vh, 170px);
@@ -32,10 +34,10 @@ const Head = styled.div`
 
   h2 {
     font-family: var(--font-display);
-    font-weight: 800;
+    font-weight: 400;
     font-size: clamp(2.75rem, 9vw, 11rem);
     line-height: 0.9;
-    letter-spacing: -0.05em;
+    letter-spacing: -0.02em;
   }
 
   p {
@@ -127,9 +129,9 @@ const Card = styled(Link)`
   }
   .title {
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 600;
     font-size: clamp(1.5rem, 3vw, 2.75rem);
-    letter-spacing: -0.035em;
+    letter-spacing: -0.025em;
     line-height: 1;
     transition: transform 0.5s var(--ease-expo), color 0.4s var(--ease-snap);
   }

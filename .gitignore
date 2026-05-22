@@ -30,3 +30,8 @@ dist-ssr
 
 # Claude Code local files & references
 .claude/
+
+# Raw asset sources — kept local only; shipped/optimized versions
+# live under public/ (public/models/*.glb, public/fonts/*.otf)
+models-source
+fonts-source

@@ -1,39 +1,20 @@
-import { useRef } from 'react';
 import styled from 'styled-components';
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useReducedMotion,
-} from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
 import PillLink from '../../components/ui/PillLink';
 import Reveal from '../../components/ui/Reveal';
 
 /**
- * "Bold ideas, brought to life" — a statement with a big electric-blue
- * disc bleeding off the top-left and a blue-duotone project still.
+ * "Bold ideas, brought to life" — a statement and a blue-duotone project
+ * still. The page-wide ribbon (see PageRibbon) carries the visual accent
+ * that the old standalone blue disc used to.
  */
 
 const Shell = styled.section`
   position: relative;
-  background: var(--paper);
+  z-index: 1;
+  background: transparent;
   color: var(--ink);
   padding: clamp(90px, 13vh, 190px) clamp(20px, 5vw, 80px);
-  overflow: hidden;
-`;
-
-const Disc = styled(motion.div)`
-  position: absolute;
-  left: -16vw;
-  top: -22vw;
-  width: 52vw;
-  height: 52vw;
-  max-width: 760px;
-  max-height: 760px;
-  border-radius: 50%;
-  background: var(--accent);
-  z-index: 0;
 `;
 
 const Inner = styled.div`
@@ -45,10 +26,10 @@ const Inner = styled.div`
 
 const Heading = styled.h2`
   font-family: var(--font-display);
-  font-weight: 800;
+  font-weight: 400;
   font-size: clamp(2.5rem, 8vw, 9.5rem);
   line-height: 0.96;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.02em;
   margin: 0 0 clamp(48px, 8vh, 120px);
 
   span {
@@ -120,24 +101,14 @@ const TextCol = styled.div`
 
 const Approach = () => {
   const { language } = useLanguage();
-  const reduced = useReducedMotion();
-  const ref = useRef<HTMLElement>(null);
   const isRu = language === 'ru';
-
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ['start end', 'end start'],
-  });
-  const discY = useTransform(scrollYProgress, [0, 1], [-80, 120]);
 
   const lines = isRu
     ? ['Смелые идеи,', 'воплощённые в жизнь']
     : ['Bold ideas,', 'brought to life'];
 
   return (
-    <Shell ref={ref} data-nav-theme="light">
-      <Disc style={{ y: reduced ? 0 : discY }} aria-hidden />
-
+    <Shell data-nav-theme="light">
       <Inner>
         <Heading>
           {lines.map((l, i) => (

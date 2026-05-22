@@ -38,21 +38,28 @@ const Wordmark = styled(motion.h1)`
   position: absolute;
   left: 0;
   right: 0;
-  bottom: clamp(46px, 9.5vh, 124px);
+  /* Anchored to the bottom edge, Lusion-style — the word is the base of the
+     frame, not a floating element. Small gap mirrors lusion.co. */
+  bottom: clamp(12px, 2.8vh, 44px);
   margin: 0;
   text-align: center;
   pointer-events: none;
   z-index: 3;
-  transform-origin: 50% 30%;
+  transform-origin: 50% 70%;
   will-change: transform, opacity, filter;
 
   .word {
     display: inline-block;
     font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(3rem, 14.5vw, 16rem);
+    /* Semibold — Lusion's wordmark is mid-heavy, not black. PP Neue Montreal
+       Extrabold (800) would read too chunky here. */
+    font-weight: 600;
+    /* Bigger + near full-bleed. Fine-tune the vw value once PP Neue Montreal
+       loads — its metrics are narrower than the Schibsted fallback. */
+    font-size: clamp(3.2rem, 18vw, 20rem);
     letter-spacing: -0.03em;
-    line-height: 1;
+    /* line-height trimmed to ~cap-height so glyphs sit flush to the edge */
+    line-height: 0.75;
     color: #fff;
     white-space: nowrap;
   }
@@ -61,21 +68,6 @@ const Wordmark = styled(motion.h1)`
     display: inline-block;
     will-change: transform, opacity;
   }
-`;
-
-const Tagline = styled(motion.p)`
-  position: absolute;
-  left: 50%;
-  top: clamp(116px, 21vh, 232px);
-  transform: translateX(-50%);
-  text-align: center;
-  font-size: clamp(0.7rem, 1vw, 0.8125rem);
-  font-weight: 500;
-  letter-spacing: 0.26em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.62);
-  margin: 0;
-  white-space: nowrap;
 `;
 
 const ScrollCue = styled(motion.div)`
@@ -93,7 +85,7 @@ const ScrollCue = styled(motion.div)`
 
   .track {
     position: relative;
-    width: 48px;
+    width: 30px;
     height: 1px;
     background: rgba(255, 255, 255, 0.25);
     overflow: hidden;
@@ -110,20 +102,6 @@ const ScrollCue = styled(motion.div)`
     0% { transform: translateX(-100%); }
     100% { transform: translateX(250%); }
   }
-`;
-
-const Edge = styled(motion.div)`
-  position: absolute;
-  left: clamp(20px, 4vw, 56px);
-  bottom: clamp(24px, 4vh, 48px);
-  z-index: 2;
-  font-size: 0.625rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
-  max-width: 220px;
-  line-height: 1.7;
 `;
 
 const WORD = 'SINTARA';
@@ -192,22 +170,12 @@ const Hero = ({ ready }: { ready: boolean }) => {
               $color="rgba(255,255,255,0.3)"
             />
 
-            <Tagline
-              initial={{ opacity: 0, y: 12 }}
-              animate={ready ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            >
-              {isRu
-                ? 'Сайты · Веб-приложения · Telegram-боты'
-                : 'Websites · Web apps · Telegram bots'}
-            </Tagline>
-
             <ScrollCue
               initial={{ opacity: 0 }}
               animate={ready ? { opacity: 1 } : {}}
               transition={{ duration: 0.8, delay: 0.9 }}
             >
-              {isRu ? 'Листайте' : 'Scroll to explore'}
+              {isRu ? 'Скролл' : 'Scroll'}
               <span className="track" />
             </ScrollCue>
           </motion.div>
@@ -244,10 +212,6 @@ const Hero = ({ ready }: { ready: boolean }) => {
             </span>
           </Wordmark>
         </Overlay>
-
-        <Edge style={{ opacity: reduced ? 1 : uiOpacity }}>
-          {isRu ? '⌖ Независимая студия' : '⌖ Independent studio'}
-        </Edge>
       </Sticky>
     </Shell>
   );

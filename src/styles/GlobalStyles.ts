@@ -2,6 +2,34 @@ import { createGlobalStyle } from 'styled-components';
 import { colors, fonts, motion, tracking } from './theme';
 
 const GlobalStyles = createGlobalStyle`
+  /* PP Neue Montreal — display typeface (Pangram Pangram), licensed via the
+     studio's Pangram Pangram account. Keep the licence confirmation email as
+     proof of usage rights. font-display: swap keeps the Schibsted Grotesk
+     fallback visible until the faces load.
+     TODO(perf): convert these .otf to .woff2 (~half the size) once a working
+     converter is available. */
+  @font-face {
+    font-family: 'PP Neue Montreal';
+    src: url('/fonts/PPNeueMontreal-Regular.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'PP Neue Montreal';
+    src: url('/fonts/PPNeueMontreal-Semibold.otf') format('opentype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'PP Neue Montreal';
+    src: url('/fonts/PPNeueMontreal-Extrabold.otf') format('opentype');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+  }
+
   :root {
     --bone: ${colors.bone};
     --bone-dim: ${colors.boneDim};

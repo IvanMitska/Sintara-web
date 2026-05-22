@@ -10,9 +10,11 @@ import { useLanguage } from '../../context/LanguageContext';
  */
 
 const Shell = styled.section`
-  background: var(--paper);
+  position: relative;
+  z-index: 1;
+  background: transparent;
   color: var(--ink);
-  padding: clamp(100px, 18vh, 260px) clamp(20px, 5vw, 80px);
+  padding: clamp(64px, 10vh, 132px) clamp(20px, 5vw, 80px);
 `;
 
 const Inner = styled.div`
@@ -41,10 +43,12 @@ const Eyebrow = styled.div`
 
 const Para = styled.p`
   font-family: var(--font-display);
-  font-weight: 600;
+  /* Light, open grotesque — matches Lusion's editorial headings, not a
+     heavy black display weight. */
+  font-weight: 400;
   font-size: clamp(1.75rem, 4.6vw, 4.5rem);
   line-height: 1.18;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.02em;
 `;
 
 const Word = styled(motion.span)`
@@ -75,9 +79,12 @@ const Manifesto = () => {
   const ref = useRef<HTMLDivElement>(null);
   const isRu = language === 'ru';
 
+  // Reveal tracks the reading zone: words ignite as the paragraph crosses
+  // the upper-middle of the viewport and finish well before it scrolls off,
+  // so the text never lags behind the scroll.
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ['start 0.85', 'end 0.4'],
+    offset: ['start 0.9', 'end 0.7'],
   });
 
   const text = isRu

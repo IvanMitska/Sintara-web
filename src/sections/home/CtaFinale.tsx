@@ -1,18 +1,26 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useLanguage } from '../../context/LanguageContext';
 import PillLink from '../../components/ui/PillLink';
 import Reveal from '../../components/ui/Reveal';
 import Crosshair from '../../components/ui/Crosshair';
+import ErrorBoundary from '../../components/ErrorBoundary';
+import FooterScene from './FooterScene';
 
 /**
- * Closing CTA — an electric-blue panel with an animated halftone dot
- * field rising from the bottom edge. Drawn on a 2D canvas for reach.
+ * Closing CTA — a dark cinematic panel. A floating astronaut and a cloud
+ * of iridescent primitives render in WebGL behind the wordmark; a halftone
+ * dot field rises from the bottom edge as a 2D sparkle layer on top.
  */
 
 const Shell = styled.section`
   position: relative;
-  background: var(--accent);
+  background: radial-gradient(
+    ellipse 72% 64% at 50% 40%,
+    #161636 0%,
+    #0a0a16 58%,
+    #050509 100%
+  );
   color: #fff;
   min-height: 92svh;
   display: flex;
@@ -64,10 +72,10 @@ const Eyebrow = styled.span`
 
 const Title = styled.h2`
   font-family: var(--font-display);
-  font-weight: 800;
+  font-weight: 400;
   font-size: clamp(3rem, 12vw, 14rem);
   line-height: 0.9;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.02em;
   color: #fff;
   margin: 0;
 `;
@@ -120,7 +128,8 @@ const DotField = ({ blue }: { blue: string }) => {
             0.5;
           const r = edge * (0.7 + wave * 2.6);
           if (r < 0.15) continue;
-          ctx.globalAlpha = 0.25 + edge * 0.6;
+          // toned down — a faint sparkle over the dark 3D scene
+          ctx.globalAlpha = 0.05 + edge * 0.24;
           ctx.beginPath();
           ctx.arc(x, y, r, 0, Math.PI * 2);
           ctx.fill();
@@ -143,9 +152,26 @@ const DotField = ({ blue }: { blue: string }) => {
 const CtaFinale = () => {
   const { language } = useLanguage();
   const isRu = language === 'ru';
+  const shellRef = useRef<HTMLElement>(null);
+  // gate the WebGL render loop to when the footer is on screen
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = shellRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { rootMargin: '200px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   return (
-    <Shell data-nav-theme="dark">
+    <Shell ref={shellRef} data-nav-theme="dark">
+      <ErrorBoundary fallback={null}>
+        <FooterScene active={inView} />
+      </ErrorBoundary>
       <DotField blue="#3D37F2" />
       <Crosshair
         style={{ top: '16%', left: '12%' }}

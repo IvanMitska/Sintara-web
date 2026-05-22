@@ -304,47 +304,6 @@ const FootA = styled.a`
 
 const Bar = () => <span className="bar" aria-hidden="true" />;
 
-// ─── Wordmark ─────────────────────────────────────────────────────────
-
-const MarkWrap = styled.div`
-  padding: 56px 0 28px;
-
-  @media (max-width: 768px) {
-    padding: 32px 0 20px;
-  }
-`;
-
-const Mark = styled(Link)`
-  display: block;
-  width: 100%;
-  font-family: var(--font-display);
-  font-size: clamp(5rem, 24.5vw, 27rem);
-  font-weight: 800;
-  line-height: 0.8;
-  letter-spacing: -0.07em;
-  white-space: nowrap;
-  text-transform: uppercase;
-  color: #fff;
-  -webkit-text-stroke: 1px transparent;
-  transition: color 0.55s var(--ease-snap);
-
-  .dot {
-    display: inline-block;
-    margin-left: -0.08em;
-    color: var(--accent);
-    -webkit-text-stroke: 0;
-  }
-
-  &:hover {
-    color: transparent;
-    -webkit-text-stroke: 1.4px rgba(255, 255, 255, 0.85);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    transition: none;
-  }
-`;
-
 // ─── Legal ────────────────────────────────────────────────────────────
 
 const Legal = styled.div`
@@ -528,12 +487,6 @@ const Footer = () => {
           </Col>
         </Grid>
       </Inner>
-
-      <MarkWrap>
-        <Mark to="/" aria-label="Sintara — home">
-          Sintara<span className="dot">.</span>
-        </Mark>
-      </MarkWrap>
 
       <Inner>
         <Legal>
