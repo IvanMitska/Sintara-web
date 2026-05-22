@@ -362,26 +362,6 @@ const ToTop = styled.button`
   }
 `;
 
-// Required CC-BY-4.0 attribution for the footer astronaut model.
-const Credit = styled.p`
-  margin: 14px 0 0;
-  font-family: var(--font-grotesk);
-  font-size: 0.625rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.3);
-
-  a {
-    color: rgba(255, 255, 255, 0.5);
-    text-decoration: underline;
-    transition: color 0.3s var(--ease-snap);
-  }
-
-  a:hover {
-    color: #fff;
-  }
-`;
-
 // ──────────────────────────────────────────────────────────────────────
 
 const Footer = () => {
@@ -525,25 +505,6 @@ const Footer = () => {
             </span>
           </ToTop>
         </Legal>
-        <Credit>
-          Astronaut model “Animated Astronaut Character in Space Suit Loop”
-          by{' '}
-          <a
-            href="https://sketchfab.com/LasquetiSpice"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            LasquetiSpice
-          </a>
-          , licensed{' '}
-          <a
-            href="http://creativecommons.org/licenses/by/4.0/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            CC BY 4.0
-          </a>
-        </Credit>
       </Inner>
     </Shell>
   );
