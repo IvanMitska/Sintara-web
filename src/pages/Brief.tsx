@@ -8,14 +8,14 @@ import {
   FaCog, FaCalendarAlt, FaCommentAlt, FaLaptopCode
 } from 'react-icons/fa';
 import { useLanguage } from '../context/LanguageContext';
-import Navigation from '../components/Navigation';
+import NavBar from '../components/NavBar';
 
 // ============ STYLED COMPONENTS ============
 
 const PageWrapper = styled.div`
   min-height: 100vh;
   height: auto;
-  background: #fff;
+  background: var(--paper);
   color: var(--ink);
   position: relative;
 
@@ -115,9 +115,9 @@ const Logo = styled.div`
 const Title = styled(motion.h1)`
   font-family: var(--font-display);
   font-size: clamp(3rem, 9.5vw, 8.5rem);
-  font-weight: 700;
-  line-height: 0.88;
-  letter-spacing: -0.05em;
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: -0.035em;
   color: var(--ink);
   margin: 0 0 28px;
   text-transform: none;
@@ -175,7 +175,7 @@ const StepCounter = styled.div`
 const BigNumber = styled.div`
   font-family: var(--font-display);
   font-size: clamp(4rem, 7vw, 6rem);
-  font-weight: 700;
+  font-weight: 400;
   line-height: 0.85;
   letter-spacing: -0.05em;
   color: var(--ink);
@@ -460,7 +460,7 @@ const CardEyebrow = styled.div`
 const SectionTitle = styled.h2`
   font-family: var(--font-display);
   font-size: clamp(2rem, 3.5vw, 3rem);
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: -0.035em;
   line-height: 1;
   color: var(--ink);
@@ -497,7 +497,7 @@ const CardWatermark = styled.div`
   user-select: none;
   font-family: var(--font-display);
   font-size: clamp(14rem, 28vw, 26rem);
-  font-weight: 800;
+  font-weight: 400;
   line-height: 0.8;
   letter-spacing: -0.07em;
   color: var(--accent);
@@ -892,7 +892,7 @@ const SuccessIcon = styled(motion.div)`
 const SuccessTitle = styled.h2`
   font-family: var(--font-display);
   font-size: clamp(1.75rem, 3.4vw, 2.5rem);
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: -0.03em;
   color: var(--ink);
   margin: 0 0 16px;
@@ -2474,7 +2474,7 @@ const Brief: React.FC = memo(() => {
   if (isSuccess) {
     return (
       <PageWrapper>
-        <Navigation />
+        <NavBar surface="light" />
         <BriefContainer>
           <FormCard
             initial={{ opacity: 0, scale: 0.95 }}
@@ -2508,7 +2508,7 @@ const Brief: React.FC = memo(() => {
 
   return (
     <PageWrapper>
-      <Navigation />
+      <NavBar surface="light" />
 
       {/* Top reading-progress bar — fills as the user advances */}
       <TopProgress>

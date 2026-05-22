@@ -1,298 +1,526 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
-import Navigation from '../components/Navigation';
+import { motion, useReducedMotion } from 'framer-motion';
+import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
-import Container from '../components/ui/Container';
-import Eyebrow from '../components/ui/Eyebrow';
-import SplitWords from '../components/ui/SplitWords';
+import PillLink from '../components/ui/PillLink';
+import Reveal from '../components/ui/Reveal';
+import Crosshair from '../components/ui/Crosshair';
 import { useLanguage } from '../context/LanguageContext';
 
-const PageShell = styled.main`
-  padding-top: 160px;
+/**
+ * Services — cinematic capabilities page. A frame-filling dark hero, a
+ * light run of numbered service rows that flood with electric accent on
+ * hover (siblings dim into a spotlight), and a dark closing CTA.
+ */
 
-  @media (max-width: 900px) {
-    padding-top: 120px;
+// ─── Hero ─────────────────────────────────────────────────────────────
+
+const Hero = styled.header`
+  position: relative;
+  background: var(--ink);
+  color: #fff;
+  overflow: hidden;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(116px, 15vh, 172px) clamp(20px, 5vw, 80px)
+    clamp(40px, 6vh, 80px);
+`;
+
+const HeroBand = styled.div`
+  width: 100%;
+  max-width: 1560px;
+  margin: 0 auto;
+`;
+
+const HeroTop = styled(HeroBand)`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+`;
+
+const Tag = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--font-grotesk);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--cyan);
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--cyan);
+  }
+
+  &.right {
+    color: var(--muted-dark);
+    &::before {
+      display: none;
+    }
   }
 `;
 
-const Head = styled.header`
-  padding: 64px 0 96px;
-`;
-
-const Title = styled.h1`
+const HeroTitle = styled.h1`
   font-family: var(--font-display);
-  font-size: clamp(4rem, 16vw, 18rem);
-  font-weight: 700;
-  line-height: 0.82;
-  letter-spacing: -0.055em;
-  text-transform: uppercase;
-  margin: 24px 0 48px;
+  font-weight: 400;
+  font-size: clamp(3.5rem, 13.2vw, 16.5rem);
+  line-height: 0.84;
+  letter-spacing: -0.04em;
+  margin: 0;
+
+  .line {
+    display: block;
+    overflow: hidden;
+  }
+  .line > span {
+    display: inline-block;
+    will-change: transform;
+  }
+  .accent {
+    color: var(--accent);
+  }
 `;
 
-const Sub = styled.p`
-  font-family: var(--font-grotesk);
-  font-size: clamp(1.125rem, 1.4vw, 1.375rem);
-  line-height: 1.5;
-  color: var(--muted);
-  max-width: 640px;
+const HeroFoot = styled(HeroBand)`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 32px;
+  flex-wrap: wrap;
+
+  p {
+    max-width: 460px;
+    font-size: clamp(1.0625rem, 1.2vw, 1.3125rem);
+    line-height: 1.5;
+    color: var(--muted-dark);
+  }
+
+  .marker {
+    font-family: var(--font-grotesk);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
 `;
 
-const List = styled.div`
-  padding-bottom: 120px;
+// ─── Service list ─────────────────────────────────────────────────────
+
+const ListShell = styled.section`
+  background: var(--paper);
+  color: var(--ink);
+  padding: clamp(72px, 11vh, 152px) clamp(20px, 5vw, 80px);
+`;
+
+const ListInner = styled.div`
+  max-width: 1560px;
+  margin: 0 auto;
+`;
+
+const ListHead = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 32px;
+  flex-wrap: wrap;
+  margin-bottom: clamp(28px, 4.5vh, 56px);
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--font-grotesk);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+
+    &::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+  }
+
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(2.25rem, 5vw, 4.5rem);
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+    margin-top: 14px;
+  }
+
+  p {
+    max-width: 340px;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+`;
+
+/* Hovering one row spotlights it — the rest fade back. */
+const Rows = styled.div`
   border-top: 1px solid var(--bone-line);
 
-  @media (max-width: 900px) {
-    padding-bottom: 72px;
+  &:hover a:not(:hover) {
+    opacity: 0.42;
   }
 `;
 
-const Row = styled(motion.article)`
-  display: grid;
-  grid-template-columns: 80px minmax(0, 1.2fr) minmax(0, 1.6fr) 140px;
-  align-items: start;
-  gap: 48px;
-  padding: 56px 0;
-  border-bottom: 1px solid var(--bone-line);
+const Row = styled(Link)`
   position: relative;
-  overflow: hidden;
-  transition: color 0.4s var(--ease-snap);
   isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns:
+    clamp(40px, 4vw, 72px) minmax(0, 1.5fr)
+    minmax(0, 1fr) auto clamp(0px, 4vw, 76px);
+  align-items: center;
+  gap: clamp(14px, 2.4vw, 48px);
+  padding: clamp(24px, 3.6vh, 46px) clamp(16px, 2.4vw, 40px);
+  border-bottom: 1px solid var(--bone-line);
+  color: var(--ink);
+  scroll-margin-top: 110px;
+  transition:
+    color 0.35s var(--ease-snap),
+    opacity 0.4s var(--ease-snap);
 
   &::before {
     content: '';
     position: absolute;
     inset: 0;
+    z-index: -1;
     background: var(--accent);
-    transform: translateY(101%);
-    transition: transform 0.75s var(--ease-expo);
-    z-index: 0;
+    transform: translateY(100%);
+    transition: transform 0.55s var(--ease-expo);
   }
-
   &:hover::before {
     transform: translateY(0);
   }
 
-  & > * {
-    position: relative;
-    z-index: 1;
-    transition: color 0.4s var(--ease-snap);
+  .num {
+    font-family: var(--font-grotesk);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    transition: color 0.35s var(--ease-snap);
   }
 
-  &:hover,
-  &:hover .muted,
-  &:hover .val {
+  .name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2rem, 4.6vw, 4.25rem);
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+    transition: transform 0.5s var(--ease-expo);
+  }
+
+  .desc {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--muted);
+    max-width: 40ch;
+    transition: color 0.35s var(--ease-snap);
+  }
+
+  .price {
+    text-align: right;
+    transition: color 0.35s var(--ease-snap);
+
+    .label {
+      display: block;
+      font-family: var(--font-grotesk);
+      font-size: 0.5625rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 7px;
+      transition: color 0.35s var(--ease-snap);
+    }
+    .val {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: clamp(1.5rem, 2.2vw, 2.125rem);
+      letter-spacing: -0.025em;
+      white-space: nowrap;
+    }
+  }
+
+  .go {
+    justify-self: end;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    display: grid;
+    place-items: center;
+    font-size: 1.125rem;
+    color: #fff;
+    opacity: 0;
+    transform: scale(0.5) rotate(-12deg);
+    transition:
+      opacity 0.3s,
+      transform 0.5s var(--ease-expo);
+  }
+
+  &:hover {
     color: #fff;
   }
+  &:hover .num {
+    color: #fff;
+  }
+  &:hover .desc,
+  &:hover .price,
+  &:hover .price .label {
+    color: rgba(255, 255, 255, 0.82);
+  }
+  &:hover .name {
+    transform: translateX(clamp(8px, 1.4vw, 26px));
+  }
+  &:hover .go {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
 
-  @media (max-width: 1024px) {
-    grid-template-columns: 60px 1fr;
-    gap: 16px 24px;
-    padding: 40px 0;
+  @media (max-width: 1040px) {
+    grid-template-columns: clamp(30px, 8vw, 48px) 1fr;
+    gap: 6px 18px;
+    padding: 30px 16px;
 
     .desc {
       grid-column: 2 / -1;
+      margin-top: 8px;
     }
     .price {
       grid-column: 2 / -1;
-      justify-self: start;
       text-align: left;
-      margin-top: 12px;
+      margin-top: 16px;
+    }
+    .go {
+      display: none;
+    }
+    &:hover .name {
+      transform: none;
     }
   }
 `;
 
-const Num = styled.div`
-  font-family: var(--font-grotesk);
-  font-size: 0.75rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--muted);
-  padding-top: 16px;
+// ─── Closing CTA ──────────────────────────────────────────────────────
+
+const CtaShell = styled.section`
+  position: relative;
+  background: var(--ink);
+  color: #fff;
+  overflow: hidden;
+  padding: clamp(96px, 16vh, 220px) clamp(20px, 5vw, 80px);
+  text-align: center;
 `;
 
-const Name = styled.h2`
-  font-family: var(--font-display);
-  font-size: clamp(2.25rem, 5vw, 4.5rem);
-  font-weight: 700;
-  line-height: 0.92;
-  letter-spacing: -0.04em;
-  text-transform: uppercase;
-  color: var(--ink);
-`;
+const CtaInner = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(28px, 5vh, 56px);
 
-const Desc = styled.p`
-  font-family: var(--font-grotesk);
-  font-size: 1rem;
-  line-height: 1.55;
-  color: var(--muted);
-  padding-top: 12px;
-  max-width: 52ch;
-`;
-
-const Price = styled.div`
-  text-align: right;
-  padding-top: 14px;
-
-  .label {
+  .eyebrow {
+    font-family: var(--font-grotesk);
     font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-    letter-spacing: 0.18em;
-    color: var(--muted);
-    display: block;
-    margin-bottom: 4px;
+    color: var(--cyan);
   }
 
-  .val {
+  h2 {
     font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 1.625rem;
-    letter-spacing: -0.015em;
-    color: var(--ink);
+    font-weight: 400;
+    font-size: clamp(2.75rem, 8.5vw, 9rem);
+    line-height: 0.92;
+    letter-spacing: -0.03em;
   }
 `;
 
 const services = [
-  {
-    n: '01',
-    nameKey: 'home.services.1.title',
-    descKey: 'home.services.1.desc',
-    price: '$1 500',
-    id: 'web',
-  },
-  {
-    n: '02',
-    nameKey: 'home.services.2.title',
-    descKey: 'home.services.2.desc',
-    price: '$15 000',
-    id: 'webapp',
-  },
-  {
-    n: '03',
-    nameKey: 'home.services.3.title',
-    descKey: 'home.services.3.desc',
-    price: '$1 200',
-    id: 'bot',
-  },
-  {
-    n: '04',
-    nameKey: 'home.services.4.title',
-    descKey: 'home.services.4.desc',
-    price: '$5 000',
-    id: 'crm',
-  },
-  {
-    n: '05',
-    nameKey: 'home.services.5.title',
-    descKey: 'home.services.5.desc',
-    price: '$3 000',
-    id: 'redesign',
-  },
-  {
-    n: '06',
-    nameKey: 'home.services.6.title',
-    descKey: 'home.services.6.desc',
-    price: '$900/mo',
-    id: 'support',
-  },
+  { n: '01', nameKey: 'home.services.1.title', descKey: 'home.services.1.desc', price: '$1 500', id: 'web' },
+  { n: '02', nameKey: 'home.services.2.title', descKey: 'home.services.2.desc', price: '$15 000', id: 'webapp' },
+  { n: '03', nameKey: 'home.services.3.title', descKey: 'home.services.3.desc', price: '$1 200', id: 'bot' },
+  { n: '04', nameKey: 'home.services.4.title', descKey: 'home.services.4.desc', price: '$5 000', id: 'crm' },
+  { n: '05', nameKey: 'home.services.5.title', descKey: 'home.services.5.desc', price: '$3 000', id: 'redesign' },
+  { n: '06', nameKey: 'home.services.6.title', descKey: 'home.services.6.desc', price: '$900/mo', id: 'support' },
 ];
 
-const Cta = styled.div`
-  padding-top: 80px;
-  display: flex;
-  justify-content: center;
-`;
-
-const CtaLink = styled(Link)`
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  padding: 22px 44px;
-  background: var(--ink);
-  color: #fff;
-  font-family: var(--font-grotesk);
-  font-size: 0.9375rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  border-radius: 999px;
-  border: 1.5px solid var(--ink);
-  transition: background 0.3s var(--ease-snap), border-color 0.3s var(--ease-snap);
-
-  &::after {
-    content: '→';
-    transition: transform 0.4s var(--ease-expo);
-  }
-
-  &:hover {
-    background: var(--accent);
-    border-color: var(--accent);
-
-    &::after {
-      transform: translateX(6px);
-    }
-  }
-`;
-
 const Services = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { hash } = useLocation();
+  const reduced = useReducedMotion();
+  const isRu = language === 'ru';
 
+  // Honour deep links from the home Capabilities section (/services#web …).
   useEffect(() => {
+    if (hash) {
+      const el = document.getElementById(hash.slice(1));
+      if (el) {
+        const timer = window.setTimeout(
+          () => el.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+          360,
+        );
+        return () => window.clearTimeout(timer);
+      }
+    }
     window.scrollTo(0, 0);
-  }, []);
+  }, [hash]);
+
+  const titleLines = [t('services.page.title1'), t('services.page.title2')];
 
   return (
     <>
-      <Navigation />
-      <PageShell data-nav-theme="light">
-        <Container>
-          <Head>
-            <Eyebrow>{t('services.page.eyebrow')}</Eyebrow>
-            <Title>
-              <SplitWords as="span" text={t('services.page.title1')} />
-              {' '}
-              <SplitWords
-                as="span"
-                text={t('services.page.title2')}
-                delay={0.18}
-              />
-            </Title>
-            <Sub>{t('services.page.sub')}</Sub>
-          </Head>
+      <NavBar />
 
-          <List>
-            {services.map((s, i) => (
-              <Row
-                key={s.n}
-                id={s.id}
-                initial={{ opacity: 0, y: 32 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{
-                  duration: 0.75,
-                  delay: i * 0.05,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-              >
-                <Num className="muted">{s.n}</Num>
-                <Name>{t(s.nameKey)}</Name>
-                <Desc className="desc muted">{t(s.descKey)}</Desc>
-                <Price className="price">
-                  <span className="label muted">
-                    {t('services.page.priceFrom')}
-                  </span>
-                  <span className="val">{s.price}</span>
-                </Price>
-              </Row>
+      <Hero data-surface="dark" data-nav-theme="dark">
+        <Crosshair
+          style={{ top: '24%', right: '8%' }}
+          $size={16}
+          $color="rgba(255,255,255,0.34)"
+        />
+        <Crosshair
+          style={{ bottom: '28%', left: '5%' }}
+          $size={13}
+          $color="rgba(255,255,255,0.22)"
+        />
+
+        <HeroTop>
+          <Reveal as="span">
+            <Tag>{t('services.page.eyebrow')}</Tag>
+          </Reveal>
+          <Reveal as="span" delay={0.06}>
+            <Tag className="right">
+              {isRu ? 'Студия Sintara' : 'Sintara Studio'}
+            </Tag>
+          </Reveal>
+        </HeroTop>
+
+        <HeroBand>
+          <HeroTitle>
+            {titleLines.map((line, i) => (
+              <span className={`line${i === 1 ? ' accent' : ''}`} key={line}>
+                <motion.span
+                  initial={reduced ? false : { y: '110%' }}
+                  animate={{ y: 0 }}
+                  transition={{
+                    duration: 1,
+                    delay: 0.15 + i * 0.12,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                >
+                  {line}
+                </motion.span>
+              </span>
             ))}
-          </List>
+          </HeroTitle>
+        </HeroBand>
 
-          <Cta>
-            <CtaLink to="/brief">{t('nav.getStarted')}</CtaLink>
-          </Cta>
-        </Container>
-      </PageShell>
+        <HeroFoot>
+          <Reveal as="p" delay={0.2}>
+            {t('services.page.sub')}
+          </Reveal>
+          <Reveal as="span" delay={0.26}>
+            <span className="marker">
+              {String(services.length).padStart(2, '0')} —{' '}
+              {isRu ? 'Направлений' : 'Capabilities'}
+            </span>
+          </Reveal>
+        </HeroFoot>
+      </Hero>
+
+      <ListShell data-nav-theme="light">
+        <ListInner>
+          <ListHead>
+            <div>
+              <Reveal as="span" className="eyebrow">
+                {isRu ? 'Услуги и цены' : 'Services & pricing'}
+              </Reveal>
+              <Reveal as="h2" delay={0.05}>
+                {isRu ? 'Что мы делаем' : 'What we build'}
+              </Reveal>
+            </div>
+            <Reveal as="p" delay={0.1}>
+              {isRu
+                ? 'Фиксированная стартовая цена за каждое направление — без скрытых смет.'
+                : 'A fixed starting price for every track — no hidden estimates.'}
+            </Reveal>
+          </ListHead>
+
+          <Rows>
+            {services.map((s, i) => (
+              <Reveal key={s.id} delay={i * 0.05}>
+                <Row id={s.id} to="/brief" data-cursor="hover">
+                  <span className="num">{s.n}</span>
+                  <span className="name">{t(s.nameKey)}</span>
+                  <span className="desc">{t(s.descKey)}</span>
+                  <span className="price">
+                    <span className="label">
+                      {t('services.page.priceFrom')}
+                    </span>
+                    <span className="val">{s.price}</span>
+                  </span>
+                  <span className="go" aria-hidden>
+                    ↗
+                  </span>
+                </Row>
+              </Reveal>
+            ))}
+          </Rows>
+        </ListInner>
+      </ListShell>
+
+      <CtaShell data-surface="dark" data-nav-theme="dark">
+        <Crosshair
+          style={{ top: '22%', left: '12%' }}
+          $size={15}
+          $color="rgba(255,255,255,0.3)"
+        />
+        <Crosshair
+          style={{ bottom: '20%', right: '14%' }}
+          $size={15}
+          $color="rgba(255,255,255,0.3)"
+        />
+        <CtaInner>
+          <Reveal as="span" className="eyebrow">
+            {isRu ? 'Готовы начать?' : 'Ready to start?'}
+          </Reveal>
+          <Reveal as="h2" delay={0.05}>
+            {isRu ? 'Расскажите о проекте' : 'Tell us what’s next'}
+          </Reveal>
+          <Reveal delay={0.12}>
+            <PillLink to="/brief" variant="light" arrow>
+              {t('nav.getStarted')}
+            </PillLink>
+          </Reveal>
+        </CtaInner>
+      </CtaShell>
+
       <Footer />
     </>
   );
