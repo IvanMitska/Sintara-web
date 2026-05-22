@@ -4,9 +4,9 @@ import PillLink from '../../components/ui/PillLink';
 import Reveal from '../../components/ui/Reveal';
 
 /**
- * "Bold ideas, brought to life" — a statement and a blue-duotone project
- * still. The page-wide ribbon (see PageRibbon) carries the visual accent
- * that the old standalone blue disc used to.
+ * "Bold ideas, brought to life" — a statement and a project still shown
+ * in its natural colours. The page-wide ribbon (see PageRibbon) carries
+ * the visual accent that the old standalone blue disc used to.
  */
 
 const Shell = styled.section`
@@ -54,7 +54,7 @@ const Still = styled.div`
   aspect-ratio: 4 / 3;
   border-radius: 14px;
   overflow: hidden;
-  background: var(--accent);
+  background: var(--paper);
 
   img {
     position: absolute;
@@ -62,8 +62,6 @@ const Still = styled.div`
     width: 100%;
     height: 100%;
     object-fit: cover;
-    mix-blend-mode: luminosity;
-    opacity: 0.9;
     transform: scale(1.04);
     transition: transform 0.9s var(--ease-expo);
   }
@@ -72,8 +70,21 @@ const Still = styled.div`
     transform: scale(1.1);
   }
 
+  /* keeps the white tag readable now that the image isn't tinted */
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 40%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.45), transparent);
+    pointer-events: none;
+  }
+
   .tag {
     position: absolute;
+    z-index: 1;
     left: 18px;
     bottom: 16px;
     font-size: 0.625rem;

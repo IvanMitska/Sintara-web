@@ -35,3 +35,4 @@ dist-ssr
 # live under public/ (public/models/*.glb, public/fonts/*.otf)
 models-source
 fonts-source
+covers-source

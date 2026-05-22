@@ -106,40 +106,8 @@ export const projects: Project[] = [
     },
   },
   {
-    slug: 'shiba-cars',
-    number: '03',
-    year: '2024',
-    client: 'SHIBA CARS',
-    category: 'bot',
-    tags: ['React', 'Node.js', 'Telegram Bot API', 'Mini App', 'PostgreSQL'],
-    cover: '/projects/shiba-cars/cover.webp',
-    screens: [],
-    accent: '#FF4A1C',
-    dark: true,
-    en: {
-      title: 'Shiba Cars — partner affiliate system',
-      summary:
-        'Partner affiliate platform with a Telegram bot, a Mini App dashboard, and real-time click tracking.',
-      challenge:
-        'A car rental operator wanted partners (bloggers, concierges, hotels) to start referring clients, but they had no tooling — every partner was tracked in a spreadsheet.',
-      solution:
-        'Built a full partner system: a Telegram bot for signup, a Mini App with live stats, and a Node backend tracking every click, booking, and payout in real time.',
-      role: 'Product, bot UX, Mini App, backend, analytics',
-    },
-    ru: {
-      title: 'Shiba Cars — партнёрская система',
-      summary:
-        'Партнёрская платформа с Telegram-ботом, Mini App-панелью и real-time отслеживанием переходов.',
-      challenge:
-        'Автопрокат хотел запустить партнёрку (блогеры, консьержи, отели), но не было инструмента — партнёров вели в гугл-таблице.',
-      solution:
-        'Сделали полноценную партнёрскую систему: Telegram-бот для регистрации, Mini App с живой статистикой и Node-бэкенд, который трекает каждый клик, бронь и выплату в реальном времени.',
-      role: 'Продукт, UX бота, Mini App, бэкенд, аналитика',
-    },
-  },
-  {
     slug: 'unicar',
-    number: '04',
+    number: '03',
     year: '2024',
     client: 'UNICAR',
     category: 'crm',
@@ -175,7 +143,7 @@ export const projects: Project[] = [
   },
   {
     slug: '3dlike',
-    number: '05',
+    number: '04',
     year: '2024',
     client: '3DLike',
     category: 'website',
