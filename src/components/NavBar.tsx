@@ -6,7 +6,9 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import AudioToggle from './AudioToggle';
 import Crosshair from './ui/Crosshair';
+import SintaraLogo3D from './brand/SintaraLogo3D';
 import { stopScroll, startScroll } from '../lib/lenis';
+import { lockScroll, unlockScroll } from '../lib/scrollLock';
 
 /**
  * Sintara v2 navigation — Lusion-style. Wordmark left; audio toggle +
@@ -52,7 +54,7 @@ const Wordmark = styled(Link)`
   line-height: 1;
 
   .dot {
-    color: var(--cyan);
+    color: var(--accent);
     margin-left: 1px;
   }
 `;
@@ -102,7 +104,7 @@ const Pill = styled(Link)<{ $solid?: boolean; $theme: NavTheme }>`
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--cyan);
+    background: var(--accent-bright);
   }
 
   &:hover {
@@ -190,8 +192,9 @@ const Overlay = styled(motion.div)`
 const OverlayInner = styled.div`
   flex: 1;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(40px, 6vw, 120px);
   padding: 120px clamp(20px, 5vw, 80px) 40px;
   position: relative;
 `;
@@ -201,41 +204,68 @@ const BigNav = styled.nav`
   flex-direction: column;
 `;
 
+/* 3D logo column on the right of the overlay; hides on narrow screens.
+   margin-right pulls it in from the right edge (shifted left). */
+const LogoStage = styled.div`
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: clamp(40px, 8vw, 180px);
+
+  @media (max-width: 1100px) {
+    margin-right: clamp(20px, 4vw, 80px);
+  }
+  @media (max-width: 920px) {
+    display: none;
+  }
+`;
+
 const Row = styled(NavLink)`
   position: relative;
   display: flex;
   align-items: baseline;
   gap: clamp(16px, 3vw, 40px);
   padding: clamp(8px, 1.4vw, 16px) 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   color: #fff;
-  overflow: hidden;
-
-  &:first-child {
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-  }
 
   .idx {
     font-family: var(--font-grotesk);
     font-size: 0.75rem;
     font-weight: 500;
-    color: var(--cyan);
+    color: var(--accent-bright);
     font-variant-numeric: tabular-nums;
   }
 
+  /* The reveal mask lives here, not on the Row. Horizontal padding gives
+     the bold glyph overhang (e.g. the S in Services) room so it isn't
+     clipped; the negative margin cancels the padding so layout is intact.
+     The hover slide moves the whole masked unit, so nothing clips on x. */
+  .label-wrap {
+    display: inline-block;
+    overflow: hidden;
+    padding: 0.1em 0.2em;
+    margin: -0.1em -0.2em;
+    transition: transform 0.5s var(--ease-expo);
+  }
+
   .label {
+    display: inline-block;
     font-family: var(--font-display);
     font-weight: 800;
     font-size: clamp(2.75rem, 9vw, 7rem);
     letter-spacing: -0.045em;
     line-height: 1.02;
-    transition: transform 0.5s var(--ease-expo), color 0.4s var(--ease-snap);
+    transition: color 0.4s var(--ease-snap);
   }
 
+  &:hover .label-wrap,
+  &.active .label-wrap {
+    transform: translateX(clamp(12px, 2vw, 32px));
+  }
   &:hover .label,
   &.active .label {
-    color: var(--cyan);
-    transform: translateX(clamp(12px, 2vw, 32px));
+    color: var(--accent-bright);
   }
 `;
 
@@ -267,7 +297,7 @@ const FootRow = styled.div`
     transition: color 0.25s;
   }
   a:hover {
-    color: var(--cyan);
+    color: var(--accent-bright);
   }
 `;
 
@@ -322,11 +352,14 @@ const NavBar = ({ surface }: NavBarProps) => {
   }, []);
 
   useEffect(() => {
-    if (open) stopScroll();
-    else startScroll();
-    document.body.style.overflow = open ? 'hidden' : '';
+    if (!open) return;
+    // lock first (measures scrollbar width while it's still visible), then
+    // hand scroll control to Lenis
+    lockScroll();
+    stopScroll();
     return () => {
-      document.body.style.overflow = '';
+      startScroll();
+      unlockScroll();
     };
   }, [open]);
 
@@ -439,22 +472,36 @@ const NavBar = ({ surface }: NavBarProps) => {
                     <span className="idx">
                       0{i + 1}
                     </span>
-                    <motion.span
-                      className="label"
-                      initial={reduced ? false : { y: '110%' }}
-                      animate={{ y: 0 }}
-                      transition={{
-                        duration: 0.7,
-                        delay: 0.18 + i * 0.07,
-                        ease: [0.16, 1, 0.3, 1],
-                      }}
-                      style={{ display: 'inline-block' } as CSSProperties}
-                    >
-                      {t(item.key)}
-                    </motion.span>
+                    <span className="label-wrap">
+                      <motion.span
+                        className="label"
+                        initial={reduced ? false : { y: '110%' }}
+                        animate={{ y: 0 }}
+                        transition={{
+                          duration: 0.7,
+                          delay: 0.18 + i * 0.07,
+                          ease: [0.16, 1, 0.3, 1],
+                        }}
+                        style={{ display: 'inline-block' } as CSSProperties}
+                      >
+                        {t(item.key)}
+                      </motion.span>
+                    </span>
                   </Row>
                 ))}
               </BigNav>
+
+              <LogoStage aria-hidden>
+                <SintaraLogo3D
+                  size={560}
+                  color="#C4B5FD"
+                  colorMid="#5B21B6"
+                  colorTo="#EDE9FE"
+                  envPreset="city"
+                  idleMotion="sway"
+                  active={open}
+                />
+              </LogoStage>
             </OverlayInner>
 
             <FootRow>

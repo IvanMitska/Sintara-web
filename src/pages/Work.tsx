@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, useReducedMotion } from 'framer-motion';
@@ -52,14 +51,14 @@ const Tag = styled.span`
   font-weight: 600;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--cyan);
+  color: var(--accent-bright);
 
   &::before {
     content: '';
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--cyan);
+    background: var(--accent-bright);
   }
 
   &.right {
@@ -81,6 +80,10 @@ const HeroTitle = styled.h1`
   .line {
     display: block;
     overflow: hidden;
+    /* Pad the clip box so descenders aren't sliced at line-height 0.84;
+       a small negative margin keeps lines tight without merging them. */
+    padding-bottom: 0.26em;
+    margin-bottom: -0.12em;
   }
   .line > span {
     display: inline-block;
@@ -111,7 +114,7 @@ const HeroFoot = styled(HeroBand)`
     font-weight: 600;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--cyan);
+    color: var(--accent-bright);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
@@ -191,6 +194,33 @@ const Cover = styled(Link)<{ $accent: string }>`
     letter-spacing: 0.16em;
     color: #fff;
     mix-blend-mode: difference;
+  }
+
+  .own {
+    position: absolute;
+    top: 20px;
+    right: 22px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    font-family: var(--font-grotesk);
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .own::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
   }
 
   .view {
@@ -315,7 +345,7 @@ const CtaInner = styled.div`
     font-weight: 600;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: var(--cyan);
+    color: var(--accent-bright);
   }
 
   h2 {
@@ -339,10 +369,6 @@ const Work = () => {
   const { language, t } = useLanguage();
   const reduced = useReducedMotion();
   const isRu = language === 'ru';
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   const titleLines = [t('work.title1'), t('work.title2')];
 
@@ -426,17 +452,29 @@ const Work = () => {
                 }}
               >
                 <Cover
-                  to={`/work/${p.slug}`}
+                  to={p.href ?? `/work/${p.slug}`}
                   $accent={p.accent}
                   data-cursor="hover"
                 >
                   <span className="index">{p.number}</span>
+                  {p.own && (
+                    <span className="own">
+                      {isRu ? 'Собственный продукт' : 'Own product'}
+                    </span>
+                  )}
                   <img src={p.cover} alt={title} loading="lazy" />
                   <span className="view">
-                    {isRu ? 'Смотреть кейс' : 'View case'} ↗
+                    {p.own
+                      ? isRu
+                        ? 'К продукту'
+                        : 'Visit product'
+                      : isRu
+                        ? 'Смотреть кейс'
+                        : 'View case'}{' '}
+                    ↗
                   </span>
                 </Cover>
-                <TitleLink to={`/work/${p.slug}`} data-cursor="hover">
+                <TitleLink to={p.href ?? `/work/${p.slug}`} data-cursor="hover">
                   <CaseMeta>
                     <span>{p.client}</span>
                     <span>{p.year}</span>

@@ -95,7 +95,7 @@ const ScrollCue = styled(motion.div)`
     position: absolute;
     inset: 0;
     width: 40%;
-    background: var(--cyan);
+    background: var(--accent-bright);
     animation: cueSlide 2.1s var(--ease-expo) infinite;
   }
   @keyframes cueSlide {

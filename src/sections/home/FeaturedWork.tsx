@@ -120,6 +120,33 @@ const Card = styled(Link)`
     transition: transform 0.9s var(--ease-expo);
   }
 
+  .badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    font-family: var(--font-grotesk);
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
   .meta {
     display: flex;
     align-items: baseline;
@@ -128,18 +155,41 @@ const Card = styled(Link)`
     margin-top: 18px;
   }
   .title {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.15em;
     font-family: var(--font-display);
     font-weight: 600;
     font-size: clamp(1.5rem, 3vw, 2.75rem);
     letter-spacing: -0.025em;
     line-height: 1;
-    transition: transform 0.5s var(--ease-expo), color 0.4s var(--ease-snap);
+    color: var(--ink);
+  }
+  .title-mask {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    line-height: 1.1;
+    padding-bottom: 0.05em;
+  }
+  .title-line {
+    display: block;
+    will-change: transform;
+    transition: transform 0.7s var(--ease-expo);
+  }
+  .title-line--ghost {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    white-space: nowrap;
   }
   .arrow {
-    font-size: 1.5rem;
+    display: inline-block;
+    font-size: 1.25rem;
     opacity: 0;
-    transform: translateX(-8px);
-    transition: opacity 0.3s, transform 0.4s var(--ease-expo);
+    transform: translate(-6px, -2px) rotate(-12deg);
+    transition: opacity 0.35s var(--ease-snap),
+      transform 0.55s var(--ease-expo);
   }
   .year {
     font-size: 0.75rem;
@@ -150,13 +200,20 @@ const Card = styled(Link)`
   &:hover .frame img {
     transform: scale(1.08);
   }
-  &:hover .title {
-    color: var(--accent);
-    transform: translateX(10px);
+  &:hover .title-line {
+    transform: translateY(-100%);
   }
   &:hover .arrow {
     opacity: 1;
-    transform: translateX(0);
+    transform: translate(0, 0) rotate(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .title-line,
+    .arrow,
+    .frame img {
+      transition: none;
+    }
   }
 `;
 
@@ -170,7 +227,8 @@ const FeaturedWork = () => {
   const { language } = useLanguage();
   const reduced = useReducedMotion();
   const isRu = language === 'ru';
-  const featured = projects.slice(0, 4);
+  // Own products get their own home block — Featured shows client work only.
+  const featured = projects.filter((p) => !p.own).slice(0, 4);
 
   return (
     <Shell data-nav-theme="light">
@@ -199,20 +257,33 @@ const FeaturedWork = () => {
                   ease: [0.16, 1, 0.3, 1],
                 }}
               >
-                <Card to={`/work/${p.slug}`} data-cursor="hover">
+                <Card to={p.href ?? `/work/${p.slug}`} data-cursor="hover">
                   <div className="tags">
                     {p.tags.slice(0, 3).map((tag) => (
                       <span key={tag}>{tag}</span>
                     ))}
                   </div>
                   <div className="frame">
+                    {p.own && (
+                      <span className="badge">
+                        {isRu ? 'Собственный продукт' : 'Own product'}
+                      </span>
+                    )}
                     <img src={p.cover} alt={loc.title} loading="lazy" />
                   </div>
                   <div className="meta">
                     <span className="title">
-                      {p.client}
+                      <span className="title-mask">
+                        <span className="title-line">{p.client}</span>
+                        <span
+                          className="title-line title-line--ghost"
+                          aria-hidden
+                        >
+                          {p.client}
+                        </span>
+                      </span>
                       <span className="arrow" aria-hidden>
-                        {'  ↗'}
+                        ↗
                       </span>
                     </span>
                     <span className="year">{p.year}</span>

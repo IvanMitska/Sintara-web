@@ -9,6 +9,7 @@ import styled, { css } from 'styled-components';
 type Variant = 'light' | 'dark' | 'ghost';
 
 const base = css`
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 11px;
@@ -21,11 +22,18 @@ const base = css`
   text-transform: uppercase;
   letter-spacing: 0.14em;
   white-space: nowrap;
-  transition:
-    background 0.4s var(--ease-snap),
-    color 0.4s var(--ease-snap),
-    border-color 0.4s var(--ease-snap),
-    transform 0.4s var(--ease-expo);
+  transition: transform 0.4s var(--ease-expo);
+
+  /* The pill lifts on hover (translateY). Without a buffer, the pointer
+     can fall just outside the moved box at the edge, rapidly toggling
+     hover and making the button jitter. Extend the hit area vertically
+     (not horizontally — adjacent pills sit only 14px apart) so the lift
+     never drops the hover. */
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -8px 0;
+  }
 
   .dot {
     width: 7px;
@@ -33,6 +41,25 @@ const base = css`
     border-radius: 50%;
     background: currentColor;
     flex: none;
+    transition: transform 0.5s var(--ease-expo);
+  }
+
+  .label {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    line-height: 1.2;
+  }
+  .label-line {
+    display: block;
+    will-change: transform;
+    transition: transform 0.55s var(--ease-expo);
+  }
+  .label-line--ghost {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    white-space: nowrap;
   }
 
   .arr {
@@ -41,8 +68,23 @@ const base = css`
 
   &:hover {
     transform: translateY(-2px);
+    .label-line {
+      transform: translateY(-100%);
+    }
+    .dot {
+      transform: scale(1.6);
+    }
     .arr {
       transform: translateX(5px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    .label-line,
+    .dot,
+    .arr {
+      transition: none;
     }
   }
 `;
@@ -52,29 +94,16 @@ const variants: Record<Variant, ReturnType<typeof css>> = {
     background: #fff;
     color: var(--ink);
     border: 1px solid #fff;
-    &:hover {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #fff;
-    }
   `,
   dark: css`
     background: var(--ink);
     color: #fff;
     border: 1px solid var(--ink);
-    &:hover {
-      background: var(--accent);
-      border-color: var(--accent);
-    }
   `,
   ghost: css`
     background: transparent;
     color: currentColor;
     border: 1px solid currentColor;
-    &:hover {
-      background: currentColor;
-      color: var(--ink);
-    }
   `,
 };
 
@@ -108,7 +137,12 @@ const PillLink = ({
   const inner = (
     <>
       {!arrow && <span className="dot" aria-hidden />}
-      <span>{children}</span>
+      <span className="label">
+        <span className="label-line">{children}</span>
+        <span className="label-line label-line--ghost" aria-hidden>
+          {children}
+        </span>
+      </span>
       {arrow && (
         <span className="arr" aria-hidden>
           →

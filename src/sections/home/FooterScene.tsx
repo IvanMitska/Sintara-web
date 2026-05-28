@@ -419,7 +419,7 @@ function Scene({
         intensity={0.7}
         color="#5b5bff"
       />
-      <pointLight position={[0, 1, 6]} intensity={40} color="#7ED4DC" />
+      <pointLight position={[0, 1, 6]} intensity={40} color="#A78BFA" />
 
       <Astronaut pointer={pointer} reduced={reduced} />
       <IconCloud count={count} pointer={pointer} reduced={reduced} />

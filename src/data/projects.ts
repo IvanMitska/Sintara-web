@@ -28,12 +28,64 @@ export interface Project {
   dark?: boolean;
   /** External live link. */
   url?: string;
+  /** Sintara's own product (not a client work). Card shows a badge,
+   *  and the click target is the dedicated /products/<slug> page. */
+  own?: boolean;
+  /** Optional dedicated detail route override (e.g. own products live
+   *  under /products/<slug> rather than /work/<slug>). */
+  href?: string;
 
   en: ProjectI18n;
   ru: ProjectI18n;
 }
 
 export const projects: Project[] = [
+  {
+    slug: 'sintara-crm',
+    number: '00',
+    year: '2025',
+    client: 'Sintara',
+    category: 'saas',
+    tags: [
+      'Next.js 15',
+      'React 19',
+      'TypeScript',
+      'Tailwind v4',
+      'GSAP',
+      'React Three Fiber',
+    ],
+    cover: '/projects/sintara-crm/cover.webp',
+    screens: [
+      '/projects/sintara-crm/screen-1.webp',
+      '/projects/sintara-crm/screen-2.webp',
+      '/projects/sintara-crm/screen-3.webp',
+    ],
+    accent: '#8B5CF6',
+    dark: true,
+    url: 'https://www.sintara-crm.com',
+    own: true,
+    href: '/products/sintara-crm',
+    en: {
+      title: 'Sintara CRM — omnichannel CRM for SMB',
+      summary:
+        'Our own SaaS — an omnichannel CRM with the feel and speed of Linear or Notion, built for small and mid-sized teams in Asia.',
+      challenge:
+        'Most CRMs feel like software from the last decade — heavy, fragmented across mailbox, messengers and booking tools, and impossible to automate without a developer on call.',
+      solution:
+        'We built Sintara CRM around four pillars: an omnichannel inbox, a customizable sales pipeline, a no-code Automation Studio with AI steps, and online booking as a core module — not a plugin. 40+ integrations, 10-minute setup, releases every two weeks.',
+      role: 'Product, design, engineering, infra — end to end',
+    },
+    ru: {
+      title: 'Sintara CRM — омниканальная CRM для SMB',
+      summary:
+        'Наш собственный SaaS — омниканальная CRM с интерфейсом и скоростью уровня Linear или Notion, для малого и среднего бизнеса в Азии.',
+      challenge:
+        'Большинство CRM выглядят как софт прошлого десятилетия: тяжёлые, размазанные между почтой, мессенджерами и онлайн-записью, и почти не автоматизируются без разработчика.',
+      solution:
+        'Построили Sintara CRM вокруг четырёх опор: омниканальный инбокс, настраиваемая воронка продаж, no-code Automation Studio с AI-шагами и онлайн-запись как ядро продукта — не плагин. 40+ интеграций, запуск за 10 минут, релизы каждые две недели.',
+      role: 'Продукт, дизайн, разработка, инфраструктура — полный цикл',
+    },
+  },
   {
     slug: 'kaif',
     number: '01',
@@ -71,16 +123,16 @@ export const projects: Project[] = [
     slug: 'kaif-crm',
     number: '02',
     year: '2025',
-    client: 'KAIF Wellness',
+    client: 'KAIF CRM',
     category: 'crm',
     tags: ['Electron', 'React', 'TypeScript', 'Tailwind', 'SQLite'],
     cover: '/projects/kaif-crm/cover.webp',
     screens: [
-      '/projects/kaif-crm/screen-1.webp',
-      '/projects/kaif-crm/screen-2.webp',
-      '/projects/kaif-crm/screen-3.webp',
-      '/projects/kaif-crm/screen-4.webp',
-      '/projects/kaif-crm/screen-5.webp',
+      '/projects/kaif-crm/macbook-pro-16-1.webp',
+      '/projects/kaif-crm/macbook-pro-16-2.webp',
+      '/projects/kaif-crm/studio-display-1.webp',
+      '/projects/kaif-crm/studio-display-2.webp',
+      '/projects/kaif-crm/ipad-pro.webp',
     ],
     accent: '#2E4AFF',
     dark: true,
@@ -150,10 +202,10 @@ export const projects: Project[] = [
     tags: ['React', 'Tailwind CSS', 'Framer Motion', 'SEO'],
     cover: '/projects/3dlike/cover.webp',
     screens: [
-      '/projects/3dlike/screen-1.webp',
-      '/projects/3dlike/screen-2.webp',
-      '/projects/3dlike/screen-3.webp',
-      '/projects/3dlike/screen-4.webp',
+      '/projects/3dlike/macbook-pro-16.webp',
+      '/projects/3dlike/studio.webp',
+      '/projects/3dlike/ipad-pro.webp',
+      '/projects/3dlike/iphone-16-pro.webp',
     ],
     accent: '#E53E12',
     en: {

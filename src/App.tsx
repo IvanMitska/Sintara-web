@@ -21,6 +21,7 @@ const Services = lazy(() => import('./pages/Services'));
 const About = lazy(() => import('./pages/About'));
 const Contact = lazy(() => import('./pages/Contact'));
 const Brief = lazy(() => import('./pages/Brief'));
+const SintaraCrmProduct = lazy(() => import('./pages/SintaraCrmProduct'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 const LoaderShell = styled.div`
@@ -95,6 +96,7 @@ const App = () => {
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/brief" element={<Brief />} />
+              <Route path="/products/sintara-crm" element={<SintaraCrmProduct />} />
               <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { stopScroll, startScroll, scrollToTop } from '../lib/lenis';
+import { lockScroll, unlockScroll } from '../lib/scrollLock';
 import { loadProgress, allReady } from '../lib/loadManager';
 
 /**
@@ -47,7 +48,7 @@ const Mark = styled(motion.div)`
   }
 
   .dot {
-    color: var(--cyan);
+    color: var(--accent-bright);
   }
 
   .caption {
@@ -96,7 +97,7 @@ const Track = styled.div`
   span {
     display: block;
     height: 100%;
-    background: var(--cyan);
+    background: var(--accent-bright);
     transform-origin: left;
   }
 `;
@@ -113,9 +114,9 @@ const Preloader = ({ onComplete }: PreloaderProps) => {
   const [done, setDone] = useState(false);
 
   useEffect(() => {
+    lockScroll();
     stopScroll();
     scrollToTop(true);
-    document.body.style.overflow = 'hidden';
 
     const minTime = 1000; // ms — minimum on-screen time for polish
     const maxTime = 11000; // ms — hard safety so it can never hang
@@ -155,7 +156,7 @@ const Preloader = ({ onComplete }: PreloaderProps) => {
   }, []);
 
   const handleExitComplete = () => {
-    document.body.style.overflow = '';
+    unlockScroll();
     startScroll();
     scrollToTop(true);
     onComplete();

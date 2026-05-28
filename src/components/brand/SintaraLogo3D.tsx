@@ -54,6 +54,60 @@ export type LogoKickKind =
   | 'wobble'
   | 'pulse';
 
+// Animation state fields a kick can poke. Subset of the full anim ref.
+type KickState = {
+  yKick: number;
+  zKick: number;
+  rollProgress: number;
+  tumbleProgress: number;
+  bounceProgress: number;
+  wobbleEnergy: number;
+  pulseProgress: number;
+};
+
+// Apply one kick of the given kind to the animation state. Shared by the
+// external `kickRef` trigger and the internal pointer-down handler.
+function applyKick(s: KickState, kind: LogoKickKind, sign: number) {
+  switch (kind) {
+    case 'flip':
+      s.rollProgress = 0;
+      s.pulseProgress = Math.max(s.pulseProgress, 0.4);
+      break;
+    case 'tumble':
+      s.tumbleProgress = 0;
+      s.zKick += 1.5 * sign;
+      break;
+    case 'bounce':
+      s.bounceProgress = 0;
+      s.yKick = Math.min(s.yKick + 2, 14);
+      break;
+    case 'wobble':
+      s.wobbleEnergy = 1;
+      s.zKick += 3 * sign;
+      break;
+    case 'pulse':
+      s.pulseProgress = 1;
+      s.yKick = Math.min(s.yKick + 1.5, 14);
+      break;
+    case 'spin':
+    default:
+      s.yKick = Math.min(s.yKick + 6, 14);
+      s.zKick += 2 * sign;
+      s.pulseProgress = Math.max(s.pulseProgress, 0.6);
+      break;
+  }
+}
+
+// Lively kick kinds a click cycles through at random — so every tap reads
+// as a different motion instead of the same flip every time.
+const CLICK_KICKS: LogoKickKind[] = [
+  'flip',
+  'tumble',
+  'bounce',
+  'wobble',
+  'spin',
+];
+
 type LogoMeshProps = {
   url: string;
   color: string;
@@ -160,43 +214,16 @@ function LogoMesh({
 
     if (kickRef && kickRef.current !== s.lastKick) {
       s.lastKick = kickRef.current;
-      const kind: LogoKickKind = kickKindRef?.current ?? 'spin';
-      const sign = Math.random() > 0.5 ? 1 : -1;
-      switch (kind) {
-        case 'flip':
-          s.rollProgress = 0;
-          s.pulseProgress = Math.max(s.pulseProgress, 0.4);
-          break;
-        case 'tumble':
-          s.tumbleProgress = 0;
-          s.zKick += 1.5 * sign;
-          break;
-        case 'bounce':
-          s.bounceProgress = 0;
-          s.yKick = Math.min(s.yKick + 2, 14);
-          break;
-        case 'wobble':
-          s.wobbleEnergy = 1;
-          s.zKick += 3 * sign;
-          break;
-        case 'pulse':
-          s.pulseProgress = 1;
-          s.yKick = Math.min(s.yKick + 1.5, 14);
-          break;
-        case 'spin':
-        default:
-          s.yKick = Math.min(s.yKick + 6, 14);
-          s.zKick += 2 * sign;
-          s.pulseProgress = Math.max(s.pulseProgress, 0.6);
-          break;
-      }
+      applyKick(s, kickKindRef?.current ?? 'spin', Math.random() > 0.5 ? 1 : -1);
     }
 
     if (clickBumpRef.current !== s.lastClickBump) {
       s.lastClickBump = clickBumpRef.current;
-      s.rollProgress = 0;
-      s.pulseProgress = 1;
-      s.yKick += 4;
+      // pick a random lively kick each tap + a punchy scale pop on top
+      const kind = CLICK_KICKS[(Math.random() * CLICK_KICKS.length) | 0];
+      applyKick(s, kind, Math.random() > 0.5 ? 1 : -1);
+      s.pulseProgress = Math.max(s.pulseProgress, 0.7);
+      s.yKick = Math.min(s.yKick + 3, 16);
     }
 
     const decay = Math.exp(-dt * 2.5);
@@ -342,14 +369,15 @@ function LogoMesh({
   return (
     <mesh ref={ref} geometry={geometry} scale={BASE_SCALE} castShadow receiveShadow>
       <meshPhysicalMaterial
-        metalness={0.78}
-        roughness={0.3}
+        metalness={1}
+        roughness={0.15}
+        reflectivity={1}
         iridescence={1}
-        iridescenceIOR={1.6}
-        iridescenceThicknessRange={[280, 1500]}
-        envMapIntensity={0.65}
+        iridescenceIOR={1.7}
+        iridescenceThicknessRange={[280, 1600]}
+        envMapIntensity={1.8}
         clearcoat={1}
-        clearcoatRoughness={0.08}
+        clearcoatRoughness={0.05}
         side={THREE.DoubleSide}
         onBeforeCompile={injectGradient as unknown as THREE.Material['onBeforeCompile']}
       />

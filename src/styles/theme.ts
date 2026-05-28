@@ -1,5 +1,5 @@
 // Design tokens — Sintara v2 (Lusion-inspired editorial relaunch)
-// Palette: lavender paper, deep ink, electric blue, cyan ribbon accent.
+// Palette: lavender paper, deep ink, brand violet (single accent).
 // Typography: Schibsted Grotesk — one tight neo-grotesk for everything.
 
 export const colors = {
@@ -20,13 +20,13 @@ export const colors = {
   mutedDark: '#8E8E9C',    // secondary text on dark
 
   // ─── Accent system ────────────────────────────────────────────────
-  //  accent  : electric blue — wordmark dot, CTAs, hover, blue sections.
-  //  cyan    : turquoise ribbon accent.
-  accent: '#3D37F2',       // electric blue
-  accentHover: '#2B26D8',  // pressed blue
-  accentSoft: '#DEDDFB',   // blue tint
-  cyan: '#7ED4DC',         // cyan ribbon
-  cyanSoft: '#D5F0F2',
+  //  accent       : brand violet (matches Sintara CRM) — wordmark dot,
+  //                 CTAs, hover, accents on light backgrounds.
+  //  accentBright : lighter violet for accents on dark backgrounds.
+  accent: '#7C3AED',       // brand violet (violet-600 — a touch darker)
+  accentHover: '#6D28D9',  // pressed violet (violet-700)
+  accentSoft: '#EDE9FE',   // violet tint (violet-100)
+  accentBright: '#A78BFA', // lighter violet for accents on dark bg (violet-400)
   success: '#1F6B3A',
 } as const;
 

@@ -37,7 +37,7 @@ const Head = styled.div`
     font-weight: 600;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--cyan);
+    color: var(--accent-bright);
   }
   h2 {
     font-family: var(--font-display);
@@ -71,7 +71,7 @@ const Row = styled(Link)`
   .num {
     font-size: 0.8125rem;
     font-weight: 500;
-    color: var(--cyan);
+    color: var(--accent-bright);
     font-variant-numeric: tabular-nums;
   }
 
@@ -95,14 +95,14 @@ const Row = styled(Link)`
 
   .arrow {
     font-size: 1.5rem;
-    color: var(--cyan);
+    color: var(--accent-bright);
     opacity: 0;
     transform: translateX(-10px);
     transition: opacity 0.3s, transform 0.4s var(--ease-expo);
   }
 
   &:hover .name {
-    color: var(--cyan);
+    color: var(--accent-bright);
     transform: translateX(clamp(8px, 1.5vw, 24px));
   }
   &:hover .desc {
@@ -187,7 +187,7 @@ const Capabilities = () => {
         <Head>
           <div>
             <Reveal as="span" className="eyebrow">
-              {isRu ? '(02) — Чем занимаемся' : '(02) — What we do'}
+              {isRu ? '(03) — Чем занимаемся' : '(03) — What we do'}
             </Reveal>
             <Reveal as="h2" delay={0.05}>
               {isRu ? 'Возможности' : 'Capabilities'}

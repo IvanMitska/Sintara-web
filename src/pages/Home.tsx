@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigationType } from 'react-router-dom';
 import styled from 'styled-components';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
@@ -8,6 +9,7 @@ import Manifesto from '../sections/home/Manifesto';
 import Statement from '../sections/home/Statement';
 import Approach from '../sections/home/Approach';
 import FeaturedWork from '../sections/home/FeaturedWork';
+import Products from '../sections/home/Products';
 import Capabilities from '../sections/home/Capabilities';
 import CtaFinale from '../sections/home/CtaFinale';
 
@@ -21,14 +23,28 @@ const Flow = styled.div`
   overflow: hidden;
 `;
 
+// Has the preloader played at least once this session? Module-scoped so it
+// survives Home unmount/remount during SPA navigation.
+let hasBooted = false;
+
 const Home = () => {
-  // Preloader plays on every entry to the home page — full load,
-  // reload, or SPA navigation back (e.g. clicking the wordmark).
-  const [loaded, setLoaded] = useState(false);
+  const navType = useNavigationType();
+  // Preloader plays on the first load and on forward navigation here
+  // (e.g. clicking the wordmark), but is skipped on back/forward (POP)
+  // returns so the page can restore its previous scroll position instead
+  // of snapping back to the hero.
+  const [loaded, setLoaded] = useState(hasBooted && navType === 'POP');
 
   return (
     <>
-      {!loaded && <Preloader onComplete={() => setLoaded(true)} />}
+      {!loaded && (
+        <Preloader
+          onComplete={() => {
+            hasBooted = true;
+            setLoaded(true);
+          }}
+        />
+      )}
       <NavBar />
       <main>
         <Hero ready={loaded} />
@@ -37,6 +53,7 @@ const Home = () => {
           <Statement />
           <Approach />
           <FeaturedWork />
+          <Products />
         </Flow>
         <Capabilities />
         <CtaFinale />

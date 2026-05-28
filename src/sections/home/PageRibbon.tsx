@@ -126,12 +126,12 @@ const PageRibbon = ({
       <Svg viewBox="0 0 100 200" preserveAspectRatio="none">
         <defs>
           <linearGradient id="rA" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#3D37F2" />
-            <stop offset="1" stopColor="#6FCED7" />
+            <stop offset="0" stopColor="#8B5CF6" />
+            <stop offset="1" stopColor="#A78BFA" />
           </linearGradient>
           <linearGradient id="rB" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#6FCED7" />
-            <stop offset="1" stopColor="#3D37F2" />
+            <stop offset="0" stopColor="#A78BFA" />
+            <stop offset="1" stopColor="#8B5CF6" />
           </linearGradient>
         </defs>
 

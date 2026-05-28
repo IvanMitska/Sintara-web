@@ -67,6 +67,14 @@
       rel="stylesheet"
     />
 
+    <!-- Preload the display typeface (PP Neue Montreal) up front so the
+         browser doesn't lazily fetch a weight mid-navigation and flash the
+         Schibsted Grotesk fallback (FOUT). All three weights are used across
+         pages; loading them eagerly keeps them cached for every route. -->
+    <link rel="preload" as="font" type="font/otf" crossorigin href="/fonts/PPNeueMontreal-Regular.otf" />
+    <link rel="preload" as="font" type="font/otf" crossorigin href="/fonts/PPNeueMontreal-Semibold.otf" />
+    <link rel="preload" as="font" type="font/otf" crossorigin href="/fonts/PPNeueMontreal-Extrabold.otf" />
+
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
     {

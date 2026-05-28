@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import Navigation from '../components/Navigation';
@@ -193,10 +192,6 @@ const SideLink = styled.a`
 
 const Contact = () => {
   const { t } = useLanguage();
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   return (
     <>

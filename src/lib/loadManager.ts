@@ -68,6 +68,16 @@ export const onLoadChange = (l: () => void): (() => void) => {
 if (typeof document !== 'undefined') {
   const fonts = (document as Document & { fonts?: FontFaceSet }).fonts;
   if (fonts && fonts.ready) {
+    // Explicitly request every PP Neue Montreal weight up front. Otherwise
+    // the browser only fetches a weight when some element first needs it —
+    // which can happen mid-navigation and flash the fallback (FOUT). Kicking
+    // them all off here means fonts.ready waits for the display typeface to
+    // be fully loaded, so the preloader covers the fetch.
+    const display = "'PP Neue Montreal'";
+    [`400 1em ${display}`, `600 1em ${display}`, `800 1em ${display}`].forEach(
+      (font) => fonts.load(font).catch(() => {}),
+    );
+
     fonts.ready.then(() => markReady('fonts')).catch(() => markReady('fonts'));
     // safety — never let a stalled font load block the site
     window.setTimeout(() => markReady('fonts'), 4000);

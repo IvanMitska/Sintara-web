@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
@@ -70,7 +69,7 @@ const MetaRow = styled.div`
   color: var(--muted-dark);
 
   .num {
-    color: var(--cyan);
+    color: var(--accent-bright);
   }
 `;
 
@@ -286,7 +285,7 @@ const NextInner = styled.div`
     font-weight: 600;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: var(--cyan);
+    color: var(--accent-bright);
   }
 `;
 
@@ -310,12 +309,12 @@ const NextLink = styled(Link)`
   &::after {
     content: '↗';
     font-size: 0.42em;
-    color: var(--cyan);
+    color: var(--accent-bright);
     transition: transform 0.5s var(--ease-expo);
   }
 
   &:hover {
-    color: var(--cyan);
+    color: var(--accent-bright);
     padding-left: clamp(12px, 2vw, 32px);
 
     &::after {
@@ -344,7 +343,7 @@ const MissingShell = styled.section`
     font-weight: 600;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: var(--cyan);
+    color: var(--accent-bright);
   }
   h1 {
     font-family: var(--font-display);
@@ -358,10 +357,6 @@ const MissingShell = styled.section`
 const ProjectDetail = () => {
   const { slug } = useParams();
   const { language, t } = useLanguage();
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [slug]);
 
   const project = slug ? getProject(slug) : undefined;
 
@@ -510,7 +505,7 @@ const ProjectDetail = () => {
             {isRu ? 'Следующий проект' : 'Next project'}
           </Reveal>
           <Reveal delay={0.05}>
-            <NextLink to={`/work/${next.slug}`} data-cursor="hover">
+            <NextLink to={next.href ?? `/work/${next.slug}`} data-cursor="hover">
               {nextTitle}
             </NextLink>
           </Reveal>

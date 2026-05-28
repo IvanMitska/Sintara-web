@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import type { MotionValue } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
+import BlobOrb from '../../components/decor/BlobOrb';
 
 /**
  * Manifesto — a single oversized paragraph whose words ignite from muted
@@ -69,7 +70,7 @@ const AnimatedWord = ({
   const opacity = useTransform(progress, range, [0.16, 1]);
   const color = useTransform(progress, range, [
     '#9A9AA8',
-    children.includes('—') ? '#3D37F2' : '#0A0A0C',
+    children.includes('—') ? '#8B5CF6' : '#0A0A0C',
   ]);
   return <Word style={{ opacity, color }}>{children}</Word>;
 };
@@ -94,6 +95,27 @@ const Manifesto = () => {
 
   return (
     <Shell data-nav-theme="light">
+      {/* Two iridescent jelly orbs flanking the manifesto paragraph.
+          zIndex: -1 keeps them behind the text — the words paint over the
+          orbs (kind of nice where they peek between letter shapes). */}
+      <BlobOrb
+        size={280}
+        spin={0.04}
+        style={{
+          top: 'clamp(140px, 28vh, 360px)',
+          left: 'clamp(20px, 6vw, 160px)',
+          zIndex: -1,
+        }}
+      />
+      <BlobOrb
+        size={320}
+        spin={0.06}
+        style={{
+          top: 'clamp(60px, 14vh, 200px)',
+          right: 'clamp(20px, 6vw, 160px)',
+          zIndex: -1,
+        }}
+      />
       <Inner ref={ref}>
         <Eyebrow>{isRu ? '(01) — Студия' : '(01) — The studio'}</Eyebrow>
         <Para>

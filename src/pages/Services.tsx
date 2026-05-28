@@ -1,5 +1,4 @@
-import { useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, useReducedMotion } from 'framer-motion';
 import NavBar from '../components/NavBar';
@@ -52,14 +51,14 @@ const Tag = styled.span`
   font-weight: 600;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--cyan);
+  color: var(--accent-bright);
 
   &::before {
     content: '';
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--cyan);
+    background: var(--accent-bright);
   }
 
   &.right {
@@ -81,6 +80,12 @@ const HeroTitle = styled.h1`
   .line {
     display: block;
     overflow: hidden;
+    /* The mask box is tighter than the glyphs at line-height 0.84, so
+       descenders (g, y, p, the period) get sliced. Pad the clip box for
+       descenders; a small negative margin keeps lines tight but leaves a
+       little breathing room so stacked lines don't visually merge. */
+    padding-bottom: 0.26em;
+    margin-bottom: -0.12em;
   }
   .line > span {
     display: inline-block;
@@ -111,7 +116,7 @@ const HeroFoot = styled(HeroBand)`
     font-weight: 600;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--cyan);
+    color: var(--accent-bright);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
@@ -186,8 +191,6 @@ const Rows = styled.div`
 
 const Row = styled(Link)`
   position: relative;
-  isolation: isolate;
-  overflow: hidden;
   display: grid;
   grid-template-columns:
     clamp(40px, 4vw, 72px) minmax(0, 1.5fr)
@@ -198,22 +201,7 @@ const Row = styled(Link)`
   border-bottom: 1px solid var(--bone-line);
   color: var(--ink);
   scroll-margin-top: 110px;
-  transition:
-    color 0.35s var(--ease-snap),
-    opacity 0.4s var(--ease-snap);
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: var(--accent);
-    transform: translateY(100%);
-    transition: transform 0.55s var(--ease-expo);
-  }
-  &:hover::before {
-    transform: translateY(0);
-  }
+  transition: opacity 0.45s var(--ease-snap);
 
   .num {
     font-family: var(--font-grotesk);
@@ -222,7 +210,7 @@ const Row = styled(Link)`
     letter-spacing: 0.04em;
     color: var(--muted);
     font-variant-numeric: tabular-nums;
-    transition: color 0.35s var(--ease-snap);
+    transition: color 0.4s var(--ease-snap);
   }
 
   .name {
@@ -231,7 +219,10 @@ const Row = styled(Link)`
     font-size: clamp(2rem, 4.6vw, 4.25rem);
     line-height: 0.98;
     letter-spacing: -0.035em;
-    transition: transform 0.5s var(--ease-expo);
+    color: var(--ink);
+    transition:
+      color 0.4s var(--ease-snap),
+      transform 0.55s var(--ease-expo);
   }
 
   .desc {
@@ -239,31 +230,19 @@ const Row = styled(Link)`
     line-height: 1.5;
     color: var(--muted);
     max-width: 40ch;
-    transition: color 0.35s var(--ease-snap);
+    transition: color 0.4s var(--ease-snap);
   }
 
-  .price {
-    text-align: right;
-    transition: color 0.35s var(--ease-snap);
-
-    .label {
-      display: block;
-      font-family: var(--font-grotesk);
-      font-size: 0.5625rem;
-      font-weight: 600;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 7px;
-      transition: color 0.35s var(--ease-snap);
-    }
-    .val {
-      font-family: var(--font-display);
-      font-weight: 600;
-      font-size: clamp(1.5rem, 2.2vw, 2.125rem);
-      letter-spacing: -0.025em;
-      white-space: nowrap;
-    }
+  .quote {
+    justify-self: end;
+    font-family: var(--font-grotesk);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--muted);
+    transition: color 0.4s var(--ease-snap);
   }
 
   .go {
@@ -271,35 +250,40 @@ const Row = styled(Link)`
     width: 52px;
     height: 52px;
     border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.45);
+    border: 1px solid var(--bone-line);
     display: grid;
     place-items: center;
     font-size: 1.125rem;
-    color: #fff;
+    color: var(--ink);
     opacity: 0;
-    transform: scale(0.5) rotate(-12deg);
+    transform: scale(0.6) rotate(-12deg);
     transition:
-      opacity 0.3s,
-      transform 0.5s var(--ease-expo);
+      opacity 0.3s var(--ease-snap),
+      transform 0.5s var(--ease-expo),
+      background 0.4s var(--ease-snap),
+      border-color 0.4s var(--ease-snap),
+      color 0.4s var(--ease-snap);
   }
 
-  &:hover {
-    color: #fff;
-  }
-  &:hover .num {
-    color: #fff;
-  }
-  &:hover .desc,
-  &:hover .price,
-  &:hover .price .label {
-    color: rgba(255, 255, 255, 0.82);
-  }
+  /* Home-style hover: the name slides + ignites to accent, the meta turns
+     accent, and the circular arrow snaps in — no full-block fill. */
   &:hover .name {
+    color: var(--accent);
     transform: translateX(clamp(8px, 1.4vw, 26px));
+  }
+  &:hover .num,
+  &:hover .quote {
+    color: var(--accent);
+  }
+  &:hover .desc {
+    color: var(--ink);
   }
   &:hover .go {
     opacity: 1;
     transform: scale(1) rotate(0deg);
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
   }
 
   @media (max-width: 1040px) {
@@ -311,10 +295,10 @@ const Row = styled(Link)`
       grid-column: 2 / -1;
       margin-top: 8px;
     }
-    .price {
+    .quote {
       grid-column: 2 / -1;
-      text-align: left;
-      margin-top: 16px;
+      justify-self: start;
+      margin-top: 14px;
     }
     .go {
       display: none;
@@ -350,7 +334,7 @@ const CtaInner = styled.div`
     font-weight: 600;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: var(--cyan);
+    color: var(--accent-bright);
   }
 
   h2 {
@@ -363,34 +347,18 @@ const CtaInner = styled.div`
 `;
 
 const services = [
-  { n: '01', nameKey: 'home.services.1.title', descKey: 'home.services.1.desc', price: '$1 500', id: 'web' },
-  { n: '02', nameKey: 'home.services.2.title', descKey: 'home.services.2.desc', price: '$15 000', id: 'webapp' },
-  { n: '03', nameKey: 'home.services.3.title', descKey: 'home.services.3.desc', price: '$1 200', id: 'bot' },
-  { n: '04', nameKey: 'home.services.4.title', descKey: 'home.services.4.desc', price: '$5 000', id: 'crm' },
-  { n: '05', nameKey: 'home.services.5.title', descKey: 'home.services.5.desc', price: '$3 000', id: 'redesign' },
-  { n: '06', nameKey: 'home.services.6.title', descKey: 'home.services.6.desc', price: '$900/mo', id: 'support' },
+  { n: '01', nameKey: 'home.services.1.title', descKey: 'home.services.1.desc', id: 'web' },
+  { n: '02', nameKey: 'home.services.2.title', descKey: 'home.services.2.desc', id: 'webapp' },
+  { n: '03', nameKey: 'home.services.3.title', descKey: 'home.services.3.desc', id: 'bot' },
+  { n: '04', nameKey: 'home.services.4.title', descKey: 'home.services.4.desc', id: 'crm' },
+  { n: '05', nameKey: 'home.services.5.title', descKey: 'home.services.5.desc', id: 'redesign' },
+  { n: '06', nameKey: 'home.services.6.title', descKey: 'home.services.6.desc', id: 'support' },
 ];
 
 const Services = () => {
   const { t, language } = useLanguage();
-  const { hash } = useLocation();
   const reduced = useReducedMotion();
   const isRu = language === 'ru';
-
-  // Honour deep links from the home Capabilities section (/services#web …).
-  useEffect(() => {
-    if (hash) {
-      const el = document.getElementById(hash.slice(1));
-      if (el) {
-        const timer = window.setTimeout(
-          () => el.scrollIntoView({ behavior: 'smooth', block: 'start' }),
-          360,
-        );
-        return () => window.clearTimeout(timer);
-      }
-    }
-    window.scrollTo(0, 0);
-  }, [hash]);
 
   const titleLines = [t('services.page.title1'), t('services.page.title2')];
 
@@ -459,7 +427,7 @@ const Services = () => {
           <ListHead>
             <div>
               <Reveal as="span" className="eyebrow">
-                {isRu ? 'Услуги и цены' : 'Services & pricing'}
+                {isRu ? 'Услуги' : 'Services'}
               </Reveal>
               <Reveal as="h2" delay={0.05}>
                 {isRu ? 'Что мы делаем' : 'What we build'}
@@ -467,8 +435,8 @@ const Services = () => {
             </div>
             <Reveal as="p" delay={0.1}>
               {isRu
-                ? 'Фиксированная стартовая цена за каждое направление — без скрытых смет.'
-                : 'A fixed starting price for every track — no hidden estimates.'}
+                ? 'Выберите направление и заполните короткий бриф — вернёмся с понятным планом и сметой.'
+                : 'Pick a direction and start a short brief — we’ll come back with a clear plan and quote.'}
             </Reveal>
           </ListHead>
 
@@ -479,11 +447,8 @@ const Services = () => {
                   <span className="num">{s.n}</span>
                   <span className="name">{t(s.nameKey)}</span>
                   <span className="desc">{t(s.descKey)}</span>
-                  <span className="price">
-                    <span className="label">
-                      {t('services.page.priceFrom')}
-                    </span>
-                    <span className="val">{s.price}</span>
+                  <span className="quote">
+                    {isRu ? 'Рассчитать' : 'Get a quote'}
                   </span>
                   <span className="go" aria-hidden>
                     ↗

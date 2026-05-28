@@ -4,6 +4,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import styled, { css, keyframes } from 'styled-components';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
+import { lockScroll, unlockScroll } from '../lib/scrollLock';
 
 /**
  * Sintara mega-menu — ported 1:1 from sintara-crm-web.
@@ -562,11 +563,12 @@ const Navigation = ({ surface }: NavigationProps) => {
     if (surface) setNavTheme(surface);
   }, [location.pathname, surface]);
 
-  // Lock body scroll while overlay open
+  // Lock scroll while overlay open (compensates scrollbar width — no shift)
   useEffect(() => {
-    document.body.style.overflow = open ? 'hidden' : '';
+    if (!open) return;
+    lockScroll();
     return () => {
-      document.body.style.overflow = '';
+      unlockScroll();
     };
   }, [open]);
 

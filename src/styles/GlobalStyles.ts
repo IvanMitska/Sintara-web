@@ -43,13 +43,12 @@ const GlobalStyles = createGlobalStyle`
     --muted: ${colors.muted};
     --muted-dark: ${colors.mutedDark};
 
-    /* Accent — electric blue everywhere */
+    /* Accent — brand violet everywhere */
     --accent: ${colors.accent};
     --accent-hover: ${colors.accentHover};
     --accent-soft: ${colors.accentSoft};
+    --accent-bright: ${colors.accentBright};
     --blue: ${colors.accent};
-    --cyan: ${colors.cyan};
-    --cyan-soft: ${colors.cyanSoft};
 
     --font-display: ${fonts.display};
     --font-grotesk: ${fonts.grotesk};
@@ -75,6 +74,14 @@ const GlobalStyles = createGlobalStyle`
     text-rendering: optimizeLegibility;
     scroll-behavior: auto;
     background: var(--paper);
+    /* Keep the scrollbar always present so the scrollport width is constant.
+       Without this the page reflows sideways whenever the bar appears or
+       disappears — on route changes, short pages, or the preloader/menu
+       toggling overflow:hidden. The custom webkit track is transparent, so
+       on non-scrolling pages this reserved 9px reads as empty space, not a
+       visible bar. Scroll-lock (see lib/scrollLock) compensates the bar
+       width with padding so even overflow:hidden never shifts the layout. */
+    overflow-y: scroll;
   }
 
   /* Lenis smooth scroll */
@@ -191,7 +198,7 @@ const GlobalStyles = createGlobalStyle`
     color: #fff;
   }
   [data-surface='dark'] ::selection {
-    background: var(--cyan);
+    background: var(--accent-bright);
     color: var(--ink);
   }
 

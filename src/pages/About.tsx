@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import Navigation from '../components/Navigation';
@@ -163,10 +162,6 @@ const PBody = styled.p`
 
 const About = () => {
   const { t } = useLanguage();
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   return (
     <>

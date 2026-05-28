@@ -172,7 +172,7 @@ const CtaFinale = () => {
       <ErrorBoundary fallback={null}>
         <FooterScene active={inView} />
       </ErrorBoundary>
-      <DotField blue="#3D37F2" />
+      <DotField blue="#8B5CF6" />
       <Crosshair
         style={{ top: '16%', left: '12%' }}
         $size={16}
