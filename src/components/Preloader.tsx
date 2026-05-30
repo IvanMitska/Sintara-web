@@ -141,11 +141,17 @@ const Preloader = ({ onComplete }: PreloaderProps) => {
     return () => {
       cancelAnimationFrame(raf);
       window.clearTimeout(endTimer);
+      // Balance the lockScroll() above in THIS effect's cleanup. lockScroll is
+      // reference-counted, so pairing lock+unlock per mount keeps it balanced
+      // under StrictMode's mount→unmount→remount in dev (otherwise locks would
+      // settle at 1 and leave <html> overflow:hidden, blocking scroll past the
+      // hero) — and also releases the lock if the preloader unmounts via
+      // navigation rather than the exit-complete path.
+      unlockScroll();
     };
   }, []);
 
   const handleExitComplete = () => {
-    unlockScroll();
     startScroll();
     scrollToTop(true);
     onComplete();
