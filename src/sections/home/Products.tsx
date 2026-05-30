@@ -117,6 +117,23 @@ const Pitch = styled.div`
     display: flex;
     gap: 14px;
     flex-wrap: wrap;
+
+    /* Mobile (single-column layout): full-width stacked CTAs so they read as
+       deliberate buttons instead of narrow pills floating in the column. The
+       label sits left, the arrow pins to the right edge. Desktop's two-column
+       inline pills are unchanged. Matches the Grid's 900px collapse. */
+    @media (max-width: 900px) {
+      flex-direction: column;
+      align-items: stretch;
+      flex-wrap: nowrap;
+      gap: 12px;
+      padding-top: clamp(24px, 4vh, 36px);
+
+      a {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
   }
 `;
 
