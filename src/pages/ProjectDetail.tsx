@@ -98,6 +98,12 @@ const ProjectTitle = styled.h1`
   font-family: var(--font-display);
   font-weight: 400;
   font-size: clamp(3.5rem, 14vw, 17rem);
+  /* Phones: scale the hero up with the viewport so it doesn't sit at the small
+     clamp floor; the floor still protects the narrowest phones. Desktop curve
+     unchanged. */
+  @media (max-width: 600px) {
+    font-size: clamp(3.5rem, 17vw, 17rem);
+  }
   line-height: 0.86;
   /* Bumped from clamp(24px, 4vh, 48px) so the title sits in roughly the
      same place after removing the MetaRow strip that used to live
