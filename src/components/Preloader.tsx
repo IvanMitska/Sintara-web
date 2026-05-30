@@ -203,7 +203,7 @@ const Preloader = ({ onComplete }: PreloaderProps) => {
           <Counter>{String(progress).padStart(3, '0')}</Counter>
 
           <Meta>
-            Est. 2024
+            Est. 2026
             <br />
             Loading
           </Meta>

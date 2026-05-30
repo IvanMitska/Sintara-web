@@ -30,7 +30,7 @@ const translations: Record<Language, Record<string, string>> = {
     'footer.elsewhere': 'Elsewhere',
 
     // Hero (editorial)
-    'home.hero.eyebrow': 'Independent studio · est. 2024',
+    'home.hero.eyebrow': 'Independent studio · est. 2026',
     'home.hero.line1': 'Sintara',
     'home.hero.line2': 'builds digital',
     'home.hero.line3': 'products.',
@@ -159,7 +159,7 @@ const translations: Record<Language, Record<string, string>> = {
     'about.title1': 'Small studio.',
     'about.title2': 'Serious work.',
     'about.lead':
-      'Sintara is an independent digital studio founded in 2024. We partner with founders, operators and marketing teams who care about the details — and want to ship without the usual agency overhead.',
+      'Sintara is an independent digital studio founded in 2026. We partner with founders, operators and marketing teams who care about the details — and want to ship without the usual agency overhead.',
     'about.block1.title': 'Why we exist',
     'about.block1.body':
       'Most software shops either sell time (and drag projects out) or sell templates (and ship the same thing to everyone). We wanted a third option: bespoke products, delivered fast, at a fixed price — with the people writing the code sitting one message away from the client.',
@@ -462,7 +462,7 @@ const translations: Record<Language, Record<string, string>> = {
     'footer.elsewhere': 'Контакты',
 
     // Hero (editorial)
-    'home.hero.eyebrow': 'Независимая студия · с 2024',
+    'home.hero.eyebrow': 'Независимая студия · с 2026',
     'home.hero.line1': 'Sintara',
     'home.hero.line2': 'делает цифровые',
     'home.hero.line3': 'продукты.',
@@ -591,7 +591,7 @@ const translations: Record<Language, Record<string, string>> = {
     'about.title1': 'Маленькая студия.',
     'about.title2': 'Серьёзная работа.',
     'about.lead':
-      'Sintara — независимая цифровая студия, основанная в 2024 году. Мы работаем с фаундерами, операционными и маркетинговыми командами, которые заботятся о деталях и хотят запускаться без типичного агентского накладного жира.',
+      'Sintara — независимая цифровая студия, основанная в 2026 году. Мы работаем с фаундерами, операционными и маркетинговыми командами, которые заботятся о деталях и хотят запускаться без типичного агентского накладного жира.',
     'about.block1.title': 'Зачем мы существуем',
     'about.block1.body':
       'Большинство студий либо продают время (и растягивают проекты), либо продают шаблоны (и отгружают одно и то же всем подряд). Нам нужен был третий вариант: авторские продукты, быстрый запуск, фиксированная цена — и люди, которые пишут код, в одном сообщении от клиента.',

@@ -77,7 +77,7 @@ const Statement = () => {
             : 'We blend design, engineering and obsessive detail to turn ambitious ideas into digital products that actually ship.'}
         </p>
         <span className="marker">
-          {isRu ? '⌖ С 2024 · Глобально' : '⌖ Est. 2024 · Worldwide'}
+          {isRu ? '⌖ С 2026 · Глобально' : '⌖ Est. 2026 · Worldwide'}
         </span>
       </Foot>
     </Shell>

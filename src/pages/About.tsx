@@ -465,7 +465,7 @@ const About = () => {
           </Reveal>
           <Reveal as="span" delay={0.06}>
             <Tag className="right">
-              {isRu ? 'Основано в 2024' : 'Est. 2024'}
+              {isRu ? 'Основано в 2026' : 'Est. 2026'}
             </Tag>
           </Reveal>
         </HeroTop>
