@@ -70,33 +70,62 @@ const Cursor = () => {
   const ringY = useSpring(y, { stiffness: 380, damping: 34, mass: 0.45 });
 
   useEffect(() => {
-    const fine = window.matchMedia('(hover: hover) and (pointer: fine)')
-      .matches;
-    if (!fine) return;
-    setEnabled(true);
-    document.documentElement.classList.add('has-cursor');
+    // Desktop-only: a real mouse (hover + fine pointer) AND a desktop-width
+    // viewport. The width gate also covers a narrow/resized desktop window and
+    // hybrid webviews that report a fine pointer — on those the ring would
+    // otherwise show at mobile widths. Re-evaluated live so resizing across the
+    // md breakpoint toggles the cursor without a reload.
+    const mql = window.matchMedia(
+      '(hover: hover) and (pointer: fine) and (min-width: 768px)',
+    );
 
-    const onMove = (e: MouseEvent) => {
-      x.set(e.clientX);
-      y.set(e.clientY);
-      setVisible(true);
-      setHovering(isInteractive(e.target as Element));
+    let detach: (() => void) | null = null;
+
+    const enable = () => {
+      if (detach) return;
+      setEnabled(true);
+      document.documentElement.classList.add('has-cursor');
+
+      const onMove = (e: MouseEvent) => {
+        x.set(e.clientX);
+        y.set(e.clientY);
+        setVisible(true);
+        setHovering(isInteractive(e.target as Element));
+      };
+      const onDown = () => setDown(true);
+      const onUp = () => setDown(false);
+      const onLeave = () => setVisible(false);
+
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mousedown', onDown);
+      window.addEventListener('mouseup', onUp);
+      document.addEventListener('mouseleave', onLeave);
+
+      detach = () => {
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mousedown', onDown);
+        window.removeEventListener('mouseup', onUp);
+        document.removeEventListener('mouseleave', onLeave);
+      };
     };
-    const onDown = () => setDown(true);
-    const onUp = () => setDown(false);
-    const onLeave = () => setVisible(false);
 
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mousedown', onDown);
-    window.addEventListener('mouseup', onUp);
-    document.addEventListener('mouseleave', onLeave);
+    const disable = () => {
+      detach?.();
+      detach = null;
+      setEnabled(false);
+      setVisible(false);
+      setHovering(false);
+      setDown(false);
+      document.documentElement.classList.remove('has-cursor');
+    };
+
+    const apply = () => (mql.matches ? enable() : disable());
+    apply();
+    mql.addEventListener('change', apply);
 
     return () => {
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mousedown', onDown);
-      window.removeEventListener('mouseup', onUp);
-      document.removeEventListener('mouseleave', onLeave);
-      document.documentElement.classList.remove('has-cursor');
+      mql.removeEventListener('change', apply);
+      disable();
     };
   }, [x, y]);
 
