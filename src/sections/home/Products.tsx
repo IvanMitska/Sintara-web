@@ -185,7 +185,7 @@ const Card = styled(Link)`
        the monitor's left edge ran off the card. object-position below 50% shows
        more of the image's left side, shifting the device rightward into frame. */
     @media (max-width: 900px) {
-      object-position: 32% center;
+      object-position: 42% center;
     }
   }
 
