@@ -27,13 +27,26 @@ const Btn = styled.button<{ $theme: NavTheme; $playing: boolean }>`
     ${({ $theme }) =>
       $theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(10,10,12,0.14)'};
   background: ${({ $theme }) =>
-    $theme === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.55)'};
-  backdrop-filter: blur(10px);
+    $theme === 'dark' ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.55)'};
+  /* Blur skipped on dark theme — backdrop-filter over the hero video
+     forces a per-frame GPU blur pass that destroys fps. The bumped
+     matte fill (0.06 → 0.14) keeps the pill readable without it. */
+  backdrop-filter: ${({ $theme }) =>
+    $theme === 'dark' ? 'none' : 'blur(10px)'};
   color: ${({ $theme }) => ($theme === 'dark' ? '#fff' : 'var(--ink)')};
   transition:
     background 0.4s var(--ease-snap),
     border-color 0.4s var(--ease-snap),
     color 0.4s var(--ease-snap);
+
+  /* Touch — drop the live blur, bump the matte fill to keep contrast. */
+  @media (pointer: coarse) {
+    backdrop-filter: none;
+    background: ${({ $theme }) =>
+      $theme === 'dark'
+        ? 'rgba(255,255,255,0.14)'
+        : 'rgba(255,255,255,0.82)'};
+  }
 
   &:hover {
     border-color: ${({ $theme }) =>

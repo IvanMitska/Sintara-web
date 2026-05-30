@@ -184,6 +184,13 @@ const Card = styled(Link)`
     transition:
       transform 0.5s var(--ease-expo),
       background 0.4s var(--ease-snap);
+
+    /* Touch — drop the per-frame blur, lift the matte fill a touch so
+       the chip stays legible over the product mockup. */
+    @media (pointer: coarse) {
+      backdrop-filter: none;
+      background: rgba(255, 255, 255, 0.2);
+    }
   }
 
   &:hover .arrow {

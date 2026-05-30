@@ -9,8 +9,11 @@ import SmoothScroll from './components/SmoothScroll';
 import RouteMount from './components/RouteMount';
 import Cursor from './components/Cursor';
 
-// WebGL layer is heavy (three.js) — keep it out of the initial bundle.
-const GlobalCanvas = lazy(() => import('./webgl/GlobalCanvas'));
+// GlobalCanvas (Three.js) was the host for the WebGL hero. Now that the
+// hero is a <video>, mounting an idle Canvas still allocates a WebGL
+// context + framebuffers + the CrystalScene/Bloom/Vignette graph in GPU
+// memory, competing with the video decoder for the same screen. Removed
+// from the tree; the files in src/webgl/ are kept for future scenes.
 
 // Home is eager — first paint matters
 import Home from './pages/Home';
@@ -121,9 +124,6 @@ const App = () => {
         <BrowserRouter>
           <GlobalStyles />
           <SmoothScroll />
-          <Suspense fallback={null}>
-            <GlobalCanvas />
-          </Suspense>
           <Cursor />
           <ErrorBoundary>
             <Suspense fallback={<PageLoader />}>

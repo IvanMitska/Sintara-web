@@ -23,9 +23,15 @@ const SmoothScroll = () => {
     const reduced = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches;
+    // Touch devices — particularly Telegram's in-app WebView — get
+    // stuttery scrolling when Lenis intercepts touchmove and drives a
+    // JS-interpolated transform every frame. Native momentum scroll is
+    // GPU-accelerated on iOS/Android and matches what users expect on
+    // mobile anyway; the cinematic Lenis easing is a desktop-only flourish.
+    const coarse = window.matchMedia('(pointer: coarse)').matches;
 
-    // Reduced motion → native scroll, still feed the WebGL layer.
-    if (reduced) {
+    // Reduced motion / coarse pointer → native scroll, still feed WebGL.
+    if (reduced || coarse) {
       const onScroll = () => {
         flux.scroll = window.scrollY;
       };

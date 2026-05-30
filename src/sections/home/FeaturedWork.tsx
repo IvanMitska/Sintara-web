@@ -138,6 +138,11 @@ const Card = styled(Link)`
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--ink);
+
+    /* Touch — base fill is already 0.92 opaque, so simply drop the blur. */
+    @media (pointer: coarse) {
+      backdrop-filter: none;
+    }
   }
   .badge::before {
     content: '';

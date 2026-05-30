@@ -1021,6 +1021,13 @@ const AutoSave = styled(motion.div)`
   background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(6px);
 
+  /* Touch — kill the per-frame blur (the saving pill sits inside the
+     scrollable form), trade with a near-opaque matte pill instead. */
+  @media (pointer: coarse) {
+    backdrop-filter: none;
+    background: rgba(255, 255, 255, 0.88);
+  }
+
   .pulse {
     width: 7px;
     height: 7px;

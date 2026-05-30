@@ -83,7 +83,11 @@ const Pill = styled(Link)<{ $solid?: boolean; $theme: NavTheme }>`
   text-transform: uppercase;
   letter-spacing: 0.13em;
   white-space: nowrap;
-  backdrop-filter: blur(10px);
+  /* Blur is skipped on dark theme (hero video) — backdrop-filter over
+     a 30fps video means a per-frame GPU pass over every sticky pill,
+     which collapses scroll fps. On light/inner pages the background is
+     static so the blur is cheap. */
+  backdrop-filter: ${({ $theme }) => ($theme === 'dark' ? 'none' : 'blur(10px)')};
   transition:
     background 0.4s var(--ease-snap),
     color 0.4s var(--ease-snap),
@@ -93,8 +97,19 @@ const Pill = styled(Link)<{ $solid?: boolean; $theme: NavTheme }>`
     $solid
       ? 'var(--ink)'
       : $theme === 'dark'
-        ? 'rgba(255,255,255,0.06)'
+        ? 'rgba(255,255,255,0.14)'
         : 'rgba(255,255,255,0.55)'};
+
+  /* Touch devices also skip blur (per-frame GPU pass on scroll). */
+  @media (pointer: coarse) {
+    backdrop-filter: none;
+    background: ${({ $solid, $theme }) =>
+      $solid
+        ? 'var(--ink)'
+        : $theme === 'dark'
+          ? 'rgba(255,255,255,0.18)'
+          : 'rgba(255,255,255,0.82)'};
+  }
   color: ${({ $solid, $theme }) =>
     $solid ? '#fff' : $theme === 'dark' ? '#fff' : 'var(--ink)'};
   border: 1px solid
@@ -137,12 +152,14 @@ const MenuBtn = styled.button<{ $theme: NavTheme; $open: boolean }>`
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.13em;
-  backdrop-filter: blur(10px);
+  /* See LetsTalk pill — blur disabled over dark hero video. */
+  backdrop-filter: ${({ $theme, $open }) =>
+    $open || $theme === 'dark' ? 'none' : 'blur(10px)'};
   background: ${({ $open, $theme }) =>
     $open
       ? '#fff'
       : $theme === 'dark'
-        ? 'rgba(255,255,255,0.06)'
+        ? 'rgba(255,255,255,0.14)'
         : 'rgba(255,255,255,0.55)'};
   color: ${({ $open, $theme }) =>
     $open ? 'var(--ink)' : $theme === 'dark' ? '#fff' : 'var(--ink)'};
@@ -154,6 +171,16 @@ const MenuBtn = styled.button<{ $theme: NavTheme; $open: boolean }>`
           ? 'rgba(255,255,255,0.2)'
           : 'rgba(10,10,12,0.14)'};
   transition: all 0.4s var(--ease-snap);
+
+  @media (pointer: coarse) {
+    backdrop-filter: none;
+    background: ${({ $open, $theme }) =>
+      $open
+        ? '#fff'
+        : $theme === 'dark'
+          ? 'rgba(255,255,255,0.14)'
+          : 'rgba(255,255,255,0.82)'};
+  }
 
   .bars {
     position: relative;

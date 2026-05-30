@@ -249,6 +249,11 @@ const Cover = styled(Link)<{ $accent: string }>`
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--ink);
+
+    /* Touch — base fill is already 0.92 opaque, drop the blur pass. */
+    @media (pointer: coarse) {
+      backdrop-filter: none;
+    }
   }
   .own::before {
     content: '';

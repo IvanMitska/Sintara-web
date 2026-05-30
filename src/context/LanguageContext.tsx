@@ -38,6 +38,10 @@ const translations: Record<Language, Record<string, string>> = {
     'home.hero.primary': 'Start a project',
     'home.hero.secondary': 'See selected work',
     'home.hero.scroll': 'Scroll',
+    'home.hero.metaLabel': 'Continuous craft',
+    'home.hero.metaIndex': '01',
+    'home.hero.metaBody':
+      'We build the web the slow way — by hand, for people who care how a thing actually feels.',
 
     // Marquee strip
     'home.marquee.1': 'Web development',
@@ -466,6 +470,10 @@ const translations: Record<Language, Record<string, string>> = {
     'home.hero.primary': 'Начать проект',
     'home.hero.secondary': 'Избранные работы',
     'home.hero.scroll': 'Листайте',
+    'home.hero.metaLabel': 'Ремесленный подход',
+    'home.hero.metaIndex': '01',
+    'home.hero.metaBody':
+      'Делаем веб по-старому — руками, для тех, кому важно, как продукт ощущается на самом деле.',
 
     // Marquee strip
     'home.marquee.1': 'Веб-разработка',

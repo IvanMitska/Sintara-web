@@ -89,9 +89,12 @@ const GlobalCanvas = () => {
 
   if (!mounted) return null;
 
-  // Run only on the home route, and only while the hero is actually on
-  // screen — frozen the moment it's scrolled behind the opaque sections.
-  const frameloop = pathname === '/' && heroVisible ? 'always' : 'never';
+  // The hero is now a <video> background owned by Hero.tsx; this WebGL
+  // surface no longer drives anything visible. Keep it mounted (cheap)
+  // so future scenes can opt back in, but never advance the loop.
+  // `heroVisible` is preserved as a signal for any DOM consumers.
+  void heroVisible;
+  const frameloop: 'always' | 'never' = 'never';
 
   // Keep the canvas mounted and laid out on every route — toggling display:none
   // can release the WebGL context, and recreating it on the next visit is a

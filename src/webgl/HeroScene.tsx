@@ -1,24 +1,24 @@
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
-import BlackHole from './BlackHole';
+import CrystalScene from './CrystalScene';
 
 /**
- * Hero scene — the Interstellar-style black hole, with a bloom pass to
- * make the accretion disk glow. The wordmark is crisp DOM type (Hero).
+ * Hero scene — a brand-violet crystal cluster on a dust-and-stars
+ * background. The DOM Hero overlays crisp type on top. Postprocessing
+ * is light: a soft bloom for the rim glow, a gentle vignette for depth.
  */
 
 const HeroScene = () => (
   <>
-    <color attach="background" args={['#000000']} />
-    <BlackHole />
+    <CrystalScene />
     <EffectComposer>
       <Bloom
         mipmapBlur
-        intensity={0.55}
-        luminanceThreshold={0.5}
-        luminanceSmoothing={0.6}
-        radius={0.8}
+        intensity={0.38}
+        luminanceThreshold={0.55}
+        luminanceSmoothing={0.7}
+        radius={0.75}
       />
-      <Vignette offset={0.42} darkness={0.55} eskil={false} />
+      <Vignette offset={0.38} darkness={0.6} eskil={false} />
     </EffectComposer>
   </>
 );
