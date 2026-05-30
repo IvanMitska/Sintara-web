@@ -249,6 +249,14 @@ const Row = styled(Link)`
     line-height: 0.98;
     letter-spacing: -0.035em;
     color: var(--ink);
+    /* Pin to its own compositor layer so the hover translateX doesn't
+       trigger a layer-promotion repaint — that's the visible text
+       "jerk" on first hover, ugliest on the multi-line "Telegram bots
+       & Mini Apps" row. Baseline translate3d + will-change keeps it on
+       a stable raster between idle and hover states. */
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+    backface-visibility: hidden;
     transition:
       color 0.4s var(--ease-snap),
       transform 0.55s var(--ease-expo);
@@ -298,7 +306,7 @@ const Row = styled(Link)`
      accent, and the circular arrow snaps in — no full-block fill. */
   &:hover .name {
     color: var(--accent);
-    transform: translateX(clamp(8px, 1.4vw, 26px));
+    transform: translate3d(clamp(8px, 1.4vw, 26px), 0, 0);
   }
   &:hover .num,
   &:hover .quote {
@@ -333,7 +341,7 @@ const Row = styled(Link)`
       display: none;
     }
     &:hover .name {
-      transform: none;
+      transform: translate3d(0, 0, 0);
     }
   }
 `;
