@@ -139,12 +139,20 @@ const Title = styled(motion.h1)`
      bring back a soft text-shadow (always reads as a smudged plate). */
   text-shadow: none;
 
-  /* Phones: the desktop clamp bottoms out at 3rem below ~436px, leaving the
-     wordmark feeling small. Scale it up with the viewport (still single-line,
-     nowrap), capping near where the desktop curve meets it at 600px so there's
-     no step at the breakpoint. Desktop sizing untouched. */
+  /* Phones: stack the two words and go large. A single line maxed out near
+     edge-to-edge; stacking lets each word breathe and read as a poster, which
+     suits the narrow viewport. Desktop keeps the single editorial line. */
   @media (max-width: 600px) {
-    font-size: clamp(3rem, 15vw, 4.1rem);
+    font-size: clamp(3.6rem, 20vw, 5.6rem);
+    line-height: 0.9;
+    white-space: normal;
+
+    .wm {
+      display: block;
+    }
+    .wm + .wm {
+      margin-left: 0;
+    }
   }
 
   .wm {
