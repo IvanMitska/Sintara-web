@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import Reveal from '../../components/ui/Reveal';
 import PillLink from '../../components/ui/PillLink';
+import { v } from '../../lib/asset';
 
 /**
  * Our products — the home block that introduces Sintara's flagship SaaS,
@@ -258,7 +259,7 @@ const Products = () => {
                   broken-image icon if the file isn't there yet. */}
               <img
                 className="mockup"
-                src="/projects/sintara-crm/mockup.webp"
+                src={v('/projects/sintara-crm/mockup.webp')}
                 alt={isRu ? 'Sintara CRM — интерфейс' : 'Sintara CRM interface'}
                 loading="lazy"
                 onError={(e) => {

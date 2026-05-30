@@ -1,6 +1,8 @@
 // Single source of truth for project/case data.
 // Used by Home (selected work), Work index, and Work detail pages.
 
+import { v } from '../lib/asset';
+
 export type ProjectCategory = 'website' | 'bot' | 'crm' | 'saas';
 
 export interface ProjectI18n {
@@ -39,7 +41,10 @@ export interface Project {
   ru: ProjectI18n;
 }
 
-export const projects: Project[] = [
+// Raw data — the cover/screen URLs run through `v()` below so they pick up
+// the current ASSET_VERSION query string. That way, replacing an image at
+// the same path actually shows up for every visitor.
+const rawProjects: Project[] = [
   {
     slug: 'sintara-crm',
     number: '00',
@@ -161,19 +166,19 @@ export const projects: Project[] = [
     slug: 'unicar',
     number: '03',
     year: '2024',
-    client: 'UNICAR',
+    client: 'UNICAR CRM',
     category: 'crm',
     tags: ['React', 'TypeScript', 'Tailwind CSS', 'Dashboard'],
     cover: '/projects/unicar/cover.webp',
     screens: [
-      '/projects/unicar/screen-1.webp',
-      '/projects/unicar/screen-2.webp',
-      '/projects/unicar/screen-3.webp',
-      '/projects/unicar/screen-4.webp',
+      '/projects/unicar/cover-1.webp',
+      '/projects/unicar/cover-2.webp',
+      '/projects/unicar/cover-3.webp',
+      '/projects/unicar/cover-4.webp',
     ],
     accent: '#1A3E8F',
     en: {
-      title: 'Unicar — car rental management CRM',
+      title: 'Unicar CRM — car rental management system',
       summary:
         'End-to-end CRM for a car rental operator: fleet, bookings, clients, and financial dashboards.',
       challenge:
@@ -183,7 +188,7 @@ export const projects: Project[] = [
       role: 'Product, UX, frontend, dashboard',
     },
     ru: {
-      title: 'Unicar — CRM для автопроката',
+      title: 'Unicar CRM — система управления автопрокатом',
       summary:
         'Сквозная CRM для автопроката: автопарк, бронирования, клиенты и финансовые дашборды.',
       challenge:
@@ -230,6 +235,12 @@ export const projects: Project[] = [
     },
   },
 ];
+
+export const projects: Project[] = rawProjects.map((p) => ({
+  ...p,
+  cover: v(p.cover),
+  screens: p.screens.map(v),
+}));
 
 export const getProject = (slug: string) =>
   projects.find((p) => p.slug === slug);

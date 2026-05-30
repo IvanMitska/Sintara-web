@@ -9,11 +9,11 @@ import {
 import type { ReactNode } from 'react';
 
 /**
- * Ambient soundscape — a procedurally generated drone (Web Audio API),
- * used as a royalty-free placeholder for the Lusion-style audio toggle.
+ * Ambient soundscape — plays a looped MP3 in /public/audio.
  *
- * To swap in a real track later: drop a file in /public, and replace the
- * oscillator graph in `buildGraph` with an <audio> / MediaElementSource.
+ * Looped playback starts at START_OFFSET (the intro of the track is skipped
+ * on first play and on every loop). Toggle from the navbar fades the volume
+ * over FADE_MS; pausing the tab fades out and pauses the element.
  */
 
 interface AmbientAudioValue {
@@ -29,9 +29,10 @@ const Ctx = createContext<AmbientAudioValue>({
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAmbientAudio = () => useContext(Ctx);
 
-const TARGET_GAIN = 0.16;
-// A minor pad: root, minor third, fifth, octave (Hz)
-const VOICES = [110, 130.81, 164.81, 220];
+const SRC = '/audio/music-for-sintara-web.mp3';
+const START_OFFSET = 53; // seconds — skip intro, loop back here
+const TARGET_VOLUME = 0.5;
+const FADE_MS = 1400;
 
 export const AmbientAudioProvider = ({
   children,
@@ -39,101 +40,204 @@ export const AmbientAudioProvider = ({
   children: ReactNode;
 }) => {
   const [playing, setPlaying] = useState(false);
-  const ctxRef = useRef<AudioContext | null>(null);
-  const masterRef = useRef<GainNode | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const fadeRafRef = useRef<number | null>(null);
+  const playingRef = useRef(false);
 
-  const buildGraph = useCallback(() => {
-    const AC =
-      window.AudioContext ||
-      (window as typeof window & { webkitAudioContext?: typeof AudioContext })
-        .webkitAudioContext;
-    const ctx = new AC();
-    ctxRef.current = ctx;
+  const ensureAudio = useCallback(() => {
+    if (audioRef.current) return audioRef.current;
+    const audio = new Audio(SRC);
+    audio.preload = 'auto';
+    audio.loop = false; // we loop manually to honour START_OFFSET
+    audio.volume = 0;
 
-    const master = ctx.createGain();
-    master.gain.value = 0;
-    master.connect(ctx.destination);
-    masterRef.current = master;
+    const seekToStart = () => {
+      try {
+        audio.currentTime = START_OFFSET;
+      } catch {
+        /* metadata not ready yet — handled by loadedmetadata */
+      }
+    };
 
-    // Gentle lowpass to keep the drone soft
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.value = 620;
-    filter.Q.value = 0.6;
-    filter.connect(master);
-
-    // Slow LFO breathing the filter cutoff
-    const lfo = ctx.createOscillator();
-    const lfoGain = ctx.createGain();
-    lfo.frequency.value = 0.06;
-    lfoGain.gain.value = 220;
-    lfo.connect(lfoGain);
-    lfoGain.connect(filter.frequency);
-    lfo.start();
-
-    VOICES.forEach((freq, i) => {
-      const osc = ctx.createOscillator();
-      osc.type = i % 2 === 0 ? 'sine' : 'triangle';
-      osc.frequency.value = freq;
-      osc.detune.value = (i - 1.5) * 6;
-
-      const voiceGain = ctx.createGain();
-      voiceGain.gain.value = 0.25 / VOICES.length + i * 0.02;
-
-      // Slight per-voice tremolo
-      const trem = ctx.createOscillator();
-      const tremGain = ctx.createGain();
-      trem.frequency.value = 0.08 + i * 0.035;
-      tremGain.gain.value = 0.04;
-      trem.connect(tremGain);
-      tremGain.connect(voiceGain.gain);
-      trem.start();
-
-      osc.connect(voiceGain);
-      voiceGain.connect(filter);
-      osc.start();
+    audio.addEventListener('loadedmetadata', seekToStart, { once: true });
+    audio.addEventListener('ended', () => {
+      audio.currentTime = START_OFFSET;
+      if (playingRef.current) audio.play().catch(() => {});
     });
+
+    audioRef.current = audio;
+    return audio;
   }, []);
 
-  const fade = useCallback((to: number) => {
-    const ctx = ctxRef.current;
-    const master = masterRef.current;
-    if (!ctx || !master) return;
-    const now = ctx.currentTime;
-    master.gain.cancelScheduledValues(now);
-    master.gain.setValueAtTime(master.gain.value, now);
-    master.gain.linearRampToValueAtTime(to, now + 1.4);
+  const fadeTo = useCallback((target: number) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (fadeRafRef.current !== null) {
+      cancelAnimationFrame(fadeRafRef.current);
+      fadeRafRef.current = null;
+    }
+
+    const startVol = audio.volume;
+    const startTime = performance.now();
+
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - startTime) / FADE_MS);
+      // ease-out for a softer landing
+      const eased = 1 - (1 - t) * (1 - t);
+      audio.volume = Math.max(0, Math.min(1, startVol + (target - startVol) * eased));
+      if (t < 1) {
+        fadeRafRef.current = requestAnimationFrame(tick);
+      } else {
+        fadeRafRef.current = null;
+        if (target === 0) audio.pause();
+      }
+    };
+    fadeRafRef.current = requestAnimationFrame(tick);
+  }, []);
+
+  // Removes the one-shot "first user interaction" listeners (see below).
+  const detachAutoplayUnlockRef = useRef<(() => void) | null>(null);
+
+  const seekToOffsetIfNeeded = useCallback((audio: HTMLAudioElement) => {
+    if (audio.readyState >= 1 && audio.currentTime < START_OFFSET) {
+      audio.currentTime = START_OFFSET;
+    }
   }, []);
 
   const toggle = useCallback(() => {
-    if (!ctxRef.current) buildGraph();
-    const ctx = ctxRef.current;
-    if (!ctx) return;
-    if (ctx.state === 'suspended') ctx.resume();
+    const audio = ensureAudio();
 
-    setPlaying((prev) => {
-      const next = !prev;
-      fade(next ? TARGET_GAIN : 0);
-      return next;
+    if (playingRef.current) {
+      playingRef.current = false;
+      setPlaying(false);
+      fadeTo(0);
+      return;
+    }
+
+    audio.muted = false;
+    seekToOffsetIfNeeded(audio);
+    audio.play().catch(() => {
+      /* user gesture should satisfy autoplay policy; bail gracefully */
     });
-  }, [buildGraph, fade]);
+    playingRef.current = true;
+    setPlaying(true);
+    fadeTo(TARGET_VOLUME);
+    detachAutoplayUnlockRef.current?.();
+    detachAutoplayUnlockRef.current = null;
+  }, [ensureAudio, fadeTo, seekToOffsetIfNeeded]);
 
-  // Pause audio when the tab is hidden
+  // Autoplay strategy:
+  //   1. Try unmuted autoplay — works when the browser has prior media
+  //      engagement (e.g. a regular F5 after the user has interacted).
+  //   2. If that's blocked, try muted autoplay — browsers almost always
+  //      allow this. The track buffers and plays silently in the
+  //      background, and on the first user gesture anywhere on the page
+  //      we unmute and fade in (no buffering delay).
+  //   3. If even muted autoplay is blocked, wait for a gesture and start
+  //      from scratch then.
+  useEffect(() => {
+    let cancelled = false;
+    const audio = ensureAudio();
+
+    const events: Array<keyof DocumentEventMap> = [
+      'pointerdown',
+      'touchstart',
+      'keydown',
+      'wheel',
+      'scroll',
+    ];
+
+    const attachUnlock = (mode: 'unmute' | 'start') => {
+      const handler = (e: Event) => {
+        // Skip the audio toggle — its own onClick fully handles starting,
+        // and double-firing here would flip the state back to paused.
+        const t = e.target;
+        if (t instanceof Element && t.closest('[data-audio-toggle]')) return;
+
+        if (mode === 'unmute') {
+          audio.muted = false;
+          if (audio.paused) audio.play().catch(() => {});
+        } else {
+          audio.muted = false;
+          seekToOffsetIfNeeded(audio);
+          audio.play().catch(() => {});
+        }
+        playingRef.current = true;
+        setPlaying(true);
+        fadeTo(TARGET_VOLUME);
+        detachAutoplayUnlockRef.current?.();
+        detachAutoplayUnlockRef.current = null;
+      };
+      events.forEach((ev) =>
+        document.addEventListener(ev, handler, { passive: true, once: false }),
+      );
+      detachAutoplayUnlockRef.current = () => {
+        events.forEach((ev) => document.removeEventListener(ev, handler));
+      };
+    };
+
+    // 1) Try unmuted autoplay.
+    audio.muted = false;
+    seekToOffsetIfNeeded(audio);
+    audio
+      .play()
+      .then(() => {
+        if (cancelled) return;
+        playingRef.current = true;
+        setPlaying(true);
+        fadeTo(TARGET_VOLUME);
+      })
+      .catch(() => {
+        if (cancelled) return;
+
+        // 2) Try muted autoplay so the track is already running silently
+        //    by the time the user does anything.
+        audio.muted = true;
+        seekToOffsetIfNeeded(audio);
+        audio
+          .play()
+          .then(() => {
+            if (cancelled) return;
+            // Music is buffering & playing silently. Unmute on first gesture.
+            attachUnlock('unmute');
+          })
+          .catch(() => {
+            if (cancelled) return;
+            // 3) Even muted blocked. Cold-start on first gesture.
+            attachUnlock('start');
+          });
+      });
+
+    return () => {
+      cancelled = true;
+      detachAutoplayUnlockRef.current?.();
+      detachAutoplayUnlockRef.current = null;
+    };
+  }, [ensureAudio, fadeTo, seekToOffsetIfNeeded]);
+
+  // Pause audio when the tab is hidden, resume on return.
   useEffect(() => {
     const onVis = () => {
-      if (document.hidden && ctxRef.current && playing) {
-        fade(0);
-      } else if (!document.hidden && ctxRef.current && playing) {
-        fade(TARGET_GAIN);
+      const audio = audioRef.current;
+      if (!audio) return;
+      if (document.hidden && playingRef.current) {
+        fadeTo(0);
+      } else if (!document.hidden && playingRef.current) {
+        audio.play().catch(() => {});
+        fadeTo(TARGET_VOLUME);
       }
     };
     document.addEventListener('visibilitychange', onVis);
     return () => document.removeEventListener('visibilitychange', onVis);
-  }, [playing, fade]);
+  }, [fadeTo]);
 
   useEffect(() => {
     return () => {
-      ctxRef.current?.close();
+      if (fadeRafRef.current !== null) cancelAnimationFrame(fadeRafRef.current);
+      // Pause but don't tear down — Strict Mode in dev remounts this effect,
+      // and clearing src would leave the next mount with a dead element.
+      audioRef.current?.pause();
     };
   }, []);
 

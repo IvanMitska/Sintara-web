@@ -21,12 +21,17 @@ const ping = keyframes`
 const Shell = styled.footer`
   background: var(--ink);
   color: #fff;
-  padding: 112px 32px 28px;
+  /* Top padding stripped almost to zero — CtaShell directly above now
+     has a much taller bottom region with a long fade-to-ink, so any
+     buffer here just creates a dead black gap between the fade endpoint
+     and the email. With ~16px of top padding the email lands directly
+     at the visual point where the texture has dissolved into black. */
+  padding: 16px 32px 28px;
   position: relative;
   overflow: hidden;
 
   @media (max-width: 768px) {
-    padding: 72px 20px 24px;
+    padding: 12px 20px 24px;
   }
 `;
 
@@ -179,41 +184,11 @@ const Status = styled.div`
   }
 `;
 
-const Pill = styled(Link)`
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  padding: 18px 30px;
-  background: #fff;
-  border: 1.5px solid #fff;
-  border-radius: 999px;
-  font-family: var(--font-grotesk);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--ink);
-  margin-top: 32px;
-  transition:
-    background 0.35s var(--ease-snap),
-    border-color 0.35s var(--ease-snap),
-    color 0.35s var(--ease-snap);
-
-  &::after {
-    content: '→';
-    transition: transform 0.45s var(--ease-expo);
-  }
-
-  &:hover {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #fff;
-
-    &::after {
-      transform: translateX(6px);
-    }
-  }
-`;
+// Pill CTA used to live here as a `Start a project` button. Removed in
+// the redesign because the page-level CtaShell directly above the footer
+// already carries that exact same call-to-action — having the pill repeat
+// it one block lower made the closer feel like two CTAs back-to-back. The
+// footer is now a quiet system layer: eyebrow + big email + status + nav.
 
 // ─── Link grid ────────────────────────────────────────────────────────
 
@@ -388,7 +363,6 @@ const Footer = () => {
                 ↗
               </span>
             </BigEmail>
-            <Pill to="/brief">{t('nav.getStarted')}</Pill>
           </Lead>
 
           <Right>

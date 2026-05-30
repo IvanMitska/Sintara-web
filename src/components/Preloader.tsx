@@ -31,24 +31,15 @@ const Mark = styled(motion.div)`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 34px;
 
-  .word {
-    font-family: var(--font-display);
-    font-weight: 800;
-    font-size: clamp(2.5rem, 7vw, 5rem);
-    letter-spacing: -0.045em;
-    line-height: 1;
-    display: flex;
-    overflow: hidden;
-  }
-
-  .char {
-    display: inline-block;
-  }
-
-  .dot {
-    color: var(--accent-bright);
+  .logo {
+    width: clamp(120px, 17vw, 210px);
+    height: clamp(120px, 17vw, 210px);
+    background-color: #fff;
+    -webkit-mask: url('/logo/sintara_logo.svg') center / contain no-repeat;
+    mask: url('/logo/sintara_logo.svg') center / contain no-repeat;
+    will-change: transform, opacity;
   }
 
   .caption {
@@ -101,8 +92,6 @@ const Track = styled.div`
     transform-origin: left;
   }
 `;
-
-const WORD = 'Sintara';
 
 interface PreloaderProps {
   onComplete: () => void;
@@ -179,31 +168,22 @@ const Preloader = ({ onComplete }: PreloaderProps) => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <span className="word" aria-label={WORD}>
-              {WORD.split('').map((c, i) => (
-                <motion.span
-                  className="char"
-                  key={i}
-                  initial={reduced ? { y: 0 } : { y: '110%' }}
-                  animate={{ y: 0 }}
-                  transition={{
-                    duration: 0.7,
-                    delay: 0.15 + i * 0.045,
-                    ease: [0.16, 1, 0.3, 1],
-                  }}
-                >
-                  {c}
-                </motion.span>
-              ))}
-              <motion.span
-                className="char dot"
-                initial={reduced ? { scale: 1 } : { scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              >
-                .
-              </motion.span>
-            </span>
+            <motion.div
+              className="logo"
+              role="img"
+              aria-label="Sintara"
+              initial={
+                reduced
+                  ? { opacity: 0, scale: 1, rotate: 0 }
+                  : { opacity: 0, scale: 0.72, rotate: -45 }
+              }
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              transition={{
+                duration: 1.05,
+                delay: 0.1,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+            />
             <motion.span
               className="caption"
               initial={{ opacity: 0 }}

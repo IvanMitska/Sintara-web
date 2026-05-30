@@ -1,5 +1,10 @@
 import { motion, useReducedMotion } from 'framer-motion';
-import type { ElementType } from 'react';
+import type { ComponentType, ReactNode } from 'react';
+
+// Permissive props for the dynamically-chosen tag (motion.h1 / 'span' / …).
+// React 19's stricter types collapse a bare `ElementType`'s props to `never`
+// in JSX, so we type the resolved tag as a component that accepts anything.
+type DynamicTagProps = { children?: ReactNode; [key: string]: unknown };
 
 interface SplitWordsProps {
   text: string;
@@ -31,12 +36,14 @@ const SplitWords = ({
   const reduced = useReducedMotion();
 
   if (reduced) {
-    const Tag = as as ElementType;
+    const Tag = as as unknown as ComponentType<DynamicTagProps>;
     return <Tag className={className}>{text}</Tag>;
   }
 
   // `motion[as]` — motion.h1, motion.h2, motion.span, etc.
-  const MotionTag = (motion as unknown as Record<string, ElementType>)[as];
+  const MotionTag = (
+    motion as unknown as Record<string, ComponentType<DynamicTagProps>>
+  )[as];
   const words = text.split(' ');
 
   return (

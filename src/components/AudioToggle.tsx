@@ -79,6 +79,7 @@ const AudioToggle = ({ theme }: { theme: NavTheme }) => {
       $theme={theme}
       $playing={playing}
       onClick={toggle}
+      data-audio-toggle="true"
       aria-pressed={playing}
       aria-label={playing ? 'Mute ambient sound' : 'Play ambient sound'}
       title={playing ? 'Sound on' : 'Sound off'}

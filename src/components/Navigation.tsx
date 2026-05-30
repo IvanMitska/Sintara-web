@@ -1,7 +1,7 @@
 import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import styled, { css, keyframes } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import { lockScroll, unlockScroll } from '../lib/scrollLock';
@@ -53,11 +53,6 @@ const Strip = styled.div<{ $theme: NavTheme }>`
   }
 `;
 
-const dotPulse = keyframes`
-  0%, 100% { transform: scale(1); }
-  50%      { transform: scale(1.35); }
-`;
-
 const Wordmark = styled(Link)`
   font-family: var(--font-display);
   font-size: 1.375rem;
@@ -66,18 +61,17 @@ const Wordmark = styled(Link)`
   color: inherit;
   display: inline-flex;
   align-items: center;
+  gap: 9px;
   line-height: 1;
   transition: color 0.4s var(--ease-snap);
 
-  .dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    background: var(--accent);
-    border-radius: 50%;
-    margin-left: 8px;
-    transform: translateY(-2px);
-    animation: ${dotPulse} 2.4s ease-in-out infinite;
+  .mark {
+    width: 26px;
+    height: 26px;
+    flex: 0 0 auto;
+    background-color: currentColor;
+    -webkit-mask: url('/logo/sintara_logo.svg') center / contain no-repeat;
+    mask: url('/logo/sintara_logo.svg') center / contain no-repeat;
   }
 
   &:hover {
@@ -639,8 +633,8 @@ const Navigation = ({ surface }: NavigationProps) => {
     <>
       <Strip $theme={effectiveTheme}>
         <Wordmark to="/" aria-label="Sintara — home">
+          <span className="mark" aria-hidden="true" />
           Sintara
-          <span className="dot" />
         </Wordmark>
 
         <MenuBtn

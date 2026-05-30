@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import type { MotionValue } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
-import BlobOrb from '../../components/decor/BlobOrb';
 
 /**
  * Manifesto — a single oversized paragraph whose words ignite from muted
@@ -15,7 +14,12 @@ const Shell = styled.section`
   z-index: 1;
   background: transparent;
   color: var(--ink);
-  padding: clamp(64px, 10vh, 132px) clamp(20px, 5vw, 80px);
+  /* Asymmetric vertical padding — keep generous breathing room at the
+     top (this is where the section first enters the viewport), but
+     tighten the bottom so the Statement section's CTA button below
+     doesn't feel like it's floating in dead space. */
+  padding: clamp(64px, 10vh, 132px) clamp(20px, 5vw, 80px)
+    clamp(32px, 5vh, 64px);
 `;
 
 const Inner = styled.div`
@@ -95,27 +99,6 @@ const Manifesto = () => {
 
   return (
     <Shell data-nav-theme="light">
-      {/* Two iridescent jelly orbs flanking the manifesto paragraph.
-          zIndex: -1 keeps them behind the text — the words paint over the
-          orbs (kind of nice where they peek between letter shapes). */}
-      <BlobOrb
-        size={280}
-        spin={0.04}
-        style={{
-          top: 'clamp(140px, 28vh, 360px)',
-          left: 'clamp(20px, 6vw, 160px)',
-          zIndex: -1,
-        }}
-      />
-      <BlobOrb
-        size={320}
-        spin={0.06}
-        style={{
-          top: 'clamp(60px, 14vh, 200px)',
-          right: 'clamp(20px, 6vw, 160px)',
-          zIndex: -1,
-        }}
-      />
       <Inner ref={ref}>
         <Eyebrow>{isRu ? '(01) — Студия' : '(01) — The studio'}</Eyebrow>
         <Para>

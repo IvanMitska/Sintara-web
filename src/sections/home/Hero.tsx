@@ -127,16 +127,29 @@ const Hero = ({ ready }: { ready: boolean }) => {
     ['blur(0px)', 'blur(13px)'],
   );
 
-  // Feed hero scroll progress + visibility into the WebGL layer.
+  // Feed hero scroll progress + visibility into the WebGL layer. Emit an
+  // event only when visibility flips so GlobalCanvas can freeze its render
+  // loop once the hero scrolls behind the opaque sections below.
   useEffect(() => {
     flux.heroVisible = true;
+    let prev = true;
+    const emit = (visible: boolean) => {
+      if (visible === prev) return;
+      prev = visible;
+      window.dispatchEvent(
+        new CustomEvent('hero:visibility', { detail: visible }),
+      );
+    };
     const unsub = scrollYProgress.on('change', (v) => {
       flux.heroProgress = v;
-      flux.heroVisible = v < 0.999;
+      const visible = v < 0.999;
+      flux.heroVisible = visible;
+      emit(visible);
     });
     return () => {
       unsub();
       flux.heroVisible = false;
+      emit(false);
     };
   }, [scrollYProgress]);
 

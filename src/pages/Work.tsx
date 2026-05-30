@@ -18,7 +18,23 @@ import { projects } from '../data/projects';
 
 const Hero = styled.header`
   position: relative;
-  background: var(--ink);
+  /* Multi-layer background:
+       1. dark gradient overlay (top) — darkens the photo down to a
+          "texture of darkness" so the white headline stays readable
+       2. hero-bg.webp (middle) — duotone foliage texture from /public/work
+       3. solid --ink (bottom fallback) — covers the page if the webp
+          ever fails to load.
+     Gradient is darker at the bottom so the foot copy reads cleanly
+     against the deeper end of the image. */
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.28) 0%,
+      rgba(0, 0, 0, 0.38) 55%,
+      rgba(0, 0, 0, 0.58) 100%
+    ),
+    url('/work/hero-bg.webp') center / cover no-repeat,
+    var(--ink);
   color: #fff;
   overflow: hidden;
   min-height: 100svh;
@@ -27,6 +43,22 @@ const Hero = styled.header`
   justify-content: space-between;
   padding: clamp(116px, 15vh, 172px) clamp(20px, 5vw, 80px)
     clamp(40px, 6vh, 80px);
+
+  /* Mobile: dampen the photo further so the giant title doesn't fight
+     a busy texture on a narrow screen. */
+  @media (max-width: 860px) {
+    /* Slightly stronger overlay on mobile — the giant title fights a
+       busy texture much harder on a narrow viewport, so the photo gets
+       dialled back a touch (but nowhere near the old crushed levels). */
+    background:
+      linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.5) 0%,
+        rgba(0, 0, 0, 0.68) 100%
+      ),
+      url('/work/hero-bg.webp') center / cover no-repeat,
+      var(--ink);
+  }
 `;
 
 const HeroBand = styled.div`
@@ -89,9 +121,12 @@ const HeroTitle = styled.h1`
     display: inline-block;
     will-change: transform;
   }
-  .accent {
-    color: var(--accent);
-  }
+  /* The .accent rule was painting the second line purple. With the new
+     textured background, all-white reads cleaner and lets the photo
+     carry the colour. The class stays on the markup so a colour accent
+     can be reintroduced later without touching the JSX — for now it is
+     a no-op. NOTE: never put backticks inside a styled-components
+     template literal — they terminate the template and break parsing. */
 `;
 
 const HeroFoot = styled(HeroBand)`
@@ -324,14 +359,88 @@ const TitleLink = styled(Link)`
 
 const CtaShell = styled.section`
   position: relative;
-  background: var(--ink);
+  /* Symmetric multi-layer treatment with the top Hero so the page reads
+     as a bookend: warm grainy texture opens it, cool grainy texture
+     closes it.
+       1. radial darkening (top) — slightly lifts the centre and crushes
+          the corners. Lets the green/yellow halo at the centre of the
+          source image cradle "Let's work together" instead of fighting
+          the white pill underneath
+       2. cta-bg.webp (middle) — the green/blue duotone splash
+       3. solid --ink (bottom fallback) */
+  background:
+    radial-gradient(
+      ellipse at 50% 45%,
+      rgba(0, 0, 0, 0.42) 0%,
+      rgba(0, 0, 0, 0.62) 55%,
+      rgba(0, 0, 0, 0.82) 100%
+    ),
+    url('/work/cta-bg.webp') center / cover no-repeat,
+    var(--ink);
   color: #fff;
   overflow: hidden;
-  padding: clamp(96px, 16vh, 220px) clamp(20px, 5vw, 80px);
+  /* Near-symmetric vertical padding with a slight bottom bias.
+     Previous pass made padding-bottom much taller than padding-top,
+     which pushed the headline + pill into the upper third of the
+     section (content sits at the top of the padded content area).
+     Bumping padding-top up to ~180-320px recentres the content
+     visually while still keeping a 20-60px bottom bias so the
+     fade tail extends a touch further than the top breathing room. */
+  padding: clamp(180px, 26vh, 320px) clamp(20px, 5vw, 80px)
+    clamp(200px, 30vh, 380px);
   text-align: center;
+
+  /* Soft fade-to-ink along the bottom edge — the next thing in DOM is
+     the global Footer (solid var(--ink)), and without this fade the
+     transition from "vibrant cool texture" to "flat black" reads as
+     an abrupt scene cut. The fade dissolves the texture into the same
+     black the footer is painted with, so the seam disappears. Sits
+     above the bg layers but below CtaInner content (see z-index on
+     CtaInner). */
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* Longer fade than the first pass — earlier version cut over
+       ~140-260px which read as a hard edge once the eye crossed into
+       Footer territory. ~220-380px stretches the gradient so the
+       texture dies gradually, and the endpoint visually lands near
+       the email below (which is now closer because Footer's top
+       padding got tightened). */
+    height: clamp(220px, 30vh, 380px);
+    background: linear-gradient(
+      to bottom,
+      rgba(8, 6, 18, 0) 0%,
+      rgba(8, 6, 18, 0.45) 45%,
+      var(--ink) 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Mobile: heavier darkening across the board — narrow viewport puts
+     the white headline closer to the bright centre and tight padding
+     compresses readability margin. */
+  @media (max-width: 860px) {
+    background:
+      radial-gradient(
+        ellipse at 50% 45%,
+        rgba(0, 0, 0, 0.65) 0%,
+        rgba(0, 0, 0, 0.82) 100%
+      ),
+      url('/work/cta-bg.webp') center / cover no-repeat,
+      var(--ink);
+  }
 `;
 
 const CtaInner = styled.div`
+  /* Lifted above the bottom fade-to-ink overlay (CtaShell::after at
+     z-index 1) so the headline and pill stay fully visible even if the
+     button drifts into the fade zone on a short viewport. */
+  position: relative;
+  z-index: 2;
   max-width: 1200px;
   margin: 0 auto;
   display: flex;

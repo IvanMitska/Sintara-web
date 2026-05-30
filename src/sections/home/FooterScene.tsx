@@ -2,6 +2,17 @@ import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Environment, useGLTF, useAnimations } from '@react-three/drei';
 import * as THREE from 'three';
+import { markReady, registerTask } from '../../lib/loadManager';
+
+const ASTRONAUT_URL = '/models/astronaut.glb';
+const ICONS_URL = '/models/icons.glb';
+
+// Register at module scope so the preloader sees a pending `footer` task
+// from the very first render — no race window where allReady() briefly
+// returns true and triggers the dismiss countdown before the footer has
+// announced itself. The task is settled by <ReadySignal/> (below) once
+// the scene's GLTFs are loaded, parsed, mounted, and all shaders compiled.
+registerTask('footer', 6);
 
 /**
  * FooterScene — the cinematic 3D layer behind the closing CTA. A floating
@@ -17,9 +28,6 @@ import * as THREE from 'three';
  * credit somewhere on the site.
  */
 
-const ASTRONAUT_URL = '/models/astronaut.glb';
-const ICONS_URL = '/models/icons.glb';
-
 // Named groups inside icons.glb (verified after Draco compression).
 const ICON_NAMES = [
   'glass',
@@ -32,9 +40,6 @@ const ICON_NAMES = [
   'abstract',
   'gear',
 ];
-
-useGLTF.preload(ASTRONAUT_URL);
-useGLTF.preload(ICONS_URL);
 
 // ── shared pointer state ──────────────────────────────────────────────
 // NDC pointer relative to the footer canvas, plus its world projection on
@@ -395,6 +400,27 @@ function Astronaut({
 }
 
 // ── scene contents ────────────────────────────────────────────────────
+// Renders inside <Suspense>, so its useEffect only runs once every useGLTF
+// in the scene has resolved (models loaded + parsed) and the astronaut /
+// icon cloud are actually mounted in the THREE scene graph. At that moment
+// we force-compile every material in the tree (so the heavy iridescent /
+// chrome / clearcoat shaders are GPU-ready before the user gets here) and
+// flip the preloader's `footer` task done. After this fires, scrolling to
+// the footer reveals an already-warm scene — no pop-in.
+function ReadySignal() {
+  const { gl, scene, camera } = useThree();
+  useEffect(() => {
+    try {
+      gl.compile(scene, camera);
+    } catch {
+      // compile failures aren't fatal — the scene will compile lazily on
+      // its first real render frame; we still release the gate
+    }
+    markReady('footer');
+  }, [gl, scene, camera]);
+  return null;
+}
+
 function Scene({
   pointer,
   reduced,
@@ -425,6 +451,7 @@ function Scene({
       <IconCloud count={count} pointer={pointer} reduced={reduced} />
 
       <Environment preset="city" />
+      <ReadySignal />
     </Suspense>
   );
 }

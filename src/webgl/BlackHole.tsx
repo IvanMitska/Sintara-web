@@ -28,7 +28,7 @@ const fragmentShader = /* glsl */ `
   uniform float uScroll;
   uniform float uBurst;
 
-  #define STEPS 300
+  #define STEPS 220
   #define RS 1.0
   #define DISK_IN 3.6
   #define DISK_OUT 8.2
@@ -152,14 +152,12 @@ const fragmentShader = /* glsl */ `
     float h2 = dot(hvec, hvec);
 
     vec3 col = vec3(0.0);
-    bool captured = false;
-    bool escaped = false;
 
     for (int i = 0; i < STEPS; i++){
       float r2 = dot(pos, pos);
       float r = sqrt(r2);
-      if (r < RS){ captured = true; break; }
-      if (r > 90.0){ escaped = true; break; }
+      if (r < RS){ break; }       // captured by the hole
+      if (r > 90.0){ break; }     // escaped to infinity
 
       float dt = clamp(r * 0.045, 0.032, 1.25);
       // light-bending acceleration in the Schwarzschild field

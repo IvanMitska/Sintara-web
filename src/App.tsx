@@ -6,6 +6,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { LanguageProvider } from './context/LanguageContext';
 import { AmbientAudioProvider } from './components/audio/AmbientAudio';
 import SmoothScroll from './components/SmoothScroll';
+import RouteMount from './components/RouteMount';
 import Cursor from './components/Cursor';
 
 // WebGL layer is heavy (three.js) — keep it out of the initial bundle.
@@ -14,15 +15,28 @@ const GlobalCanvas = lazy(() => import('./webgl/GlobalCanvas'));
 // Home is eager — first paint matters
 import Home from './pages/Home';
 
-// Inner pages lazy-loaded
-const Work = lazy(() => import('./pages/Work'));
-const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
-const Services = lazy(() => import('./pages/Services'));
-const About = lazy(() => import('./pages/About'));
-const Contact = lazy(() => import('./pages/Contact'));
-const Brief = lazy(() => import('./pages/Brief'));
-const SintaraCrmProduct = lazy(() => import('./pages/SintaraCrmProduct'));
-const NotFound = lazy(() => import('./pages/NotFound'));
+// Inner-page imports are held as plain factories so we can both lazy-load them
+// for React.lazy AND warm them up on idle. Without the warm-up the first click
+// from Home into an inner page has to wait on the chunk fetch + parse during
+// the React commit — which shows up as a brief freeze on the still-visible
+// home page right before the route swaps in.
+const workImport = () => import('./pages/Work');
+const projectDetailImport = () => import('./pages/ProjectDetail');
+const servicesImport = () => import('./pages/Services');
+const aboutImport = () => import('./pages/About');
+const contactImport = () => import('./pages/Contact');
+const briefImport = () => import('./pages/Brief');
+const sintaraCrmImport = () => import('./pages/SintaraCrmProduct');
+const notFoundImport = () => import('./pages/NotFound');
+
+const Work = lazy(workImport);
+const ProjectDetail = lazy(projectDetailImport);
+const Services = lazy(servicesImport);
+const About = lazy(aboutImport);
+const Contact = lazy(contactImport);
+const Brief = lazy(briefImport);
+const SintaraCrmProduct = lazy(sintaraCrmImport);
+const NotFound = lazy(notFoundImport);
 
 const LoaderShell = styled.div`
   position: fixed;
@@ -68,9 +82,36 @@ const App = () => {
     };
     window.addEventListener('error', handleError);
     window.addEventListener('unhandledrejection', handleRejection);
+
+    // Warm the inner-page chunks during browser idle time so the first
+    // navigation from Home doesn't pay the fetch+parse tax mid-commit.
+    const warm = () => {
+      void workImport();
+      void projectDetailImport();
+      void servicesImport();
+      void aboutImport();
+      void contactImport();
+      void briefImport();
+      void sintaraCrmImport();
+      void notFoundImport();
+    };
+    const win = window as typeof window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout?: number }) => number;
+      cancelIdleCallback?: (h: number) => void;
+    };
+    let idleHandle = 0;
+    let timeoutHandle = 0;
+    if (win.requestIdleCallback) {
+      idleHandle = win.requestIdleCallback(warm, { timeout: 4000 });
+    } else {
+      timeoutHandle = window.setTimeout(warm, 1500);
+    }
+
     return () => {
       window.removeEventListener('error', handleError);
       window.removeEventListener('unhandledrejection', handleRejection);
+      if (idleHandle && win.cancelIdleCallback) win.cancelIdleCallback(idleHandle);
+      if (timeoutHandle) window.clearTimeout(timeoutHandle);
     };
   }, []);
 
@@ -86,18 +127,23 @@ const App = () => {
           <Cursor />
           <ErrorBoundary>
             <Suspense fallback={<PageLoader />}>
+              {/* Each RouteMount gets a key tied to its route so React doesn't
+                  reuse a single instance across navigations — without it
+                  React keeps the same RouteMount mounted across route swaps
+                  (same component, same position) and our mount-only scroll
+                  reset never refires on the new route. */}
               <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/work" element={<Work />} />
-              <Route path="/work/:slug" element={<ProjectDetail />} />
+              <Route path="/" element={<><RouteMount key="r:/" /><Home /></>} />
+              <Route path="/work" element={<><RouteMount key="r:/work" /><Work /></>} />
+              <Route path="/work/:slug" element={<><RouteMount key="r:/work/:slug" /><ProjectDetail /></>} />
               {/* Keep legacy /project/:slug for backward compat */}
-              <Route path="/project/:slug" element={<ProjectDetail />} />
-              <Route path="/services" element={<Services />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/brief" element={<Brief />} />
-              <Route path="/products/sintara-crm" element={<SintaraCrmProduct />} />
-              <Route path="*" element={<NotFound />} />
+              <Route path="/project/:slug" element={<><RouteMount key="r:/project/:slug" /><ProjectDetail /></>} />
+              <Route path="/services" element={<><RouteMount key="r:/services" /><Services /></>} />
+              <Route path="/about" element={<><RouteMount key="r:/about" /><About /></>} />
+              <Route path="/contact" element={<><RouteMount key="r:/contact" /><Contact /></>} />
+              <Route path="/brief" element={<><RouteMount key="r:/brief" /><Brief /></>} />
+              <Route path="/products/sintara-crm" element={<><RouteMount key="r:/products/sintara-crm" /><SintaraCrmProduct /></>} />
+              <Route path="*" element={<><RouteMount key="r:404" /><NotFound /></>} />
               </Routes>
             </Suspense>
           </ErrorBoundary>

@@ -23,6 +23,11 @@ const GlobalCanvas = () => {
   const { pathname } = useLocation();
   const [mounted, setMounted] = useState(false);
   const [capable, setCapable] = useState(false);
+  // Whether the hero is currently on screen. Once it scrolls behind the
+  // opaque DOM sections below, we freeze the (full-screen, raymarched)
+  // render loop — it's fully occluded, so this is invisible but saves the
+  // GPU for the entire rest of the long home page.
+  const [heroVisible, setHeroVisible] = useState(true);
 
   useEffect(() => {
     setMounted(true);
@@ -69,13 +74,30 @@ const GlobalCanvas = () => {
 
   useEffect(() => {
     flux.route = pathname;
+    // Entering the home route — the hero is at the top, so make sure the
+    // loop is live regardless of any stale state from a previous visit.
+    if (pathname === '/') setHeroVisible(true);
   }, [pathname]);
+
+  // Listen for the hero crossing in/out of view (dispatched by Hero).
+  useEffect(() => {
+    const onVis = (e: Event) =>
+      setHeroVisible((e as CustomEvent<boolean>).detail);
+    window.addEventListener('hero:visibility', onVis);
+    return () => window.removeEventListener('hero:visibility', onVis);
+  }, []);
 
   if (!mounted) return null;
 
-  // Freeze the render loop on routes that never reveal the canvas.
-  const frameloop = pathname === '/' ? 'always' : 'never';
+  // Run only on the home route, and only while the hero is actually on
+  // screen — frozen the moment it's scrolled behind the opaque sections.
+  const frameloop = pathname === '/' && heroVisible ? 'always' : 'never';
 
+  // Keep the canvas mounted and laid out on every route — toggling display:none
+  // can release the WebGL context, and recreating it on the next visit is a
+  // multi-hundred-ms stall that registers as a visible freeze right when a
+  // category link is clicked. Inner pages are opaque (#root sits at z-index 1)
+  // so this layer at z-index 0 is visually covered anyway.
   const layer = (
     <div
       style={{
@@ -84,8 +106,6 @@ const GlobalCanvas = () => {
         zIndex: 0,
         pointerEvents: 'none',
         background: capable ? '#000' : FALLBACK_BG,
-        // only revealed on the home route; inner pages are opaque
-        display: pathname === '/' ? 'block' : 'none',
       }}
       aria-hidden="true"
     >

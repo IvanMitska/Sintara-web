@@ -132,8 +132,14 @@ const Approach = () => {
         <Row>
           <Reveal>
             <Still data-cursor="hover">
+              {/* Standalone homepage showcase mockup — intentionally not
+                  tied to any real project on the site, so it lives in
+                  /public/home/ rather than /public/projects/<slug>/.
+                  No v() wrap: cache-bust helper only stamps /projects/*
+                  paths; if this file ever needs a forced refresh we can
+                  rename it (e.g. approach-v2.webp) or extend the helper. */}
               <img
-                src="/projects/kaif-crm/cover.webp"
+                src="/home/approach.webp"
                 alt=""
                 loading="lazy"
               />

@@ -905,6 +905,11 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
   );
 };
 
+// The provider, its hook and the context object intentionally live together
+// (idiomatic React Context). That co-export only costs a Fast Refresh full
+// reload when editing this one file — no runtime impact — so we opt out of
+// the rule here rather than fragment a widely-imported module.
+// eslint-disable-next-line react-refresh/only-export-components
 export const useLanguage = (): LanguageContextType => {
   const context = useContext(LanguageContext);
   if (!context) {

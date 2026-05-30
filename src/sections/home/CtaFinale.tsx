@@ -80,11 +80,14 @@ const Title = styled.h2`
   margin: 0;
 `;
 
-const DotField = ({ blue }: { blue: string }) => {
-  void blue;
+const DotField = ({ active }: { active: boolean }) => {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    // Only run the (~3000 arc/frame) loop while the footer is on screen.
+    // Offscreen — i.e. the whole time you read the page above it — this
+    // would otherwise burn the main thread for nothing.
+    if (!active) return;
     const canvas = ref.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -144,7 +147,7 @@ const DotField = ({ blue }: { blue: string }) => {
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', resize);
     };
-  }, []);
+  }, [active]);
 
   return <Field ref={ref} aria-hidden />;
 };
@@ -153,7 +156,10 @@ const CtaFinale = () => {
   const { language } = useLanguage();
   const isRu = language === 'ru';
   const shellRef = useRef<HTMLElement>(null);
-  // gate the WebGL render loop to when the footer is on screen
+  // Gates the WebGL render loop (frameloop) to when the footer is on
+  // screen. The scene itself stays mounted from page load on purpose —
+  // it loads + compiles behind the preloader so it's ready to animate the
+  // moment the user reaches it, no pop-in. See FooterScene's ReadySignal.
   const [inView, setInView] = useState(false);
 
   useEffect(() => {
@@ -172,7 +178,7 @@ const CtaFinale = () => {
       <ErrorBoundary fallback={null}>
         <FooterScene active={inView} />
       </ErrorBoundary>
-      <DotField blue="#8B5CF6" />
+      <DotField active={inView} />
       <Crosshair
         style={{ top: '16%', left: '12%' }}
         $size={16}

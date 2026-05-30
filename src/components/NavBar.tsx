@@ -51,11 +51,16 @@ const Wordmark = styled(Link)`
   color: inherit;
   display: inline-flex;
   align-items: center;
+  gap: 9px;
   line-height: 1;
 
-  .dot {
-    color: var(--accent);
-    margin-left: 1px;
+  .mark {
+    width: 26px;
+    height: 26px;
+    flex: 0 0 auto;
+    background-color: currentColor;
+    -webkit-mask: url('/logo/sintara_logo.svg') center / contain no-repeat;
+    mask: url('/logo/sintara_logo.svg') center / contain no-repeat;
   }
 `;
 
@@ -409,7 +414,8 @@ const NavBar = ({ surface }: NavBarProps) => {
     <>
       <Strip $theme={theme} $scrolled={scrolled}>
         <Wordmark to="/" aria-label="Sintara — home">
-          Sintara<span className="dot">.</span>
+          <span className="mark" aria-hidden="true" />
+          Sintara
         </Wordmark>
 
         <Cluster>

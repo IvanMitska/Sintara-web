@@ -1,12 +1,13 @@
 import styled from 'styled-components';
-import { motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
 import PillLink from '../../components/ui/PillLink';
 
 /**
- * Editorial statement — an oversized headline that the page-wide ribbon
- * threads through. The decorative ribbon now lives at the page level
- * (see PageRibbon), so this section is just type on a shared surface.
+ * Editorial statement — CTA pill + a short supporting paragraph and a
+ * dateline marker. The oversized "Where ideas become digital products"
+ * headline that used to sit between them was dropped on the user's
+ * request: it was leaving a tall void between the pill and the foot and
+ * adding nothing the surrounding sections don't already say.
  */
 
 const Shell = styled.section`
@@ -14,44 +15,26 @@ const Shell = styled.section`
   z-index: 1;
   background: transparent;
   color: var(--ink);
-  padding: clamp(56px, 8vh, 110px) 0 clamp(56px, 8vh, 110px);
+  /* Compact vertical rhythm — no editorial headline lives here anymore,
+     so the section is just pill + foot. Keep just enough top/bottom to
+     separate it from Manifesto above and the next section below. */
+  padding: clamp(24px, 4vh, 56px) 0 clamp(40px, 6vh, 80px);
 `;
 
 const Top = styled.div`
   display: flex;
   justify-content: center;
-  margin-bottom: clamp(28px, 4vh, 56px);
-`;
-
-const Heading = styled.h2`
-  position: relative;
-  z-index: 1;
-  margin: 0 auto;
-  max-width: 1500px;
-  padding: 0 clamp(20px, 5vw, 80px);
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(2.75rem, 9.2vw, 12rem);
-  line-height: 0.95;
-  letter-spacing: -0.02em;
-  text-align: center;
-`;
-
-const Line = styled.span`
-  display: block;
-  overflow: hidden;
-
-  & > span {
-    display: inline-block;
-    will-change: transform;
-  }
+  /* Pill → foot breathing room. Roughly doubled from the previous pass
+     so the CTA reads as a standalone accent with a clear pause before
+     the supporting paragraph, instead of fusing into a single group. */
+  margin-bottom: clamp(56px, 8vh, 120px);
 `;
 
 const Foot = styled.div`
   position: relative;
   z-index: 1;
   max-width: 1500px;
-  margin: clamp(32px, 4.5vh, 64px) auto 0;
+  margin: 0 auto;
   padding: 0 clamp(20px, 5vw, 80px);
   display: flex;
   justify-content: space-between;
@@ -77,12 +60,7 @@ const Foot = styled.div`
 
 const Statement = () => {
   const { language } = useLanguage();
-  const reduced = useReducedMotion();
   const isRu = language === 'ru';
-
-  const lines = isRu
-    ? ['Где идеи', 'становятся', 'продуктом']
-    : ['Where ideas', 'become digital', 'products'];
 
   return (
     <Shell data-nav-theme="light">
@@ -91,25 +69,6 @@ const Statement = () => {
           {isRu ? 'Все проекты' : 'See all projects'}
         </PillLink>
       </Top>
-
-      <Heading>
-        {lines.map((line, i) => (
-          <Line key={line}>
-            <motion.span
-              initial={reduced ? false : { y: '110%' }}
-              whileInView={{ y: 0 }}
-              viewport={{ once: true, amount: 0.25 }}
-              transition={{
-                duration: 0.95,
-                delay: i * 0.09,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-            >
-              {line}
-            </motion.span>
-          </Line>
-        ))}
-      </Heading>
 
       <Foot>
         <p>

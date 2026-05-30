@@ -2188,7 +2188,7 @@ const Brief: React.FC = memo(() => {
           </>
         );
 
-      case 6: // Technical
+      case 6: { // Technical
         const isWebsite = formData.productType.includes('Веб-сайт') || formData.productType.includes('Website');
         const isMobileApp = formData.productType.includes('Мобильное') || formData.productType.includes('Mobile');
         const isBot = formData.productType.includes('Telegram') || formData.productType.includes('бот');
@@ -2367,6 +2367,7 @@ const Brief: React.FC = memo(() => {
 
           </>
         );
+      }
 
       case 7: // Budget
         return (
