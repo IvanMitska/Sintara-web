@@ -17,44 +17,46 @@ import { useLanguage } from '../context/LanguageContext';
 
 const Hero = styled.header`
   position: relative;
-  background: var(--ink);
+  /* Real product mockup as the hero background — same three-layer
+     pattern as the other case pages (ProjectDetail). Top of the hero
+     stays dark for the headline; the cover bleeds in cleanly at the
+     bottom. Fallback colour is the product's brand violet. */
+  background:
+    linear-gradient(
+      180deg,
+      rgba(10, 10, 12, 0.92) 0%,
+      rgba(10, 10, 12, 0.85) 35%,
+      rgba(10, 10, 12, 0.7) 60%,
+      rgba(10, 10, 12, 0.3) 85%,
+      rgba(10, 10, 12, 0) 100%
+    ),
+    url('/projects/sintara-crm/mockup.webp') center / cover no-repeat,
+    #8B5CF6;
   color: #fff;
   overflow: hidden;
+  min-height: 100svh;
   padding: clamp(130px, 18vh, 220px) clamp(20px, 5vw, 80px)
     clamp(48px, 8vh, 96px);
+
+  /* Mobile: stronger overlay across the whole hero so the giant title
+     stays readable on a narrow viewport. */
+  @media (max-width: 860px) {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(10, 10, 12, 0.94) 0%,
+        rgba(10, 10, 12, 0.88) 50%,
+        rgba(10, 10, 12, 0.62) 85%,
+        rgba(10, 10, 12, 0.3) 100%
+      ),
+      url('/projects/sintara-crm/mockup.webp') center / cover no-repeat,
+      #8B5CF6;
+  }
 `;
 
 const Inner = styled.div`
   max-width: 1500px;
   margin: 0 auto;
-`;
-
-const MetaRow = styled.div`
-  display: flex;
-  gap: clamp(20px, 5vw, 64px);
-  flex-wrap: wrap;
-  margin: 0 0 clamp(28px, 5vh, 56px);
-  padding-bottom: 22px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-  font-family: var(--font-grotesk);
-  font-size: 0.6875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: var(--muted-dark);
-
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    color: var(--accent-bright);
-  }
-  .badge::before {
-    content: '';
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--accent-bright);
-  }
 `;
 
 const ProductTitle = styled.h1`
@@ -63,7 +65,9 @@ const ProductTitle = styled.h1`
   font-size: clamp(3.5rem, 14vw, 17rem);
   line-height: 0.86;
   letter-spacing: -0.04em;
-  margin: 0;
+  /* Compensates for the removed MetaRow strip that used to sit above
+     the title — keeps the headline at roughly the same vertical spot. */
+  margin: clamp(72px, 13vh, 160px) 0 0;
 
   .accent {
     color: var(--accent);
@@ -85,7 +89,10 @@ const Lead = styled.p`
   font-family: var(--font-grotesk);
   font-size: clamp(1.0625rem, 1.2vw, 1.3125rem);
   line-height: 1.5;
-  color: var(--muted-dark);
+  /* High-opacity white — sits in the lower part of the hero where the
+     overlay is lighter and the mockup bleeds through. muted-dark
+     washes out on the violet/dark mockup. */
+  color: rgba(255, 255, 255, 0.88);
   max-width: 36em;
   margin: clamp(20px, 3vh, 32px) 0 0;
 `;
@@ -95,108 +102,6 @@ const CtaRow = styled.div`
   gap: 14px;
   flex-wrap: wrap;
   margin-top: clamp(36px, 5.5vh, 64px);
-`;
-
-// ─── Mockup band (placeholder cover surface) ──────────────────────────
-
-const MockBand = styled.div`
-  position: relative;
-  background: var(--accent);
-  color: #fff;
-  overflow: hidden;
-  padding: clamp(64px, 10vh, 140px) clamp(20px, 5vw, 80px);
-
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(
-        1200px 600px at 80% 0%,
-        rgba(126, 212, 220, 0.32),
-        transparent 60%
-      ),
-      radial-gradient(
-        900px 500px at 0% 100%,
-        rgba(10, 10, 12, 0.45),
-        transparent 60%
-      );
-    pointer-events: none;
-  }
-`;
-
-const MockFrame = styled.div`
-  position: relative;
-  z-index: 1;
-  max-width: 1280px;
-  margin: 0 auto;
-  border-radius: 20px;
-  background: rgba(10, 10, 12, 0.55);
-  backdrop-filter: blur(18px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  padding: clamp(28px, 4vw, 56px);
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: clamp(20px, 2.5vw, 40px);
-
-  @media (max-width: 860px) {
-    grid-template-columns: 1fr;
-  }
-
-  .panel {
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 12px;
-    padding: 22px;
-    background: rgba(255, 255, 255, 0.03);
-    min-height: 220px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-  .panel .head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-family: var(--font-grotesk);
-    font-size: 0.625rem;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.6);
-  }
-  .panel .dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--accent-bright);
-  }
-  .panel .row {
-    height: 12px;
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.12);
-  }
-  .panel .row.s {
-    width: 60%;
-  }
-  .panel .row.m {
-    width: 82%;
-  }
-  .panel .row.l {
-    width: 100%;
-  }
-  .panel .big {
-    margin-top: auto;
-    font-family: var(--font-display);
-    font-weight: 500;
-    font-size: clamp(1.5rem, 2.4vw, 2rem);
-    letter-spacing: -0.02em;
-    line-height: 1;
-  }
-  .panel .big .pct {
-    color: var(--accent-bright);
-    margin-left: 6px;
-    font-size: 0.7em;
-  }
 `;
 
 // ─── Body — light ─────────────────────────────────────────────────────
@@ -558,16 +463,6 @@ const SintaraCrmProduct = () => {
           $color="rgba(255,255,255,0.22)"
         />
         <Inner>
-          <Reveal delay={0.04}>
-            <MetaRow>
-              <span className="badge">
-                {isRu ? 'Собственный продукт' : 'Own product'}
-              </span>
-              <span>SaaS · CRM</span>
-              <span>{isRu ? 'Рынок — Азия' : 'Market — Asia'}</span>
-              <span>2024 — 2026</span>
-            </MetaRow>
-          </Reveal>
           <ProductTitle>
             <motion.span
               style={{ display: 'inline-block' }}
@@ -612,47 +507,6 @@ const SintaraCrmProduct = () => {
           </Reveal>
         </Inner>
       </Hero>
-
-      <MockBand>
-        <MockFrame>
-          {[
-            {
-              head: isRu ? 'Инбокс' : 'Inbox',
-              rows: ['l', 'm', 's', 'l', 'm'],
-              big: '14',
-              pct: isRu ? 'новых' : 'new',
-            },
-            {
-              head: isRu ? 'Воронка' : 'Pipeline',
-              rows: ['l', 'l', 'm', 's', 'm'],
-              big: '$48k',
-              pct: '+12%',
-            },
-            {
-              head: isRu ? 'Автоматизации' : 'Automations',
-              rows: ['m', 'l', 's', 'm', 'l'],
-              big: '84',
-              pct: isRu ? 'шаблонов' : 'templates',
-            },
-          ].map((p, i) => (
-            <Reveal key={p.head} delay={i * 0.08}>
-              <div className="panel">
-                <div className="head">
-                  <span>{p.head}</span>
-                  <span className="dot" />
-                </div>
-                {p.rows.map((r, j) => (
-                  <span key={j} className={`row ${r}`} />
-                ))}
-                <div className="big">
-                  {p.big}
-                  <span className="pct">{p.pct}</span>
-                </div>
-              </div>
-            </Reveal>
-          ))}
-        </MockFrame>
-      </MockBand>
 
       <Body data-nav-theme="light">
         <Inner>

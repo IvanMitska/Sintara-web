@@ -11,20 +11,56 @@ import { useLanguage } from '../context/LanguageContext';
 import { getProject, getNextProject } from '../data/projects';
 
 /**
- * Project detail — cinematic case study. Dark editorial hero, a full-bleed
- * cover, a light run of facts / challenge-solution / gallery / tech, and a
- * dark next-project teaser. Matches the home page's surface rhythm.
+ * Project detail — cinematic case study. The hero fuses the cover image
+ * into a full-viewport opener: text sits in a strong dark zone at the
+ * top, the cover bleeds in clearly at the bottom. Replaces the old
+ * "empty dark headline + standalone cover" stack — one cinematic
+ * moment instead of two.
+ * Below: a light run of facts / challenge-solution / gallery / tech,
+ * then a dark next-project teaser.
  */
 
 // ─── Hero ─────────────────────────────────────────────────────────────
 
-const Hero = styled.header`
+const Hero = styled.header<{ $cover: string; $accent: string }>`
   position: relative;
-  background: var(--ink);
+  /* Three-layer background — same pattern as the inner-page bookends,
+     but here the middle layer is the per-project cover and the bottom
+     fallback uses project.accent (each case has its own brand colour).
+     The gradient is strong at top and fades to clear at bottom so the
+     headline stays readable while the cover reveals cleanly below. */
+  background:
+    linear-gradient(
+      180deg,
+      rgba(10, 10, 12, 0.92) 0%,
+      rgba(10, 10, 12, 0.85) 35%,
+      rgba(10, 10, 12, 0.7) 60%,
+      rgba(10, 10, 12, 0.3) 85%,
+      rgba(10, 10, 12, 0) 100%
+    ),
+    url(${(p) => p.$cover}) center / cover no-repeat,
+    ${(p) => p.$accent};
   color: #fff;
   overflow: hidden;
+  min-height: 100svh;
   padding: clamp(130px, 18vh, 220px) clamp(20px, 5vw, 80px)
     clamp(48px, 8vh, 96px);
+
+  /* Mobile: stronger overlay across the whole hero — narrow viewports
+     compress the text zone, so the cover needs more darkening to keep
+     the giant title readable. */
+  @media (max-width: 860px) {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(10, 10, 12, 0.94) 0%,
+        rgba(10, 10, 12, 0.88) 50%,
+        rgba(10, 10, 12, 0.62) 85%,
+        rgba(10, 10, 12, 0.3) 100%
+      ),
+      url(${(p) => p.$cover}) center / cover no-repeat,
+      ${(p) => p.$accent};
+  }
 `;
 
 const Inner = styled.div`
@@ -41,7 +77,10 @@ const BackLink = styled(Link)`
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  color: var(--muted-dark);
+  /* White on cover-as-bg: muted-dark gets washed out where the cover
+     bleeds through the overlay. Slight transparency keeps it from
+     fighting the title for attention. */
+  color: rgba(255, 255, 255, 0.78);
   transition:
     color 0.3s var(--ease-snap),
     gap 0.4s var(--ease-expo);
@@ -55,31 +94,15 @@ const BackLink = styled(Link)`
   }
 `;
 
-const MetaRow = styled.div`
-  display: flex;
-  gap: clamp(20px, 5vw, 64px);
-  flex-wrap: wrap;
-  margin: clamp(40px, 7vh, 88px) 0 0;
-  padding-bottom: 22px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-  font-family: var(--font-grotesk);
-  font-size: 0.6875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: var(--muted-dark);
-
-  .num {
-    color: var(--accent-bright);
-  }
-`;
-
 const ProjectTitle = styled.h1`
   font-family: var(--font-display);
   font-weight: 400;
   font-size: clamp(3.5rem, 14vw, 17rem);
   line-height: 0.86;
-  letter-spacing: -0.04em;
-  margin: clamp(24px, 4vh, 48px) 0 0;
+  /* Bumped from clamp(24px, 4vh, 48px) so the title sits in roughly the
+     same place after removing the MetaRow strip that used to live
+     between BackLink and Title. */
+  margin: clamp(72px, 13vh, 160px) 0 0;
 `;
 
 const Lead = styled.p`
@@ -88,31 +111,12 @@ const Lead = styled.p`
   font-size: clamp(1.375rem, 2.6vw, 2.4rem);
   line-height: 1.24;
   letter-spacing: -0.02em;
-  color: var(--muted-dark);
+  /* Bumped from muted-dark to a high-opacity white — muted-dark sat in
+     a part of the overlay where the cover bleeds through, washing out
+     the lead text on bright covers (Kaif orange / Unicar green). */
+  color: rgba(255, 255, 255, 0.95);
   max-width: 22em;
   margin: clamp(28px, 4.5vh, 56px) 0 0;
-`;
-
-// ─── Full-bleed cover ─────────────────────────────────────────────────
-
-const Cover = styled.div<{ $accent: string }>`
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  background-color: ${(p) => p.$accent};
-  overflow: hidden;
-
-  img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  @media (max-width: 700px) {
-    aspect-ratio: 4 / 3;
-  }
 `;
 
 // ─── Light content run ────────────────────────────────────────────────
@@ -387,7 +391,12 @@ const ProjectDetail = () => {
     <>
       <NavBar />
 
-      <Hero data-surface="dark" data-nav-theme="dark">
+      <Hero
+        data-surface="dark"
+        data-nav-theme="dark"
+        $cover={project.cover}
+        $accent={project.accent}
+      >
         <Crosshair
           style={{ top: '18%', right: '8%' }}
           $size={15}
@@ -397,14 +406,6 @@ const ProjectDetail = () => {
           <Reveal as="span">
             <BackLink to="/work">{t('projectDetail.back')}</BackLink>
           </Reveal>
-          <Reveal delay={0.05}>
-            <MetaRow>
-              <span className="num">{project.number}</span>
-              <span>{project.client}</span>
-              <span>{project.year}</span>
-              <span>{project.category.toUpperCase()}</span>
-            </MetaRow>
-          </Reveal>
           <ProjectTitle>
             <SplitWords as="span" text={title} delay={0.08} />
           </ProjectTitle>
@@ -413,10 +414,6 @@ const ProjectDetail = () => {
           </Reveal>
         </Inner>
       </Hero>
-
-      <Cover $accent={project.accent}>
-        <img src={project.cover} alt={title} />
-      </Cover>
 
       <Body data-nav-theme="light">
         <Inner>

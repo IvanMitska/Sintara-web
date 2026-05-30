@@ -48,6 +48,17 @@ const SplitWords = ({
 
   return (
     <MotionTag
+      // Force a full remount when the text changes. Without this,
+      // routes that reuse the same component instance (e.g. /work/:slug
+      // hopping between cases) leave the parent MotionTag in its
+      // already-triggered "visible" state while the per-word children
+      // get a fresh set of keys (\`${word}-${i}\`) on the new text.
+      // The new word-children inherit the parent's variant
+      // inconsistently and stay stuck at \`y: 110%\` (off-screen) — the
+      // bug where the giant title disappears on next-project until F5.
+      // Keying by text unmounts the whole tree on text change so
+      // whileInView re-triggers cleanly from \`hidden\` to \`visible\`.
+      key={text}
       className={className}
       aria-label={text}
       initial="hidden"
