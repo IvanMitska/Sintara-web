@@ -413,34 +413,53 @@ const NavBar = ({ surface }: NavBarProps) => {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
-  // [data-nav-theme] section observer
+  // Nav theme = the [data-nav-theme] section currently under the header line.
+  // A scroll/rAF sample (not a razor-thin IntersectionObserver band): the old
+  // observer used a ~0.6%-tall root band that fast mobile flick-scrolling could
+  // skip between callback frames, so on touch the theme stuck on the initial
+  // 'dark' (white logo over light sections). Sampling a fixed point every
+  // scroll frame is deterministic on both touch and desktop — same switch line.
   useEffect(() => {
     if (surface) {
       setNavTheme(surface);
       return;
     }
-    let observer: IntersectionObserver | null = null;
-    const timer = window.setTimeout(() => {
-      const els = document.querySelectorAll<HTMLElement>('[data-nav-theme]');
-      if (!els.length) return;
-      observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              const th = entry.target.getAttribute(
-                'data-nav-theme',
-              ) as NavTheme | null;
-              if (th) setNavTheme(th);
-            }
-          });
-        },
-        { rootMargin: '-72px 0px -99.4% 0px', threshold: 0 },
+    const LINE = 72; // px below the viewport top, just under the header
+    let els: HTMLElement[] = [];
+    let raf = 0;
+    const refresh = () => {
+      els = Array.from(
+        document.querySelectorAll<HTMLElement>('[data-nav-theme]'),
       );
-      els.forEach((el) => observer!.observe(el));
+    };
+    const compute = () => {
+      raf = 0;
+      if (!els.length) refresh();
+      let pick: NavTheme | null = null;
+      for (const el of els) {
+        const r = el.getBoundingClientRect();
+        if (r.top <= LINE && r.bottom > LINE) {
+          const th = el.getAttribute('data-nav-theme') as NavTheme | null;
+          if (th) pick = th; // later (lower) sections win ties → topmost-at-line
+        }
+      }
+      if (pick) setNavTheme(pick);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(compute);
+    };
+    // Defer the first read so sections are laid out (and past the preloader).
+    const timer = window.setTimeout(() => {
+      refresh();
+      compute();
     }, 60);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
     return () => {
       window.clearTimeout(timer);
-      observer?.disconnect();
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (raf) cancelAnimationFrame(raf);
     };
   }, [surface, location.pathname]);
 
