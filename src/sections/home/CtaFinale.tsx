@@ -198,6 +198,40 @@ const CtaFinale = () => {
     };
   }, []);
 
+  // Warm the footer 3D in the background as soon as the page goes idle — long
+  // before the mount gate above fires. Downloads the chunk (three.js) and the
+  // GLB models into cache WITHOUT rendering anything, so a fast scroll to the
+  // footer finds ~5.6 MB already cached instead of waiting on it mid-scroll
+  // (the "scroll to the bottom, then it loads" pop-in). Render still happens
+  // only at the 1200px mount gate. The /models/* immutable cache header makes
+  // drei's later useGLTF fetch reuse these warmed responses (one network hit).
+  useEffect(() => {
+    let warmed = false;
+    const warm = () => {
+      if (warmed) return;
+      warmed = true;
+      void import('./FooterScene');
+      ['/models/astronaut.glb', '/models/icons.glb'].forEach((url) => {
+        fetch(url, { priority: 'low' } as RequestInit).catch(() => {});
+      });
+    };
+    const win = window as typeof window & {
+      requestIdleCallback?: (cb: () => void, o?: { timeout?: number }) => number;
+      cancelIdleCallback?: (h: number) => void;
+    };
+    let idle = 0;
+    let timer = 0;
+    if (win.requestIdleCallback) {
+      idle = win.requestIdleCallback(warm, { timeout: 2500 });
+    } else {
+      timer = window.setTimeout(warm, 800);
+    }
+    return () => {
+      if (idle && win.cancelIdleCallback) win.cancelIdleCallback(idle);
+      if (timer) window.clearTimeout(timer);
+    };
+  }, []);
+
   return (
     <Shell ref={shellRef} data-nav-theme="dark">
       <ErrorBoundary fallback={null}>
