@@ -292,6 +292,13 @@ const Row = styled(NavLink)`
     letter-spacing: -0.045em;
     line-height: 1.02;
     transition: color 0.4s var(--ease-snap);
+
+    /* Phones: the desktop clamp bottoms out at 2.75rem, so the menu read
+       small. Raise the floor (same 9vw curve) — the overlay has plenty of
+       room. The floor meets the desktop curve near 600px, so no visible step. */
+    @media (max-width: 600px) {
+      font-size: clamp(3.6rem, 9vw, 7rem);
+    }
   }
 
   &:hover .label-wrap,
