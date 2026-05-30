@@ -129,9 +129,13 @@ const Pitch = styled.div`
       gap: 12px;
       padding-top: clamp(24px, 4vh, 36px);
 
+      /* Full-width, but content centred (label + arrow as one group) so the
+         button reads as a solid CTA — space-between left a cheap-looking void
+         in the middle with these short labels. */
       a {
         width: 100%;
-        justify-content: space-between;
+        justify-content: center;
+        gap: 14px;
       }
     }
   }
