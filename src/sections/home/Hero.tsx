@@ -139,6 +139,14 @@ const Title = styled(motion.h1)`
      bring back a soft text-shadow (always reads as a smudged plate). */
   text-shadow: none;
 
+  /* Phones: the desktop clamp bottoms out at 3rem below ~436px, leaving the
+     wordmark feeling small. Scale it up with the viewport (still single-line,
+     nowrap), capping near where the desktop curve meets it at 600px so there's
+     no step at the breakpoint. Desktop sizing untouched. */
+  @media (max-width: 600px) {
+    font-size: clamp(3rem, 15vw, 4.1rem);
+  }
+
   .wm {
     display: inline-block;
     overflow: hidden;
