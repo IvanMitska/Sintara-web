@@ -347,13 +347,18 @@ function Astronaut({
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
     const scale = 9.2 / (size.y || 1);
+    // On phones the figure dominates the narrow frame and its head/torso sit
+    // right over the heading + CTA. Drop it lower (mobile only) so it reads as
+    // a backdrop; desktop keeps the original placement. Matches `count`'s
+    // one-shot innerWidth read — viewport class doesn't change mid-session.
+    const mobileDrop = window.innerWidth < 768 ? -1.8 : 0;
     return {
       scale,
       offset: new THREE.Vector3(
         -center.x * scale,
         // sit the astronaut low — head behind the wordmark, waving hand
         // reaching up toward the eyebrow line
-        -center.y * scale - 3.4,
+        -center.y * scale - 3.4 + mobileDrop,
         -center.z * scale,
       ),
     };
