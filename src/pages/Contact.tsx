@@ -105,7 +105,7 @@ const HeroTitle = styled.h1`
      viewport on mobile — the floor still protects the narrowest phones (~≤330px)
      where the longest title line would otherwise wrap. Desktop curve unchanged. */
   @media (max-width: 600px) {
-    font-size: clamp(3.5rem, 17vw, 16.5rem);
+    font-size: clamp(3.5rem, 18.5vw, 16.5rem);
   }
   line-height: 0.84;
   letter-spacing: -0.04em;

@@ -67,7 +67,7 @@ const ProductTitle = styled.h1`
      clamp floor; the floor still protects the narrowest phones. Desktop curve
      unchanged. */
   @media (max-width: 600px) {
-    font-size: clamp(3.5rem, 17vw, 17rem);
+    font-size: clamp(3.5rem, 18.5vw, 17rem);
   }
   line-height: 0.86;
   letter-spacing: -0.04em;
