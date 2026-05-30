@@ -298,6 +298,12 @@ const Legal = styled.div`
   .built {
     color: var(--muted-dark);
   }
+  .reg {
+    display: block;
+    margin-top: 6px;
+    color: var(--muted-dark);
+    letter-spacing: 0.1em;
+  }
 `;
 
 const ToTop = styled.button`
@@ -465,7 +471,12 @@ const Footer = () => {
       <Inner>
         <Legal>
           <span>
-            © {year} Sintara — {t('footer.rights')}
+            © {year} Sintara Studio Co., Ltd. — {t('footer.rights')}
+            <span className="reg">
+              {language === 'ru'
+                ? 'Рег. № 0205569021645 · Чонбури, Таиланд'
+                : 'Company Reg. No. 0205569021645 · Chon Buri, Thailand'}
+            </span>
           </span>
           <span className="built">
             {language === 'ru'
