@@ -13,9 +13,14 @@ interface Task {
   weight: number;
 }
 
+// NOTE: there is no longer a persistent WebGL hero (it's a <video> now), so
+// the old `webgl` gate has been removed. It used to be settled by
+// GlobalCanvas/CrystalScene, none of which mount anymore — leaving the task
+// permanently `done: false`, so allReady() never returned true and the
+// preloader always ran to its 11s safety timeout. The `footer` 3D task still
+// registers itself at runtime (see FooterScene) when the home page mounts.
 const tasks: Record<string, Task> = {
   fonts: { done: false, weight: 1 },
-  webgl: { done: false, weight: 5 },
 };
 
 const listeners = new Set<() => void>();

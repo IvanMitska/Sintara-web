@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
@@ -6,7 +6,10 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import AudioToggle from './AudioToggle';
 import Crosshair from './ui/Crosshair';
-import SintaraLogo3D from './brand/SintaraLogo3D';
+// Lazy so the ~1.1 MB three.js chunk is no longer pulled into the eager
+// entry graph (and modulepreloaded) on every page. It only loads when the
+// menu overlay actually mounts the 3D wordmark. Matches Navigation/ServicesTeaser.
+const SintaraLogo3D = lazy(() => import('./brand/SintaraLogo3D'));
 import { stopScroll, startScroll } from '../lib/lenis';
 import { lockScroll, unlockScroll } from '../lib/scrollLock';
 
@@ -525,15 +528,17 @@ const NavBar = ({ surface }: NavBarProps) => {
               </BigNav>
 
               <LogoStage aria-hidden>
-                <SintaraLogo3D
-                  size={560}
-                  color="#C4B5FD"
-                  colorMid="#5B21B6"
-                  colorTo="#EDE9FE"
-                  envPreset="city"
-                  idleMotion="sway"
-                  active={open}
-                />
+                <Suspense fallback={null}>
+                  <SintaraLogo3D
+                    size={560}
+                    color="#C4B5FD"
+                    colorMid="#5B21B6"
+                    colorTo="#EDE9FE"
+                    envPreset="city"
+                    idleMotion="sway"
+                    active={open}
+                  />
+                </Suspense>
               </LogoStage>
             </OverlayInner>
 

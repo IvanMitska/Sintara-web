@@ -47,7 +47,10 @@ export const AmbientAudioProvider = ({
   const ensureAudio = useCallback(() => {
     if (audioRef.current) return audioRef.current;
     const audio = new Audio(SRC);
-    audio.preload = 'auto';
+    // 'metadata' (not 'auto') so the browser fetches just the header up front
+    // instead of eagerly prefetching the whole ~10 MB track and starving the
+    // critical render path. Playback (manual or autoplay) streams on demand.
+    audio.preload = 'metadata';
     audio.loop = false; // we loop manually to honour START_OFFSET
     audio.volume = 0;
 

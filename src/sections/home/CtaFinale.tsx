@@ -1,11 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useLanguage } from '../../context/LanguageContext';
 import PillLink from '../../components/ui/PillLink';
 import Reveal from '../../components/ui/Reveal';
 import Crosshair from '../../components/ui/Crosshair';
 import ErrorBoundary from '../../components/ErrorBoundary';
-import FooterScene from './FooterScene';
+// Lazy so the ~1.1 MB three.js chunk + ~4.5 MB astronaut.glb leave the eager
+// home graph (they were `modulepreload`-ed and gated the preloader). The scene
+// is mounted ahead of the viewport (see `shouldMount` below) so it has loaded +
+// compiled by the time the user scrolls down — no pop-in — but first paint of
+// the page no longer waits on ~5.6 MB of footer assets.
+const FooterScene = lazy(() => import('./FooterScene'));
 
 /**
  * Closing CTA — a dark cinematic panel. A floating astronaut and a cloud
@@ -161,22 +166,46 @@ const CtaFinale = () => {
   // it loads + compiles behind the preloader so it's ready to animate the
   // moment the user reaches it, no pop-in. See FooterScene's ReadySignal.
   const [inView, setInView] = useState(false);
+  // Latches true the first time the footer comes within a generous margin, so
+  // the lazy 3D chunk + models start downloading well before the section is
+  // actually visible. Once mounted it never unmounts (no reload on scroll-away).
+  const [shouldMount, setShouldMount] = useState(false);
 
   useEffect(() => {
     const el = shellRef.current;
     if (!el) return;
+    // Frameloop / DotField gate — tight margin, toggles with visibility.
     const io = new IntersectionObserver(
       ([entry]) => setInView(entry.isIntersecting),
       { rootMargin: '200px' },
     );
     io.observe(el);
-    return () => io.disconnect();
+    // Mount gate — wide lead margin, fires once. ~1.5 screens of runway gives
+    // the assets time to load before the footer paints.
+    const mountIo = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldMount(true);
+          mountIo.disconnect();
+        }
+      },
+      { rootMargin: '1200px' },
+    );
+    mountIo.observe(el);
+    return () => {
+      io.disconnect();
+      mountIo.disconnect();
+    };
   }, []);
 
   return (
     <Shell ref={shellRef} data-nav-theme="dark">
       <ErrorBoundary fallback={null}>
-        <FooterScene active={inView} />
+        {shouldMount && (
+          <Suspense fallback={null}>
+            <FooterScene active={inView} />
+          </Suspense>
+        )}
       </ErrorBoundary>
       <DotField active={inView} />
       <Crosshair
