@@ -180,6 +180,13 @@ const Card = styled(Link)`
     height: 100%;
     object-fit: cover;
     z-index: 1;
+
+    /* The portrait mobile card crops the landscape mockup on the sides. Centred,
+       the monitor's left edge ran off the card. object-position below 50% shows
+       more of the image's left side, shifting the device rightward into frame. */
+    @media (max-width: 900px) {
+      object-position: 32% center;
+    }
   }
 
   &:hover {
