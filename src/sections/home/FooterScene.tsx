@@ -2,17 +2,14 @@ import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Environment, useGLTF, useAnimations } from '@react-three/drei';
 import * as THREE from 'three';
-import { markReady, registerTask } from '../../lib/loadManager';
-
 const ASTRONAUT_URL = '/models/astronaut.glb';
 const ICONS_URL = '/models/icons.glb';
 
-// Register at module scope so the preloader sees a pending `footer` task
-// from the very first render — no race window where allReady() briefly
-// returns true and triggers the dismiss countdown before the footer has
-// announced itself. The task is settled by <ReadySignal/> (below) once
-// the scene's GLTFs are loaded, parsed, mounted, and all shaders compiled.
-registerTask('footer', 6);
+// NOTE: this scene no longer registers a loadManager task. It's lazy-mounted
+// near the footer (well after the preloader) and pre-warmed in the background
+// (see CtaFinale), so the preloader must NOT wait on it — gating the preloader
+// on a task that only completes on scroll would hang it at ~94% until the 11s
+// safety timeout.
 
 /**
  * FooterScene — the cinematic 3D layer behind the closing CTA. A floating
@@ -409,19 +406,17 @@ function Astronaut({
 // in the scene has resolved (models loaded + parsed) and the astronaut /
 // icon cloud are actually mounted in the THREE scene graph. At that moment
 // we force-compile every material in the tree (so the heavy iridescent /
-// chrome / clearcoat shaders are GPU-ready before the user gets here) and
-// flip the preloader's `footer` task done. After this fires, scrolling to
-// the footer reveals an already-warm scene — no pop-in.
+// chrome / clearcoat shaders are GPU-ready) — scrolling to the footer then
+// reveals an already-warm scene with no shader-compile hitch.
 function ReadySignal() {
   const { gl, scene, camera } = useThree();
   useEffect(() => {
     try {
       gl.compile(scene, camera);
     } catch {
-      // compile failures aren't fatal — the scene will compile lazily on
-      // its first real render frame; we still release the gate
+      // compile failures aren't fatal — the scene compiles lazily on its
+      // first real render frame instead.
     }
-    markReady('footer');
   }, [gl, scene, camera]);
   return null;
 }
