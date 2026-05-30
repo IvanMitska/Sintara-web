@@ -204,6 +204,17 @@ const GlobalStyles = createGlobalStyle`
   @media (pointer: coarse) {
     html {
       overflow-y: auto;
+      /* Touch only: the root background fills the iOS safe-area insets (behind
+         the status bar and the home-indicator) and the rubber-band overscroll
+         zones. With the light --paper it showed white strips top + bottom on
+         iPhone. Every route's top/bottom edge is a dark hero/footer, so a dark
+         root makes those strips blend. Kept off desktop, where this same
+         background paints the reserved scrollbar gutter (which must stay light
+         for the light inner pages). */
+      background: #08060f;
+    }
+    body {
+      background: #08060f;
     }
     ::-webkit-scrollbar {
       width: 0;
