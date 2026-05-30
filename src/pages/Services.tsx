@@ -18,7 +18,23 @@ import { useLanguage } from '../context/LanguageContext';
 
 const Hero = styled.header`
   position: relative;
-  background: var(--ink);
+  /* Same textured bookend treatment as the Work page hero — keeps the
+     two top-level inner pages visually parented. Layers:
+       1. dark gradient (top) — darkens the photo so the white headline
+          stays readable
+       2. hero-bg.webp (middle) — magenta/crimson painterly splash from
+          /public/services (sibling to /work in style, but on the
+          violet→magenta side of the brand palette)
+       3. solid --ink (bottom fallback) */
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.28) 0%,
+      rgba(0, 0, 0, 0.38) 55%,
+      rgba(0, 0, 0, 0.58) 100%
+    ),
+    url('/services/hero-bg.webp') center / cover no-repeat,
+    var(--ink);
   color: #fff;
   overflow: hidden;
   min-height: 100svh;
@@ -27,6 +43,19 @@ const Hero = styled.header`
   justify-content: space-between;
   padding: clamp(116px, 15vh, 172px) clamp(20px, 5vw, 80px)
     clamp(40px, 6vh, 80px);
+
+  /* Mobile: heavier overlay — the giant title fights a busy texture
+     more on a narrow viewport. */
+  @media (max-width: 860px) {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.5) 0%,
+        rgba(0, 0, 0, 0.68) 100%
+      ),
+      url('/services/hero-bg.webp') center / cover no-repeat,
+      var(--ink);
+  }
 `;
 
 const HeroBand = styled.div`
@@ -91,9 +120,9 @@ const HeroTitle = styled.h1`
     display: inline-block;
     will-change: transform;
   }
-  .accent {
-    color: var(--accent);
-  }
+  /* With the textured background, all-white reads cleaner — the photo
+     carries the colour. The class stays on the markup so a colour accent
+     can be reintroduced later without touching the JSX. */
 `;
 
 const HeroFoot = styled(HeroBand)`
@@ -313,14 +342,70 @@ const Row = styled(Link)`
 
 const CtaShell = styled.section`
   position: relative;
-  background: var(--ink);
+  /* Symmetric textured closer — mirrors the warm hero with a cool splash
+     to give the page bookended visual rhythm (same pattern as Work).
+       1. radial darkening (top) — crushes the corners, lifts the centre
+          so the white headline + pill sit in a halo
+       2. cta-bg.webp (middle) — indigo/cyan painterly splash from
+          /public/services (sibling to /work in style, but on the
+          violet→indigo side of the brand palette)
+       3. solid --ink (bottom fallback) */
+  background:
+    radial-gradient(
+      ellipse at 50% 45%,
+      rgba(0, 0, 0, 0.42) 0%,
+      rgba(0, 0, 0, 0.62) 55%,
+      rgba(0, 0, 0, 0.82) 100%
+    ),
+    url('/services/cta-bg.webp') center / cover no-repeat,
+    var(--ink);
   color: #fff;
   overflow: hidden;
-  padding: clamp(96px, 16vh, 220px) clamp(20px, 5vw, 80px);
+  /* Near-symmetric vertical padding with a slight bottom bias so the
+     fade tail extends past the headline (same proportions as Work). */
+  padding: clamp(180px, 26vh, 320px) clamp(20px, 5vw, 80px)
+    clamp(200px, 30vh, 380px);
   text-align: center;
+
+  /* Soft fade-to-ink along the bottom edge so the seam into the global
+     Footer (solid var(--ink)) dissolves instead of cutting hard. */
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: clamp(220px, 30vh, 380px);
+    background: linear-gradient(
+      to bottom,
+      rgba(8, 6, 18, 0) 0%,
+      rgba(8, 6, 18, 0.45) 45%,
+      var(--ink) 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Mobile: heavier darkening — narrow viewport compresses readability
+     around the bright centre. */
+  @media (max-width: 860px) {
+    background:
+      radial-gradient(
+        ellipse at 50% 45%,
+        rgba(0, 0, 0, 0.65) 0%,
+        rgba(0, 0, 0, 0.82) 100%
+      ),
+      url('/services/cta-bg.webp') center / cover no-repeat,
+      var(--ink);
+  }
 `;
 
 const CtaInner = styled.div`
+  /* Lifted above the bottom fade-to-ink overlay (CtaShell::after at
+     z-index 1) so headline and pill stay fully visible on short
+     viewports where the button might drift into the fade zone. */
+  position: relative;
+  z-index: 2;
   max-width: 1200px;
   margin: 0 auto;
   display: flex;

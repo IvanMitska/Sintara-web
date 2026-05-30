@@ -59,7 +59,7 @@ const rawProjects: Project[] = [
       'GSAP',
       'React Three Fiber',
     ],
-    cover: '/projects/sintara-crm/cover.webp',
+    cover: '/projects/sintara-crm/mockup.webp',
     screens: [
       '/projects/sintara-crm/screen-1.webp',
       '/projects/sintara-crm/screen-2.webp',
