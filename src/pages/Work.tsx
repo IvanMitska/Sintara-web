@@ -514,7 +514,7 @@ const Work = () => {
           </Reveal>
           <Reveal as="span" delay={0.06}>
             <Tag className="right">
-              {isRu ? '2024 — 2025' : '2024 — 2025'}
+              {isRu ? '2025 — 2026' : '2025 — 2026'}
             </Tag>
           </Reveal>
         </HeroTop>

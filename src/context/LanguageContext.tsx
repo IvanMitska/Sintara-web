@@ -139,7 +139,7 @@ const translations: Record<Language, Record<string, string>> = {
     'home.cta.secondary': 'sintaradev@gmail.com',
 
     // Work page
-    'work.eyebrow': 'Selected work · 2024 – 2025',
+    'work.eyebrow': 'Selected work · 2025 – 2026',
     'work.title1': 'The work',
     'work.title2': 'so far.',
     'work.sub':
@@ -571,7 +571,7 @@ const translations: Record<Language, Record<string, string>> = {
     'home.cta.secondary': 'sintaradev@gmail.com',
 
     // Work page
-    'work.eyebrow': 'Избранные работы · 2024 – 2025',
+    'work.eyebrow': 'Избранные работы · 2025 – 2026',
     'work.title1': 'Наши',
     'work.title2': 'работы.',
     'work.sub':

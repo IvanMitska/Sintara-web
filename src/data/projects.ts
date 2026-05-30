@@ -165,7 +165,7 @@ const rawProjects: Project[] = [
   {
     slug: 'unicar',
     number: '03',
-    year: '2024',
+    year: '2025',
     client: 'UNICAR CRM',
     category: 'crm',
     tags: ['React', 'TypeScript', 'Tailwind CSS', 'Dashboard'],
@@ -201,7 +201,7 @@ const rawProjects: Project[] = [
   {
     slug: '3dlike',
     number: '04',
-    year: '2024',
+    year: '2025',
     client: '3DLike',
     category: 'website',
     tags: ['React', 'Tailwind CSS', 'Framer Motion', 'SEO'],
