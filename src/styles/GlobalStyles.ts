@@ -195,6 +195,22 @@ const GlobalStyles = createGlobalStyle`
     background: var(--ink);
   }
 
+  /* Touch devices use overlay scrollbars that take no layout space, so the
+     permanent gutter reserved by html{overflow-y:scroll} above isn't needed —
+     it only exposes the light --paper html background as a strip down the
+     right edge (very visible over the dark hero). Drop the reservation and the
+     custom bar on coarse-pointer devices. scrollLock adds 0px padding here
+     since the measured scrollbar width is already 0, so nothing shifts. */
+  @media (pointer: coarse) {
+    html {
+      overflow-y: auto;
+    }
+    ::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+  }
+
   [data-surface='dark'] {
     background: var(--ink);
     color: #fff;
