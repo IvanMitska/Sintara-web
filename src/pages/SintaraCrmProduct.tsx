@@ -306,14 +306,94 @@ const Tag = styled.span`
 
 const CtaShell = styled.section`
   position: relative;
+  /* The photo (laptop with product on screen) competes for attention
+     with the headline — the screen text bleeds through any reasonable
+     overlay. Solution: move the image into ::before and blur it. The
+     laptop screen content dissolves into bokeh while the colour mood
+     (purple couch, laptop silhouette) stays. Filter can't sit on the
+     section itself or it would blur the headline and pills too. */
   background: var(--ink);
   color: #fff;
   overflow: hidden;
-  padding: clamp(96px, 16vh, 220px) clamp(20px, 5vw, 80px);
+  /* Padding matches the other inner-page CTAs, with a slight bottom
+     bias for the fade tail. */
+  padding: clamp(180px, 26vh, 320px) clamp(20px, 5vw, 80px)
+    clamp(200px, 30vh, 380px);
   text-align: center;
+
+  /* Blurred photograph + overlay sit here behind everything else.
+     Slight overdraw (inset: -24px) so the blur halo doesn't reveal a
+     sharp edge against the page. The radial + linear darkening layers
+     are baked into this same pseudo so they get blurred together with
+     the photo (a blurred gradient is still a gradient, no harm). */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -16px;
+    background:
+      radial-gradient(
+        ellipse at 50% 50%,
+        rgba(0, 0, 0, 0.35) 0%,
+        rgba(0, 0, 0, 0.15) 55%,
+        rgba(0, 0, 0, 0) 100%
+      ),
+      linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+      url('/projects/sintara-crm/cta-bg.webp') center / cover no-repeat;
+    /* 5px blur — mockup stays recognisable (Sintara CRM panels visible,
+       laptop shape clear), but small UI text on the screen becomes
+       softened enough that it stops fighting the headline. 14px was
+       erasing the mockup entirely, 0px had readable competing text.
+       This is the sweet spot. */
+    filter: blur(5px);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* Soft fade-to-ink along the bottom edge so the seam into the
+     global Footer (solid var(--ink)) dissolves instead of cutting
+     hard. Sits above the blurred image, below the content. */
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: clamp(220px, 30vh, 380px);
+    background: linear-gradient(
+      to bottom,
+      rgba(8, 6, 18, 0) 0%,
+      rgba(8, 6, 18, 0.45) 45%,
+      var(--ink) 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Mobile: slightly stronger blur + a touch more darkening, since the
+     headline and pills sit very close to the laptop centre on a narrow
+     screen and the screen content lands almost directly under the text. */
+  @media (max-width: 860px) {
+    &::before {
+      filter: blur(8px);
+      background:
+        radial-gradient(
+          ellipse at 50% 50%,
+          rgba(0, 0, 0, 0.45) 0%,
+          rgba(0, 0, 0, 0.2) 65%,
+          rgba(0, 0, 0, 0) 100%
+        ),
+        linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+        url('/projects/sintara-crm/cta-bg.webp') center / cover no-repeat;
+    }
+  }
 `;
 
 const CtaInner = styled.div`
+  /* Lifted above the bottom fade-to-ink overlay (CtaShell::after at
+     z-index: 1) so the headline and pills stay visible on short
+     viewports where they'd otherwise drift into the fade zone. */
+  position: relative;
+  z-index: 2;
   max-width: 1200px;
   margin: 0 auto;
   display: flex;

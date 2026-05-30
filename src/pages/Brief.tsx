@@ -26,33 +26,53 @@ const PageWrapper = styled.div`
 `;
 
 /**
- * Top hero strip — full-width editorial header with the page title.
- * Sits above the working two-column area so the title can breathe big
- * across the entire viewport without competing with the form.
+ * Top hero band — light surface matching the form area below. Dark
+ * hero was tried (matching Work/Services/About/Contact) but it created
+ * a stark dark→light seam right above the form fields and made the
+ * page feel like "a decorative wall, then a form" rather than a
+ * cohesive work surface. For a form-driven page, one calm light
+ * surface from top to bottom reads as premium and focused (think
+ * Linear / Stripe / Vercel signup flows). The new typography stays
+ * (display title, eyebrow Logo) so it still feels "in our style".
+ *
+ * Compact top padding fixes the "feels pushed down" complaint.
  */
-const BriefHero = styled.div`
-  max-width: 1480px;
-  margin: 0 auto;
-  padding: 140px 40px 56px;
+const BriefHero = styled.section`
+  /* Tight padding — Brief is a working form. The header sits above
+     the form fields but must NOT eat half the viewport. */
+  padding: clamp(96px, 12vh, 130px) clamp(20px, 5vw, 80px)
+    clamp(24px, 3.5vh, 40px);
 
   @media (max-width: 768px) {
-    padding: 108px 20px 40px;
+    padding: clamp(84px, 10vh, 100px) 20px 24px;
   }
 `;
 
+const BriefHeroInner = styled.div`
+  /* Aligned with BriefContainer's max-width so the page reads as
+     one column: title + form sit in the same horizontal band. */
+  max-width: 1280px;
+  margin: 0 auto;
+`;
+
 const BriefContainer = styled.div`
-  max-width: 1480px;
+  /* Tighter container — was 1480px which let the form stretch to
+     ~1000px and feel sparse on wide screens. 1280px keeps it focused
+     and readable, with the right-side empty space tightened up. */
+  max-width: 1280px;
   margin: 0 auto;
   padding: 0 40px 120px;
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 80px;
+  /* Narrower sidebar (was 320px) + tighter gap so the form column
+     stays generous without becoming a wide wall of fields. */
+  grid-template-columns: 260px 1fr;
+  gap: 64px;
 
   @media (max-width: 1100px) {
-    grid-template-columns: 240px 1fr;
-    gap: 48px;
+    grid-template-columns: 220px 1fr;
+    gap: 40px;
   }
 
   @media (max-width: 900px) {
@@ -63,42 +83,56 @@ const BriefContainer = styled.div`
 `;
 
 const BackButton = styled(motion.button)`
-  display: flex;
+  display: inline-flex;
   width: fit-content;
   align-items: center;
-  gap: 10px;
+  gap: 11px;
   background: transparent;
   border: 1px solid var(--bone-line);
   border-radius: 999px;
-  padding: 10px 18px;
+  height: 44px;
+  padding: 0 22px;
   color: var(--ink);
   font-family: var(--font-grotesk);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.16em;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   cursor: pointer;
   transition:
-    background 0.3s var(--ease-snap),
-    color 0.3s var(--ease-snap),
-    border-color 0.3s var(--ease-snap);
-  margin-bottom: 56px;
+    background 0.4s var(--ease-snap),
+    color 0.4s var(--ease-snap),
+    border-color 0.4s var(--ease-snap),
+    transform 0.4s var(--ease-expo);
+  margin-bottom: clamp(24px, 4vh, 40px);
+
+  svg {
+    font-size: 11px;
+    transition: transform 0.4s var(--ease-expo);
+  }
 
   &:hover {
+    transform: translateY(-2px);
     background: var(--ink);
     border-color: var(--ink);
     color: #fff;
   }
+  &:hover svg {
+    transform: translateX(-4px);
+  }
 `;
 
+/* Eyebrow-style label — same dot+caps pattern as the eyebrows on
+   other inner pages, but in muted ink on light so it doesn't shout
+   above the form. */
 const Logo = styled.div`
   font-family: var(--font-grotesk);
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: 0.6875rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.22em;
   color: var(--muted);
-  margin-bottom: 24px;
+  margin-bottom: 14px;
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -112,24 +146,28 @@ const Logo = styled.div`
   }
 `;
 
+/* Compact display title — was clamp(3rem, 9.5vw, 8.5rem) which
+   produced ~180px on desktop and ate half the viewport. Brief is a
+   form: the title should be prominent but not cinematic. Capped at
+   ~72px keeps it editorial without dominating. */
 const Title = styled(motion.h1)`
   font-family: var(--font-display);
-  font-size: clamp(3rem, 9.5vw, 8.5rem);
+  font-size: clamp(2.25rem, 4.8vw, 4.5rem);
   font-weight: 400;
-  line-height: 0.9;
+  line-height: 0.96;
   letter-spacing: -0.035em;
   color: var(--ink);
-  margin: 0 0 28px;
+  margin: 0 0 16px;
   text-transform: none;
 `;
 
 const Subtitle = styled(motion.p)`
   font-family: var(--font-grotesk);
-  font-size: clamp(1.0625rem, 1.3vw, 1.25rem);
+  font-size: clamp(0.9375rem, 1.05vw, 1.0625rem);
   color: var(--muted);
-  max-width: 620px;
+  max-width: 560px;
   margin: 0;
-  line-height: 1.55;
+  line-height: 1.5;
 `;
 
 // ─── Sidebar ────────────────────────────────────────────────────────
@@ -174,7 +212,10 @@ const StepCounter = styled.div`
 
 const BigNumber = styled.div`
   font-family: var(--font-display);
-  font-size: clamp(4rem, 7vw, 6rem);
+  /* Slightly smaller — was clamp(4rem, 7vw, 6rem) which dominated
+     the sidebar column. clamp(3rem, 5.4vw, 4.5rem) is still big
+     enough to anchor the column without shouting. */
+  font-size: clamp(3rem, 5.4vw, 4.5rem);
   font-weight: 400;
   line-height: 0.85;
   letter-spacing: -0.05em;
@@ -230,18 +271,20 @@ const NavStep = styled.button<{ $active: boolean; $completed: boolean }>`
   grid-template-columns: 28px 1fr;
   align-items: center;
   gap: 14px;
-  padding: 10px 12px;
+  padding: 12px 12px;
   margin: 0 -12px;
-  background: ${({ $active }) => ($active ? '#EFE4FF' : 'transparent')};
+  background: ${({ $active }) =>
+    $active ? 'rgba(124, 58, 237, 0.08)' : 'transparent'};
   border: none;
   border-radius: 8px;
   cursor: pointer;
   text-align: left;
   font-family: var(--font-grotesk);
-  transition: background 0.25s var(--ease-snap);
+  transition: background 0.3s var(--ease-snap);
 
   &:hover {
-    background: ${({ $active }) => ($active ? '#EFE4FF' : '#fafafa')};
+    background: ${({ $active }) =>
+      $active ? 'rgba(124, 58, 237, 0.08)' : 'rgba(10, 10, 12, 0.04)'};
   }
 
   .marker {
@@ -371,22 +414,23 @@ const StripItem = styled.button<{ $active: boolean; $completed: boolean }>`
 // ─── Form Card ─────────────────────────────────────────────────────
 
 /**
- * Form card. Editorial paper feel — ink hairline border, no shadow,
- * generous internal padding, and a giant background step number that
- * acts as a watermark behind the question. On hover-free desktop it
- * reads as the chapter mark of the page.
+ * Form card. Transparent — sits directly on --paper, no card chrome.
+ * Removing the white box-on-paper kills one of the competing surfaces
+ * that made Brief read as "a generic SaaS form on our site". The
+ * content (typography + form controls) carries the structure now.
  *
- * Two CSS-only flourishes:
+ * Two CSS-only flourishes kept from the original:
  *  • A radial cursor glow follows the mouse (driven by --cursor-x/y
  *    set via onMouseMove on the JSX side). Premium "live" feel.
  *  • CSS counters number every Label inside the card automatically —
  *    `Q01 ─── Company name`. Resets per step. No JSX changes needed.
  */
 const FormCard = styled(motion.div)`
-  background: #fff;
-  border: 1px solid var(--bone-line);
-  border-radius: 12px;
-  padding: 56px 56px 48px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: clamp(32px, 5vh, 56px) clamp(0px, 2vw, 24px)
+    clamp(24px, 4vh, 48px);
   position: relative;
   overflow: hidden;
   isolation: isolate;
@@ -400,7 +444,7 @@ const FormCard = styled(motion.div)`
     inset: 0;
     background: radial-gradient(
       420px circle at var(--cursor-x, 50%) var(--cursor-y, 50%),
-      rgba(124, 58, 237, 0.08),
+      rgba(124, 58, 237, 0.05),
       transparent 55%
     );
     opacity: 0;
@@ -419,8 +463,7 @@ const FormCard = styled(motion.div)`
   }
 
   @media (max-width: 768px) {
-    padding: 32px 24px 28px;
-    border-radius: 8px;
+    padding: 28px 0 24px;
   }
 `;
 
@@ -459,10 +502,12 @@ const CardEyebrow = styled.div`
 
 const SectionTitle = styled.h2`
   font-family: var(--font-display);
-  font-size: clamp(2rem, 3.5vw, 3rem);
+  /* Bumped from clamp(2rem, 3.5vw, 3rem) — matches the editorial
+     section heads on Services/About inner pages (clamp 2.25-4.5rem). */
+  font-size: clamp(2.25rem, 4.4vw, 3.75rem);
   font-weight: 400;
   letter-spacing: -0.035em;
-  line-height: 1;
+  line-height: 0.98;
   color: var(--ink);
   margin: 0 0 14px;
   display: flex;
@@ -477,7 +522,7 @@ const SectionTitle = styled.h2`
 
 const SectionSubtitle = styled.p`
   font-family: var(--font-grotesk);
-  font-size: 1rem;
+  font-size: 0.9375rem;
   color: var(--muted);
   margin: 0;
   line-height: 1.55;
@@ -517,35 +562,41 @@ const CardBody = styled.div`
 
 // Form Elements
 const FormGroup = styled.div`
-  margin-bottom: 28px;
+  /* More breathing — was 28px, makes fields feel less crammed. */
+  margin-bottom: 36px;
 `;
 
 const FormRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  /* Slightly wider gap between paired fields. */
+  gap: 28px;
 
   @media (max-width: 600px) {
     grid-template-columns: 1fr;
+    gap: 0;
   }
 `;
 
 /**
  * Editorial label — auto-numbered via CSS counters (resets per step
- * inside the FormCard). Renders as `Q01 ─── COMPANY NAME` — adds
- * rhythm and gives the user a sense of being walked through.
+ * inside the FormCard). Renders as `Q01  COMPANY NAME *`. Previously
+ * had a horizontal line filler after the text (`::after { flex: 1 }`),
+ * but in a 2-column FormRow it created dense parallel rules across
+ * every field — read as visual noise. The Q-number + caps text alone
+ * carries the rhythm cleanly.
  */
 const Label = styled.label`
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
   font-family: var(--font-grotesk);
   font-size: 0.6875rem;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.16em;
   color: var(--ink);
-  margin-bottom: 14px;
+  margin-bottom: 12px;
   counter-increment: q;
 
   &::before {
@@ -555,18 +606,11 @@ const Label = styled.label`
     font-weight: 600;
     letter-spacing: 0.08em;
   }
-
-  &::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--bone-line);
-  }
 `;
 
 const RequiredMark = styled.span`
   color: var(--accent);
-  margin-left: 2px;
+  margin-left: 4px;
 `;
 
 /**
@@ -620,36 +664,34 @@ const Input = styled.input`
  */
 const Textarea = styled.textarea`
   width: 100%;
-  background: #fafafa;
+  background: transparent;
   border: 1px solid var(--bone-line);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 16px 18px;
   font-family: var(--font-grotesk);
   font-size: 1rem;
   color: var(--ink);
   transition:
     border-color 0.25s var(--ease-snap),
-    background 0.25s var(--ease-snap),
-    box-shadow 0.25s var(--ease-snap);
+    background 0.25s var(--ease-snap);
   resize: vertical;
   min-height: 132px;
   line-height: 1.55;
 
   &::placeholder {
     color: var(--muted);
-    opacity: 0.55;
+    opacity: 0.6;
   }
 
   &:hover {
     border-color: var(--ink);
-    background: #fff;
   }
 
   &:focus {
     outline: none;
     border-color: var(--accent);
-    background: #fff;
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+    /* No heavy box-shadow ring — keeps the editorial restraint of the
+       rest of the design system. */
   }
 `;
 
@@ -668,23 +710,22 @@ const CheckboxItem = styled.label<{ $checked: boolean }>`
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 16px;
-  background: ${props => (props.$checked ? '#EFE4FF' : '#fff')};
+  padding: 14px 18px;
+  background: ${props => (props.$checked ? 'rgba(124, 58, 237, 0.08)' : 'transparent')};
   border: 1px solid ${props => (props.$checked ? 'var(--accent)' : 'var(--bone-line)')};
-  border-radius: 8px;
+  border-radius: 999px;
   cursor: pointer;
   position: relative;
   z-index: 1;
+  /* Cleaner hover — border-only highlight, no lift/shadow. Matches the
+     restrained hover language on Services/About row lists. */
   transition:
-    background 0.25s var(--ease-snap),
-    border-color 0.25s var(--ease-snap),
-    transform 0.4s var(--ease-expo),
-    box-shadow 0.4s var(--ease-expo);
+    background 0.3s var(--ease-snap),
+    border-color 0.3s var(--ease-snap),
+    color 0.3s var(--ease-snap);
 
   &:hover {
-    border-color: var(--accent);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px -8px rgba(124, 58, 237, 0.25);
+    border-color: var(--ink);
   }
 
   input {
@@ -732,22 +773,19 @@ const RadioItem = styled.label<{ $checked: boolean }>`
   align-items: center;
   gap: 10px;
   padding: 12px 18px;
-  background: ${props => (props.$checked ? '#EFE4FF' : '#fff')};
+  background: ${props => (props.$checked ? 'rgba(124, 58, 237, 0.08)' : 'transparent')};
   border: 1px solid ${props => (props.$checked ? 'var(--accent)' : 'var(--bone-line)')};
   border-radius: 999px;
   cursor: pointer;
   position: relative;
   z-index: 1;
   transition:
-    background 0.25s var(--ease-snap),
-    border-color 0.25s var(--ease-snap),
-    transform 0.4s var(--ease-expo),
-    box-shadow 0.4s var(--ease-expo);
+    background 0.3s var(--ease-snap),
+    border-color 0.3s var(--ease-snap),
+    color 0.3s var(--ease-snap);
 
   &:hover {
-    border-color: var(--accent);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px -8px rgba(124, 58, 237, 0.25);
+    border-color: var(--ink);
   }
 
   input {
@@ -799,31 +837,35 @@ const NavButtons = styled.div`
   }
 `;
 
+/**
+ * Step nav buttons — visually identical to our PillLink pill: 52px tall,
+ * 28px horizontal padding, fully rounded, capslet typography, smooth
+ * lift-on-hover. Primary = dark ink fill, ghost = outlined.
+ */
 const NavButton = styled.button<{ $primary?: boolean }>`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 18px 32px;
+  gap: 11px;
+  height: 52px;
+  padding: 0 28px;
   border-radius: 999px;
   font-family: var(--font-grotesk);
-  font-size: 0.8125rem;
-  font-weight: 500;
+  font-size: 0.6875rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   cursor: pointer;
   position: relative;
-  overflow: hidden;
   transition:
-    background 0.35s var(--ease-snap),
-    color 0.35s var(--ease-snap),
-    border-color 0.35s var(--ease-snap),
-    padding 0.5s var(--ease-expo),
-    transform 0.3s var(--ease-snap);
+    background 0.4s var(--ease-snap),
+    color 0.4s var(--ease-snap),
+    border-color 0.4s var(--ease-snap),
+    transform 0.4s var(--ease-expo);
 
   svg {
     font-size: 12px;
-    transition: transform 0.4s var(--ease-expo);
+    transition: transform 0.45s var(--ease-expo);
   }
 
   ${props =>
@@ -831,17 +873,15 @@ const NavButton = styled.button<{ $primary?: boolean }>`
       ? `
     background: var(--ink);
     color: #fff;
-    border: 1.5px solid var(--ink);
-    box-shadow: 0 4px 24px rgba(10, 10, 10, 0.08);
+    border: 1px solid var(--ink);
 
     &:hover:not(:disabled) {
+      transform: translateY(-2px);
       background: var(--accent);
       border-color: var(--accent);
-      padding: 18px 38px;
-      box-shadow: 0 6px 28px rgba(124, 58, 237, 0.32);
     }
     &:hover:not(:disabled) svg {
-      transform: translateX(6px);
+      transform: translateX(5px);
     }
     &:active:not(:disabled) {
       transform: scale(0.98);
@@ -850,9 +890,10 @@ const NavButton = styled.button<{ $primary?: boolean }>`
       : `
     background: transparent;
     color: var(--ink);
-    border: 1.5px solid var(--bone-line);
+    border: 1px solid var(--bone-line);
 
     &:hover:not(:disabled) {
+      transform: translateY(-2px);
       border-color: var(--ink);
     }
     &:hover:not(:disabled) svg {
@@ -869,44 +910,45 @@ const NavButton = styled.button<{ $primary?: boolean }>`
 // Success Screen
 const SuccessScreen = styled(motion.div)`
   text-align: center;
-  padding: 64px 40px;
+  padding: clamp(72px, 14vh, 160px) 40px;
 `;
 
 const SuccessIcon = styled(motion.div)`
-  width: 80px;
-  height: 80px;
+  width: 88px;
+  height: 88px;
   border-radius: 50%;
-  background: #EFE4FF;
-  border: 2px solid var(--accent);
+  background: rgba(124, 58, 237, 0.08);
+  border: 1.5px solid var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 28px;
+  margin: 0 auto 36px;
 
   svg {
-    font-size: 30px;
+    font-size: 32px;
     color: var(--accent);
   }
 `;
 
 const SuccessTitle = styled.h2`
   font-family: var(--font-display);
-  font-size: clamp(1.75rem, 3.4vw, 2.5rem);
+  /* Bigger display title — matches the closing CTA headlines on other
+     inner pages (the "Let's work together" finale size). */
+  font-size: clamp(2.5rem, 6.5vw, 5.5rem);
   font-weight: 400;
   letter-spacing: -0.03em;
+  line-height: 0.96;
   color: var(--ink);
-  margin: 0 0 16px;
+  margin: 0 0 22px;
 `;
 
 const SuccessText = styled.p`
   font-family: var(--font-grotesk);
-  font-size: 1.0625rem;
+  font-size: clamp(1.0625rem, 1.2vw, 1.25rem);
   color: var(--muted);
-  margin: 0 0 36px;
+  margin: 0 auto 44px;
   line-height: 1.55;
-  max-width: 520px;
-  margin-left: auto;
-  margin-right: auto;
+  max-width: 540px;
 `;
 
 const ErrorMessage = styled(motion.div)`
@@ -967,7 +1009,7 @@ const AutoSave = styled(motion.div)`
   align-items: center;
   gap: 10px;
   padding: 8px 14px;
-  margin-top: 28px;
+  margin-top: 18px;
   border: 1px solid var(--bone-line);
   border-radius: 999px;
   font-family: var(--font-grotesk);
@@ -976,7 +1018,7 @@ const AutoSave = styled(motion.div)`
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--muted);
-  background: rgba(250, 250, 250, 0.6);
+  background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(6px);
 
   .pulse {
@@ -2475,8 +2517,8 @@ const Brief: React.FC = memo(() => {
   if (isSuccess) {
     return (
       <PageWrapper>
-        <NavBar surface="light" />
-        <BriefContainer>
+        <NavBar />
+        <BriefContainer data-nav-theme="light">
           <FormCard
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -2527,46 +2569,48 @@ const Brief: React.FC = memo(() => {
       </TopProgress>
 
       <BriefHero>
-        <BackButton
-          onClick={() => navigate('/')}
-          whileHover={{ x: -4 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <FaArrowLeft /> {t.back}
-        </BackButton>
+        <BriefHeroInner>
+          <BackButton
+            onClick={() => navigate('/')}
+            whileHover={{ x: -4 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <FaArrowLeft /> {t.back}
+          </BackButton>
 
-        <Logo>SINTARA · BRIEF</Logo>
-        <Title
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        >
-          {t.title}
-        </Title>
-        <Subtitle
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-        >
-          {t.subtitle}
-        </Subtitle>
+          <Logo>SINTARA · BRIEF</Logo>
+          <Title
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {t.title}
+          </Title>
+          <Subtitle
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {t.subtitle}
+          </Subtitle>
 
-        <AutoSave
-          className={saveStatus === 'saving' ? 'saving' : ''}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <span className="pulse" />
-          {saveStatus === 'saving' ? (
-            language === 'ru' ? <>Сохраняю…</> : <>Saving…</>
-          ) : (
-            language === 'ru' ? <><strong>Сохранено</strong> · только что</> : <><strong>Saved</strong> · just now</>
-          )}
-        </AutoSave>
+          <AutoSave
+            className={saveStatus === 'saving' ? 'saving' : ''}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <span className="pulse" />
+            {saveStatus === 'saving' ? (
+              language === 'ru' ? <>Сохраняю…</> : <>Saving…</>
+            ) : (
+              language === 'ru' ? <><strong>Сохранено</strong> · только что</> : <><strong>Saved</strong> · just now</>
+            )}
+          </AutoSave>
+        </BriefHeroInner>
       </BriefHero>
 
-      <BriefContainer>
+      <BriefContainer data-nav-theme="light">
         <Sidebar>
           {/* Mobile horizontal strip */}
           <SidebarStrip>
