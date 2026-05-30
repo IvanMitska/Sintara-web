@@ -143,7 +143,7 @@ const Title = styled(motion.h1)`
      edge-to-edge; stacking lets each word breathe and read as a poster, which
      suits the narrow viewport. Desktop keeps the single editorial line. */
   @media (max-width: 600px) {
-    font-size: clamp(3.9rem, 24vw, 6.6rem);
+    font-size: clamp(3.6rem, 20vw, 5.6rem);
     line-height: 0.9;
     white-space: normal;
 
