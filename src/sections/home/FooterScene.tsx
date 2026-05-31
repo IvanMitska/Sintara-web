@@ -432,8 +432,8 @@ function Scene({
   // lighter cloud on small / lower-power devices
   const count = useMemo(() => {
     const w = window.innerWidth;
-    if (w < 600) return 10;
-    if (w < 1100) return 16;
+    if (w < 600) return 6;
+    if (w < 1100) return 14;
     return 24;
   }, []);
 
@@ -480,9 +480,17 @@ const FooterScene = ({ active }: { active: boolean }) => {
       window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     [],
   );
+  const coarse = useMemo(
+    () =>
+      typeof window !== 'undefined' &&
+      window.matchMedia('(pointer: coarse)').matches,
+    [],
+  );
 
-  // translate window pointer events into canvas-local NDC
+  // translate window pointer events into canvas-local NDC (desktop only —
+  // there's no cursor-scatter on touch, so skip the per-pointermove rect read)
   useEffect(() => {
+    if (coarse) return;
     const onMove = (e: PointerEvent) => {
       const el = wrapRef.current;
       if (!el) return;
@@ -509,7 +517,7 @@ const FooterScene = ({ active }: { active: boolean }) => {
       window.removeEventListener('pointermove', onMove);
       document.removeEventListener('mouseleave', onLeave);
     };
-  }, []);
+  }, [coarse]);
 
   return (
     <div
@@ -523,11 +531,15 @@ const FooterScene = ({ active }: { active: boolean }) => {
       }}
     >
       <Canvas
-        dpr={[1, 1.6]}
+        // Mobile: cap DPR + drop MSAA. The iridescent/clearcoat physical
+        // materials are fragment-shader heavy, so shading fewer pixels with no
+        // multisampling is a large GPU win at little visual cost on a small
+        // background scene.
+        dpr={coarse ? [1, 1.25] : [1, 1.6]}
         frameloop={active && !reduced ? 'always' : 'demand'}
         camera={{ position: [0, 0, 15], fov: 36 }}
         gl={{
-          antialias: true,
+          antialias: !coarse,
           alpha: true,
           powerPreference: 'high-performance',
         }}

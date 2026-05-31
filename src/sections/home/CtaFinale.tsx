@@ -12,6 +12,13 @@ import ErrorBoundary from '../../components/ErrorBoundary';
 // the page no longer waits on ~5.6 MB of footer assets.
 const FooterScene = lazy(() => import('./FooterScene'));
 
+// Touch devices: skip the DotField sparkle canvas — it draws hundreds of arcs
+// per frame on the main thread, competing with the footer's WebGL render, and
+// is barely visible over the 3D scene. Evaluated once (pointer type is stable).
+const IS_COARSE =
+  typeof window !== 'undefined' &&
+  window.matchMedia('(pointer: coarse)').matches;
+
 /**
  * Closing CTA — a dark cinematic panel. A floating astronaut and a cloud
  * of iridescent primitives render in WebGL behind the wordmark; a halftone
@@ -241,7 +248,7 @@ const CtaFinale = () => {
           </Suspense>
         )}
       </ErrorBoundary>
-      <DotField active={inView} />
+      {!IS_COARSE && <DotField active={inView} />}
       <Crosshair
         style={{ top: '16%', left: '12%' }}
         $size={16}
