@@ -1,10 +1,15 @@
 import { Component } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
-import styled, { keyframes } from 'styled-components';
-import { FaExclamationTriangle, FaRedo, FaHome } from 'react-icons/fa';
+import styled from 'styled-components';
 
 interface Props {
   children: ReactNode;
+  /**
+   * What to render when a child throws. Pass `null` to silently hide the
+   * subtree (e.g. an optional 3D layer) — this is honoured as an explicit
+   * choice, distinct from not passing a fallback at all (which shows the
+   * branded full-screen error below).
+   */
   fallback?: ReactNode;
 }
 
@@ -13,203 +18,141 @@ interface State {
   error?: Error;
 }
 
-const glitch = keyframes`
-  0%, 100% {
-    text-shadow: -2px 0 #7c3aed, 2px 0 #ef4444;
-  }
-  25% {
-    text-shadow: 2px 0 #7c3aed, -2px 0 #ef4444;
-  }
-  50% {
-    text-shadow: -2px -2px #7c3aed, 2px 2px #ef4444;
-  }
-  75% {
-    text-shadow: 2px -2px #7c3aed, -2px 2px #ef4444;
-  }
-`;
-
-const pulse = keyframes`
-  0%, 100% { transform: scale(1); opacity: 0.8; }
-  50% { transform: scale(1.05); opacity: 1; }
-`;
-
-const ErrorContainer = styled.div`
-  width: 100%;
-  min-height: 100vh;
+const Shell = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #050208 0%, #0a0512 50%, #050208 100%);
-  padding: 40px 20px;
+  padding: 40px 24px;
   text-align: center;
-  position: relative;
-  overflow: hidden;
+  color: #fff;
+  background: #08060f;
+  background-image: radial-gradient(
+    760px 480px at 50% -2%,
+    rgba(124, 58, 237, 0.22),
+    transparent 62%
+  );
+  font-family: var(--font-grotesk, system-ui, sans-serif);
+`;
+
+const Inner = styled.div`
+  max-width: 460px;
+`;
+
+const Eyebrow = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent-bright, #a78bfa);
+  margin-bottom: 22px;
 
   &::before {
     content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background:
-      radial-gradient(circle at 30% 20%, rgba(124, 58, 237, 0.1) 0%, transparent 40%),
-      radial-gradient(circle at 70% 80%, rgba(239, 68, 68, 0.08) 0%, transparent 40%);
-    pointer-events: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-bright, #a78bfa);
   }
 `;
 
-const Content = styled.div`
-  position: relative;
-  z-index: 1;
-  max-width: 500px;
-`;
-
-const IconWrapper = styled.div`
-  width: 100px;
-  height: 100px;
-  margin: 0 auto 32px;
-  border-radius: 24px;
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.05) 100%);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: ${pulse} 2s ease-in-out infinite;
-
-  svg {
-    font-size: 40px;
-    color: #ef4444;
-  }
-`;
-
-const ErrorCode = styled.div`
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-size: clamp(4rem, 15vw, 7rem);
-  font-weight: 900;
-  color: transparent;
-  background: linear-gradient(135deg, #ef4444 0%, #7c3aed 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  line-height: 1;
-  margin-bottom: 16px;
-  animation: ${glitch} 3s infinite;
-`;
-
-const ErrorTitle = styled.h3`
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 1.5rem;
+const Title = styled.h1`
+  font-family: var(--font-display, system-ui, sans-serif);
   font-weight: 600;
-  color: #ffffff;
-  margin: 0 0 12px;
+  font-size: clamp(2rem, 7vw, 3rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: #fff;
+  margin: 0 0 14px;
 `;
 
-const ErrorMessage = styled.p`
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+const Msg = styled.p`
   font-size: 1rem;
-  color: rgba(255, 255, 255, 0.5);
   line-height: 1.6;
+  color: rgba(255, 255, 255, 0.55);
   margin: 0 0 32px;
 `;
 
-const ButtonGroup = styled.div`
+const Row = styled.div`
   display: flex;
   gap: 12px;
   justify-content: center;
   flex-wrap: wrap;
 `;
 
-const Button = styled.button<{ $primary?: boolean }>`
+const Btn = styled.button<{ $primary?: boolean }>`
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 24px;
-  border-radius: 12px;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 0.95rem;
-  font-weight: 500;
+  height: 50px;
+  padding: 0 26px;
+  border-radius: 999px;
+  font-family: var(--font-grotesk, system-ui, sans-serif);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition:
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.3s ease,
+    border-color 0.3s ease;
 
-  ${props => props.$primary ? `
-    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-    color: white;
-    border: none;
-    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(124, 58, 237, 0.4);
-    }
-  ` : `
-    background: rgba(255, 255, 255, 0.03);
-    color: rgba(255, 255, 255, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-
-    &:hover {
-      background: rgba(124, 58, 237, 0.1);
-      border-color: rgba(124, 58, 237, 0.3);
-      color: white;
-      transform: translateY(-2px);
-    }
+  ${({ $primary }) =>
+    $primary
+      ? `
+    background: var(--accent, #7c3aed);
+    color: #fff;
+    border: 1px solid var(--accent, #7c3aed);
+  `
+      : `
+    background: transparent;
+    color: rgba(255,255,255,0.85);
+    border: 1px solid rgba(255,255,255,0.22);
   `}
 
-  svg {
-    font-size: 16px;
-  }
-`;
-
-const ErrorDetails = styled.details`
-  margin-top: 32px;
-  text-align: left;
-  width: 100%;
-`;
-
-const ErrorSummary = styled.summary`
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.4);
-  cursor: pointer;
-  padding: 8px 0;
-
   &:hover {
-    color: rgba(255, 255, 255, 0.6);
+    transform: translateY(-2px);
+    ${({ $primary }) =>
+      $primary
+        ? 'background: var(--accent-bright, #a78bfa); border-color: var(--accent-bright, #a78bfa);'
+        : 'border-color: rgba(255,255,255,0.5);'}
   }
 `;
 
-const ErrorStack = styled.pre`
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.4);
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  padding: 16px;
-  overflow-x: auto;
-  margin-top: 8px;
-  max-height: 150px;
-  overflow-y: auto;
+const Details = styled.details`
+  margin-top: 30px;
+  text-align: left;
 
-  &::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  summary {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.35);
+    cursor: pointer;
   }
 
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: rgba(124, 58, 237, 0.3);
-    border-radius: 3px;
+  pre {
+    margin-top: 10px;
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.7rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.4);
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 14px;
+    max-height: 160px;
+    overflow: auto;
   }
 `;
 
 class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
-    hasError: false
-  };
+  public state: State = { hasError: false };
 
   public static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
@@ -219,52 +162,43 @@ class ErrorBoundary extends Component<Props, State> {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
   }
 
-  private handleRetry = () => {
-    this.setState({ hasError: false, error: undefined });
-  };
+  private handleRetry = () => this.setState({ hasError: false, error: undefined });
 
   private handleGoHome = () => {
     window.location.href = '/';
   };
 
   public render() {
-    if (this.state.hasError) {
-      if (this.props.fallback) {
-        return this.props.fallback;
-      }
+    if (!this.state.hasError) return this.props.children;
 
-      return (
-        <ErrorContainer>
-          <Content>
-            <IconWrapper>
-              <FaExclamationTriangle />
-            </IconWrapper>
-            <ErrorCode>Oops!</ErrorCode>
-            <ErrorTitle>Something went wrong</ErrorTitle>
-            <ErrorMessage>
-              An error occurred while loading the component.
-              Try refreshing the page or click retry.
-            </ErrorMessage>
-            <ButtonGroup>
-              <Button $primary onClick={this.handleRetry}>
-                <FaRedo /> Try again
-              </Button>
-              <Button onClick={this.handleGoHome}>
-                <FaHome /> Go home
-              </Button>
-            </ButtonGroup>
-            {this.state.error && (
-              <ErrorDetails>
-                <ErrorSummary>Technical details</ErrorSummary>
-                <ErrorStack>{this.state.error.stack}</ErrorStack>
-              </ErrorDetails>
-            )}
-          </Content>
-        </ErrorContainer>
-      );
-    }
+    // An explicit fallback (including `null`) is honoured — used to hide
+    // optional subtrees like the 3D footer instead of breaking the page.
+    if (this.props.fallback !== undefined) return this.props.fallback;
 
-    return this.props.children;
+    return (
+      <Shell role="alert">
+        <Inner>
+          <Eyebrow>Sintara</Eyebrow>
+          <Title>Something went wrong</Title>
+          <Msg>
+            A part of the page didn’t load as expected. Try again, or head back
+            to the homepage.
+          </Msg>
+          <Row>
+            <Btn $primary onClick={this.handleRetry}>
+              Try again
+            </Btn>
+            <Btn onClick={this.handleGoHome}>Go home</Btn>
+          </Row>
+          {import.meta.env.DEV && this.state.error && (
+            <Details>
+              <summary>Technical details</summary>
+              <pre>{this.state.error.stack}</pre>
+            </Details>
+          )}
+        </Inner>
+      </Shell>
+    );
   }
 }
 

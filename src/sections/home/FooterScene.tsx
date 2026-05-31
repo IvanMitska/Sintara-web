@@ -2,6 +2,7 @@ import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Environment, useGLTF, useAnimations } from '@react-three/drei';
 import * as THREE from 'three';
+import ErrorBoundary from '../../components/ErrorBoundary';
 const ASTRONAUT_URL = '/models/astronaut.glb';
 const ICONS_URL = '/models/icons.glb';
 
@@ -450,7 +451,15 @@ function Scene({
       <Astronaut pointer={pointer} reduced={reduced} />
       <IconCloud count={count} pointer={pointer} reduced={reduced} />
 
-      <Environment preset="city" />
+      {/* The "city" preset fetches an HDR from drei's CDN — on a flaky mobile
+          network that fetch can fail intermittently. Isolate it: a failure
+          drops only the reflections (materials look slightly flatter), never
+          the whole scene or the page. */}
+      <ErrorBoundary fallback={null}>
+        <Suspense fallback={null}>
+          <Environment preset="city" />
+        </Suspense>
+      </ErrorBoundary>
       <ReadySignal />
     </Suspense>
   );
