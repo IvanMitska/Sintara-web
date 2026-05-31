@@ -292,15 +292,19 @@ const Hero = ({ ready }: { ready: boolean }) => {
   useEffect(() => {
     const el = shellRef.current;
     if (!el) return;
-    flux.heroVisible = true;
-    let prev = true;
-    const emit = (visible: boolean) => {
+    // null = unknown until the observer's first callback fires. A `true`
+    // initial value made the first "visible" reading early-return, so the
+    // video was never explicitly played and relied solely on the autoplay
+    // attribute — which intermittently doesn't kick in on mobile (the
+    // "paused on open" bug). Starting from null guarantees the first visible
+    // reading calls play().
+    let prev: boolean | null = null;
+    const apply = (visible: boolean) => {
       if (visible === prev) return;
       prev = visible;
       flux.heroVisible = visible;
-      // Pause the hero video once it scrolls out of view — otherwise the
-      // decoder keeps burning GPU/CPU (notably on mobile) during the rest of
-      // the page scroll. Resume on return.
+      // Pause the decoder while the hero is scrolled out of view (saves
+      // GPU/CPU on mobile); resume the moment it returns.
       const v = videoRef.current;
       if (v) {
         if (visible) v.play().catch(() => {});
@@ -311,14 +315,14 @@ const Hero = ({ ready }: { ready: boolean }) => {
       );
     };
     const io = new IntersectionObserver(
-      (entries) => emit(entries[0].isIntersecting),
+      (entries) => apply(entries[0].isIntersecting),
       { threshold: 0.02 },
     );
     io.observe(el);
-    return () => {
-      io.disconnect();
-      emit(false);
-    };
+    // Don't pause on unmount — the element is going away anyway, and pausing
+    // here is what (under dev StrictMode's remount) could leave a freshly
+    // mounted hero's video stuck paused.
+    return () => io.disconnect();
   }, []);
 
   useEffect(() => {
