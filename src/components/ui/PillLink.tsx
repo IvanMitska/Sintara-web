@@ -22,13 +22,11 @@ const base = css`
   text-transform: uppercase;
   letter-spacing: 0.14em;
   white-space: nowrap;
-  transition: transform 0.4s var(--ease-expo);
 
-  /* The pill lifts on hover (translateY). Without a buffer, the pointer
-     can fall just outside the moved box at the edge, rapidly toggling
-     hover and making the button jitter. Extend the hit area vertically
-     (not horizontally — adjacent pills sit only 14px apart) so the lift
-     never drops the hover. */
+  /* A comfortable, stable hit area. The pill deliberately does NOT lift on
+     hover — a transform moves the element's hit box, so the pointer fell just
+     outside it at the bottom edge and rapidly toggled hover, making the button
+     (and its text roll) jitter. With no lift the hover stays rock-steady. */
   &::after {
     content: '';
     position: absolute;
@@ -41,7 +39,7 @@ const base = css`
     border-radius: 50%;
     background: currentColor;
     flex: none;
-    transition: transform 0.5s var(--ease-expo);
+    transition: transform 0.5s var(--ease-snap);
   }
 
   .label {
@@ -53,7 +51,7 @@ const base = css`
   .label-line {
     display: block;
     will-change: transform;
-    transition: transform 0.55s var(--ease-expo);
+    transition: transform 0.5s var(--ease-snap);
   }
   .label-line--ghost {
     position: absolute;
@@ -63,11 +61,10 @@ const base = css`
   }
 
   .arr {
-    transition: transform 0.45s var(--ease-expo);
+    transition: transform 0.45s var(--ease-snap);
   }
 
   &:hover {
-    transform: translateY(-2px);
     .label-line {
       transform: translateY(-100%);
     }
