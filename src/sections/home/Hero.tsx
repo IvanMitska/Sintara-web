@@ -284,6 +284,7 @@ const Hero = ({ ready }: { ready: boolean }) => {
   const { t } = useLanguage();
   const reduced = useReducedMotion();
   const shellRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   // Tell GlobalCanvas when the hero is on-screen so it can freeze the
   // WebGL render loop once we scroll past. With no long sticky, we use a
@@ -297,6 +298,14 @@ const Hero = ({ ready }: { ready: boolean }) => {
       if (visible === prev) return;
       prev = visible;
       flux.heroVisible = visible;
+      // Pause the hero video once it scrolls out of view — otherwise the
+      // decoder keeps burning GPU/CPU (notably on mobile) during the rest of
+      // the page scroll. Resume on return.
+      const v = videoRef.current;
+      if (v) {
+        if (visible) v.play().catch(() => {});
+        else v.pause();
+      }
       window.dispatchEvent(
         new CustomEvent('hero:visibility', { detail: visible }),
       );
@@ -328,6 +337,7 @@ const Hero = ({ ready }: { ready: boolean }) => {
   return (
     <Shell ref={shellRef} data-nav-theme="dark">
       <VideoBg
+        ref={videoRef}
         autoPlay
         muted
         loop

@@ -56,10 +56,11 @@ const Para = styled.p`
   letter-spacing: -0.02em;
 `;
 
-const Word = styled(motion.span)`
+const Word = styled(motion.span)<{ $accent?: boolean }>`
   display: inline-block;
   margin-right: 0.26em;
   white-space: pre;
+  color: ${({ $accent }) => ($accent ? '#8B5CF6' : 'var(--ink)')};
 `;
 
 const AnimatedWord = ({
@@ -71,12 +72,17 @@ const AnimatedWord = ({
   progress: MotionValue<number>;
   range: [number, number];
 }) => {
-  const opacity = useTransform(progress, range, [0.16, 1]);
-  const color = useTransform(progress, range, [
-    '#9A9AA8',
-    children.includes('—') ? '#8B5CF6' : '#0A0A0C',
-  ]);
-  return <Word style={{ opacity, color }}>{children}</Word>;
+  // Opacity only — composited, so it stays smooth on scroll. The previous
+  // version ALSO drove `color` per word, which repaints (~28 words) on every
+  // scroll frame in both directions and was the main cause of the scroll jank,
+  // especially on mobile. A faint→full opacity fade of ink-coloured text reads
+  // almost identically to the old muted→ink colour shift.
+  const opacity = useTransform(progress, range, [0.2, 1]);
+  return (
+    <Word $accent={children.includes('—')} style={{ opacity }}>
+      {children}
+    </Word>
+  );
 };
 
 const Manifesto = () => {
