@@ -6,6 +6,7 @@ import Footer from '../components/Footer';
 import PillLink from '../components/ui/PillLink';
 import Reveal from '../components/ui/Reveal';
 import Crosshair from '../components/ui/Crosshair';
+import CoverImage from '../components/ui/CoverImage';
 import { useLanguage } from '../context/LanguageContext';
 import { projects } from '../data/projects';
 
@@ -208,8 +209,16 @@ const Cover = styled(Link)<{ $accent: string }>`
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 1.4s var(--ease-expo);
+    /* Fade in once decoded (see CoverImage) so the cover doesn't pop in
+       mid-reveal and hitch the card's entrance animation. */
+    opacity: 0;
+    transition:
+      opacity 0.55s ease,
+      transform 1.4s var(--ease-expo);
     will-change: transform;
+  }
+  img.loaded {
+    opacity: 1;
   }
 
   &::after {
@@ -582,7 +591,7 @@ const Work = () => {
                       {isRu ? 'Собственный продукт' : 'Own product'}
                     </span>
                   )}
-                  <img src={p.cover} alt={title} loading="lazy" />
+                  <CoverImage src={p.cover} alt={title} />
                   <span className="view">
                     {p.own
                       ? isRu

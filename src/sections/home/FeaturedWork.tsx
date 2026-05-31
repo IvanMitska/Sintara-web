@@ -5,6 +5,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { projects } from '../../data/projects';
 import Reveal from '../../components/ui/Reveal';
 import PillLink from '../../components/ui/PillLink';
+import CoverImage from '../../components/ui/CoverImage';
 
 /**
  * Featured work — an editorial project grid. Tag row, full-bleed cover,
@@ -117,7 +118,14 @@ const Card = styled(Link)`
     height: 100%;
     object-fit: cover;
     transform: scale(1.02);
-    transition: transform 0.9s var(--ease-expo);
+    /* Fade in once decoded (see Cover) so the cover doesn't pop mid-reveal. */
+    opacity: 0;
+    transition:
+      opacity 0.55s ease,
+      transform 0.9s var(--ease-expo);
+  }
+  .frame img.loaded {
+    opacity: 1;
   }
 
   .badge {
@@ -274,7 +282,7 @@ const FeaturedWork = () => {
                         {isRu ? 'Собственный продукт' : 'Own product'}
                       </span>
                     )}
-                    <img src={p.cover} alt={loc.title} loading="lazy" />
+                    <CoverImage src={p.cover} alt={loc.title} />
                   </div>
                   <div className="meta">
                     <span className="title">
