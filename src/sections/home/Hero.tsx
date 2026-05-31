@@ -24,7 +24,13 @@ const HERO_POSTER = '/home/hero-poster.jpg';
 
 const Shell = styled.section`
   position: relative;
-  height: 100svh;
+  /* Fill the LARGE viewport (lvh) so the video/background reaches the very
+     bottom on iOS — under the Safari bottom bar — instead of ending at the
+     small-viewport line and letting the next section peek through. The content
+     itself is laid out in the small viewport (see Frame) so the meta/SCROLL
+     stay above the bar. lvh/svh are static per device, so no resize-on-scroll. */
+  height: 100vh;
+  height: 100lvh;
   min-height: 640px;
   width: 100%;
   /* Solid dark fallback so the frame reads even before the video paints
@@ -71,7 +77,13 @@ const Tint = styled.div`
 
 const Frame = styled.div`
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* Content lives in the SMALL viewport (above the iOS bottom bar) while the
+     Shell fills the large one — keeps the bottom meta / SCROLL above the bar. */
+  height: 100vh;
+  height: 100svh;
   z-index: 2;
   pointer-events: none;
   /* breathing room from viewport edges; matches the navbar padding */
