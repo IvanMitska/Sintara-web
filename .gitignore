@@ -37,3 +37,6 @@ models-source
 fonts-source
 covers-source
 videos-source
+
+# Print-only artifacts — business cards / typography deliverables (kept local)
+business-card/

@@ -92,8 +92,55 @@ const rawProjects: Project[] = [
     },
   },
   {
-    slug: 'kaif',
+    slug: 'sintara-rent-crm',
     number: '01',
+    year: '2025',
+    client: 'Sintara',
+    category: 'saas',
+    tags: [
+      'React 18',
+      'TypeScript',
+      'Tailwind CSS',
+      'Node.js',
+      'PostgreSQL',
+      'Claude AI',
+      'Leaflet',
+    ],
+    cover: '/projects/sintara-rent-crm/mockup.webp',
+    screens: [
+      '/projects/sintara-rent-crm/screen-1.webp',
+      '/projects/sintara-rent-crm/screen-2.webp',
+      '/projects/sintara-rent-crm/screen-3.webp',
+    ],
+    accent: '#D97706',
+    dark: true,
+    url: 'https://sintara-rent-crm.com',
+    own: true,
+    href: '/products/sintara-rent-crm',
+    en: {
+      title: 'Sintara Rent CRM — car & moto rental',
+      summary:
+        'Our own SaaS — an omnichannel CRM purpose-built for vehicle rental: fleet, deposits, online booking, GPS and a Telegram/WhatsApp/Instagram inbox with AI, in one isolated workspace.',
+      challenge:
+        'Rental operators run their business across spreadsheets and chats — requests from Telegram and WhatsApp get lost, cars get double-booked, deposits turn into disputes, and nobody knows which car actually makes money.',
+      solution:
+        'We built Sintara Rent CRM around the full rental cycle: an omnichannel inbox with AI, rentals with deposits and extensions, a fleet with photo-proof, per-car finances, provider-agnostic GPS and a self-service booking site. An isolated workspace with its own subdomain — live in five minutes.',
+      role: 'Product, design, engineering, infra — end to end',
+    },
+    ru: {
+      title: 'Sintara Rent CRM — авто- и мотопрокат',
+      summary:
+        'Наш собственный SaaS — омниканальная CRM, заточенная под прокат транспорта: автопарк, депозиты, онлайн-бронь, GPS и инбокс Telegram/WhatsApp/Instagram с AI — в одном изолированном пространстве.',
+      challenge:
+        'Прокаты ведут бизнес в таблицах и чатах: заявки из Telegram и WhatsApp теряются, машины бронируются дважды, депозиты превращаются в споры, а какая машина реально приносит деньги — непонятно.',
+      solution:
+        'Построили Sintara Rent CRM вокруг полного цикла аренды: омниканальный инбокс с AI, аренды с депозитами и продлениями, автопарк с фотофиксацией, финансы по каждой машине, провайдеро-независимый GPS и сайт онлайн-брони. Изолированное пространство со своим поддоменом — запуск за пять минут.',
+      role: 'Продукт, дизайн, разработка, инфраструктура — полный цикл',
+    },
+  },
+  {
+    slug: 'kaif',
+    number: '02',
     year: '2025',
     client: 'KAIF Wellness',
     category: 'website',
@@ -126,7 +173,7 @@ const rawProjects: Project[] = [
   },
   {
     slug: 'kaif-crm',
-    number: '02',
+    number: '03',
     year: '2025',
     client: 'KAIF CRM',
     category: 'crm',
@@ -164,7 +211,7 @@ const rawProjects: Project[] = [
   },
   {
     slug: 'unicar',
-    number: '03',
+    number: '04',
     year: '2025',
     client: 'UNICAR CRM',
     category: 'crm',
@@ -200,7 +247,7 @@ const rawProjects: Project[] = [
   },
   {
     slug: '3dlike',
-    number: '04',
+    number: '05',
     year: '2025',
     client: '3DLike',
     category: 'website',
