@@ -1,8 +1,101 @@
 /* Hand-off to styled-components GlobalStyles. */
-/* Anti-flash background before React mounts */
+
+/* PP Neue Montreal — display typeface (Pangram Pangram), licensed via the
+   studio's Pangram Pangram account. Keep the licence confirmation email as
+   proof of usage rights. woff2 first (~57% smaller than the .otf); the .otf
+   stays as a fallback for any engine without woff2.
+
+   IMPORTANT: these @font-face rules must live in a static stylesheet, NOT in
+   createGlobalStyle. styled-components rewrites its own <style> tag whenever
+   new component styles are injected (e.g. a lazy route's chunk loading on
+   navigation), which re-parses every rule in that tag — @font-face included.
+   Re-parsed faces are torn down and re-created, so for a few frames the
+   families are "loading" again and, with font-display: swap, every visible
+   headline flashes to the fallback font and back. That was the site-wide
+   "text jerks when you click a link" bug. A static CSS file is parsed once
+   and never rewritten, so the FontFace objects stay alive across route
+   changes. */
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('/fonts/PPNeueMontreal-Regular.woff2') format('woff2'),
+       url('/fonts/PPNeueMontreal-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('/fonts/PPNeueMontreal-Semibold.woff2') format('woff2'),
+       url('/fonts/PPNeueMontreal-Semibold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('/fonts/PPNeueMontreal-Extrabold.woff2') format('woff2'),
+       url('/fonts/PPNeueMontreal-Extrabold.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Metric-compatible local fallbacks (the "fontaine" technique). While the
+   web fonts load (font-display: swap shows a fallback first), these faces
+   render Helvetica Neue / Arial scaled with size-adjust + ascent/descent
+   overrides so line wrapping and text height match the incoming web font —
+   the swap then happens with (almost) no layout jump. Numbers computed from
+   the actual font files (see scratch font-metrics script):
+     PP Neue Montreal upm 1000, asc 958, desc -242; Schibsted upm 2048,
+     asc 2000, desc -528; Arial/Helvetica avg char width 0.4470 em.
+   unicode-range limits the fallbacks to latin: Schibsted Grotesk has no
+   cyrillic, so Russian text intentionally falls through to the system font
+   exactly as before — these faces must not resize it. */
+@font-face {
+  font-family: 'PP Neue Montreal Fallback';
+  src: local('Helvetica Neue'), local('Arial');
+  font-weight: 400;
+  size-adjust: 96.03%;
+  ascent-override: 99.77%;
+  descent-override: 25.2%;
+  line-gap-override: 0%;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'PP Neue Montreal Fallback';
+  src: local('Helvetica Neue'), local('Arial');
+  font-weight: 600;
+  size-adjust: 101.59%;
+  ascent-override: 94.3%;
+  descent-override: 23.82%;
+  line-gap-override: 0%;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'PP Neue Montreal Fallback';
+  src: local('Helvetica Neue Bold'), local('Arial Bold');
+  font-weight: 800;
+  size-adjust: 97.81%;
+  ascent-override: 97.95%;
+  descent-override: 24.74%;
+  line-gap-override: 0%;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Schibsted Grotesk Fallback';
+  src: local('Helvetica Neue'), local('Arial');
+  size-adjust: 105.23%;
+  ascent-override: 92.8%;
+  descent-override: 24.5%;
+  line-gap-override: 0%;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+
+/* Anti-flash background before React mounts — same dark as the inline
+   critical CSS in index.html and the theme-color meta. */
 html,
 body {
-  background-color: #000000;
+  background-color: #08060f;
 }
 
 #root {

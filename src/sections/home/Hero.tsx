@@ -13,14 +13,14 @@ import { flux } from '../../webgl/flux';
  * scroll cue).
  *
  * Asset is loaded from /public/home/hero-loop.mp4 (+ optional .webm).
- * A poster image (hero-poster.jpg) shows instantly while the video
+ * A poster image (hero-poster.avif) shows instantly while the video
  * downloads; if neither file exists yet, the dark fallback Shell
  * background still reads as intentional.
  */
 
 const HERO_VIDEO_MP4 = '/home/hero-loop.mp4';
 const HERO_VIDEO_WEBM = '/home/hero-loop.webm';
-const HERO_POSTER = '/home/hero-poster.jpg';
+const HERO_POSTER = '/home/hero-poster.avif';
 
 const Shell = styled.section`
   position: relative;

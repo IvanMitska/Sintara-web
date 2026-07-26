@@ -9,7 +9,7 @@ import { v } from '../../lib/asset';
  * Our products — the home block that introduces Sintara's own SaaS,
  * Sintara Rent CRM. Sits in the light run between FeaturedWork and
  * Capabilities. A two-column layout: editorial pitch on the left, a product
- * mockup image on the right (/public/projects/sintara-rent-crm/mockup.webp).
+ * mockup image on the right (/public/projects/sintara-rent-crm/mockup.avif).
  *
  * This block is scoped to the rental product, so it overrides the studio's
  * violet `--accent` with the product's own warm amber locally — only this
@@ -175,7 +175,7 @@ const Card = styled(Link)`
   overflow: hidden;
   isolation: isolate;
   /* neutral dark placeholder — visible until the mockup image loads
-     from /public/projects/sintara-rent-crm/mockup.webp (and behind it after).
+     from /public/projects/sintara-rent-crm/mockup.avif (and behind it after).
      Kept monochrome so the block shows no orange before the photo arrives. */
   background: linear-gradient(160deg, #2a2a30 0%, #0a0a0c 100%);
   transition: transform 0.6s var(--ease-expo);
@@ -320,7 +320,7 @@ const Products = () => {
                   onError hides a broken-image icon if the file is missing. */}
               <img
                 className="mockup"
-                src={v('/projects/sintara-rent-crm/mockup.webp')}
+                src={v('/projects/sintara-rent-crm/mockup.avif')}
                 alt={
                   isRu
                     ? 'Sintara Rent CRM — интерфейс'

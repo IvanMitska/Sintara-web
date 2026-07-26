@@ -69,7 +69,7 @@
 
     <!-- Typography: Schibsted Grotesk (single family) + JetBrains Mono -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
 
@@ -80,6 +80,26 @@
     <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/PPNeueMontreal-Regular.woff2" />
     <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/PPNeueMontreal-Semibold.woff2" />
     <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/PPNeueMontreal-Extrabold.woff2" />
+
+    <!-- Critical pre-JS styles. All real styles arrive with the bundle
+         (styled-components GlobalStyles), so without this block the first
+         paint uses UA defaults — body margin 8px, white background — and the
+         whole page jumps 8px + flashes when the bundle lands. Mirror the
+         layout-affecting essentials here so the pre-JS frame already matches.
+         styled-components injects its <style> later in <head>, so GlobalStyles
+         still wins once loaded. -->
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html { background: #08060f; overflow-y: scroll; }
+      body {
+        background: #08060f;
+        font-family: 'Schibsted Grotesk', -apple-system, BlinkMacSystemFont,
+          'Helvetica Neue', Helvetica, Arial, sans-serif;
+      }
+      @media (pointer: coarse) {
+        html { overflow-y: auto; }
+      }
+    </style>
 
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">

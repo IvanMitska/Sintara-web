@@ -23,7 +23,7 @@ const Hero = styled.header`
   /* Textured opener — wine/violet painterly splash from /public/contact,
      the warm (brand-led) side of the Contact bookend pair. Layers:
        1. dark gradient (top) — keeps the white headline readable
-       2. hero-bg.webp (middle) — wine splash with hot violet halo
+       2. hero-bg.avif (middle) — wine splash with hot violet halo
        3. solid --ink (bottom fallback) */
   background:
     linear-gradient(
@@ -32,7 +32,7 @@ const Hero = styled.header`
       rgba(0, 0, 0, 0.38) 55%,
       rgba(0, 0, 0, 0.58) 100%
     ),
-    url('/contact/hero-bg.webp') center / cover no-repeat,
+    url('/contact/hero-bg.avif') center / cover no-repeat,
     var(--ink);
   color: #fff;
   overflow: hidden;
@@ -52,7 +52,7 @@ const Hero = styled.header`
         rgba(0, 0, 0, 0.5) 0%,
         rgba(0, 0, 0, 0.68) 100%
       ),
-      url('/contact/hero-bg.webp') center / cover no-repeat,
+      url('/contact/hero-bg.avif') center / cover no-repeat,
       var(--ink);
   }
 `;
@@ -445,7 +445,7 @@ const CtaShell = styled.section`
      the cool side of the Contact bookend pair with brand violet bleed.
        1. radial darkening (top) — crushes corners, lifts the centre
           so the email pill sits in a halo
-       2. cta-bg.webp (middle) — cyan splash with violet accent
+       2. cta-bg.avif (middle) — cyan splash with violet accent
        3. solid --ink (bottom fallback) */
   background:
     radial-gradient(
@@ -454,7 +454,7 @@ const CtaShell = styled.section`
       rgba(0, 0, 0, 0.62) 55%,
       rgba(0, 0, 0, 0.82) 100%
     ),
-    url('/contact/cta-bg.webp') center / cover no-repeat,
+    url('/contact/cta-bg.avif') center / cover no-repeat,
     var(--ink);
   color: #fff;
   overflow: hidden;
@@ -493,7 +493,7 @@ const CtaShell = styled.section`
         rgba(0, 0, 0, 0.65) 0%,
         rgba(0, 0, 0, 0.82) 100%
       ),
-      url('/contact/cta-bg.webp') center / cover no-repeat,
+      url('/contact/cta-bg.avif') center / cover no-repeat,
       var(--ink);
   }
 `;

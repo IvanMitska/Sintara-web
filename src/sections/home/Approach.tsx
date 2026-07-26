@@ -137,9 +137,9 @@ const Approach = () => {
                   /public/home/ rather than /public/projects/<slug>/.
                   No v() wrap: cache-bust helper only stamps /projects/*
                   paths; if this file ever needs a forced refresh we can
-                  rename it (e.g. approach-v2.webp) or extend the helper. */}
+                  rename it (e.g. approach-v2.avif) or extend the helper. */}
               <img
-                src="/home/approach.webp"
+                src="/home/approach.avif"
                 alt=""
                 loading="lazy"
               />

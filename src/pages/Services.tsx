@@ -22,7 +22,7 @@ const Hero = styled.header`
      two top-level inner pages visually parented. Layers:
        1. dark gradient (top) — darkens the photo so the white headline
           stays readable
-       2. hero-bg.webp (middle) — magenta/crimson painterly splash from
+       2. hero-bg.avif (middle) — magenta/crimson painterly splash from
           /public/services (sibling to /work in style, but on the
           violet→magenta side of the brand palette)
        3. solid --ink (bottom fallback) */
@@ -33,7 +33,7 @@ const Hero = styled.header`
       rgba(0, 0, 0, 0.38) 55%,
       rgba(0, 0, 0, 0.58) 100%
     ),
-    url('/services/hero-bg.webp') center / cover no-repeat,
+    url('/services/hero-bg.avif') center / cover no-repeat,
     var(--ink);
   color: #fff;
   overflow: hidden;
@@ -53,7 +53,7 @@ const Hero = styled.header`
         rgba(0, 0, 0, 0.5) 0%,
         rgba(0, 0, 0, 0.68) 100%
       ),
-      url('/services/hero-bg.webp') center / cover no-repeat,
+      url('/services/hero-bg.avif') center / cover no-repeat,
       var(--ink);
   }
 `;
@@ -360,7 +360,7 @@ const CtaShell = styled.section`
      to give the page bookended visual rhythm (same pattern as Work).
        1. radial darkening (top) — crushes the corners, lifts the centre
           so the white headline + pill sit in a halo
-       2. cta-bg.webp (middle) — indigo/cyan painterly splash from
+       2. cta-bg.avif (middle) — indigo/cyan painterly splash from
           /public/services (sibling to /work in style, but on the
           violet→indigo side of the brand palette)
        3. solid --ink (bottom fallback) */
@@ -371,7 +371,7 @@ const CtaShell = styled.section`
       rgba(0, 0, 0, 0.62) 55%,
       rgba(0, 0, 0, 0.82) 100%
     ),
-    url('/services/cta-bg.webp') center / cover no-repeat,
+    url('/services/cta-bg.avif') center / cover no-repeat,
     var(--ink);
   color: #fff;
   overflow: hidden;
@@ -409,7 +409,7 @@ const CtaShell = styled.section`
         rgba(0, 0, 0, 0.65) 0%,
         rgba(0, 0, 0, 0.82) 100%
       ),
-      url('/services/cta-bg.webp') center / cover no-repeat,
+      url('/services/cta-bg.avif') center / cover no-repeat,
       var(--ink);
   }
 `;

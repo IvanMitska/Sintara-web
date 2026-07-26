@@ -29,7 +29,6 @@ const servicesImport = () => import('./pages/Services');
 const aboutImport = () => import('./pages/About');
 const contactImport = () => import('./pages/Contact');
 const briefImport = () => import('./pages/Brief');
-const sintaraCrmImport = () => import('./pages/SintaraCrmProduct');
 const rentCrmImport = () => import('./pages/RentCrmProduct');
 const notFoundImport = () => import('./pages/NotFound');
 
@@ -39,7 +38,6 @@ const Services = lazy(servicesImport);
 const About = lazy(aboutImport);
 const Contact = lazy(contactImport);
 const Brief = lazy(briefImport);
-const SintaraCrmProduct = lazy(sintaraCrmImport);
 const RentCrmProduct = lazy(rentCrmImport);
 const NotFound = lazy(notFoundImport);
 
@@ -97,7 +95,6 @@ const App = () => {
       void aboutImport();
       void contactImport();
       void briefImport();
-      void sintaraCrmImport();
       void rentCrmImport();
       void notFoundImport();
     };
@@ -145,7 +142,6 @@ const App = () => {
               <Route path="/about" element={<><RouteMount key="r:/about" /><About /></>} />
               <Route path="/contact" element={<><RouteMount key="r:/contact" /><Contact /></>} />
               <Route path="/brief" element={<><RouteMount key="r:/brief" /><Brief /></>} />
-              <Route path="/products/sintara-crm" element={<><RouteMount key="r:/products/sintara-crm" /><SintaraCrmProduct /></>} />
               <Route path="/products/sintara-rent-crm" element={<><RouteMount key="r:/products/sintara-rent-crm" /><RentCrmProduct /></>} />
               <Route path="*" element={<><RouteMount key="r:404" /><NotFound /></>} />
               </Routes>

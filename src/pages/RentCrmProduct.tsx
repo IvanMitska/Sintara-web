@@ -9,10 +9,10 @@ import { useLanguage } from '../context/LanguageContext';
 import { v } from '../lib/asset';
 
 /**
- * Sintara Rent CRM — our second in-house product: a vertical CRM built for
+ * Sintara Rent CRM — our in-house product: a vertical CRM built for
  * vehicle rental. Same cinematic dark-light-dark rhythm as the sibling
- * SintaraCrmProduct / ProjectDetail pages, but on the product's warm amber
- * dashboard mockup (lifted straight from the rental site's hero section).
+ * ProjectDetail pages, but on the product's warm amber dashboard mockup
+ * (lifted straight from the rental site's hero section).
  *
  * No pricing here on purpose — the live product site carries the up-to-date
  * plans; this case page sells the product and links out.
@@ -35,7 +35,7 @@ const Hero = styled.header`
       rgba(10, 10, 12, 0.3) 85%,
       rgba(10, 10, 12, 0) 100%
     ),
-    url('/projects/sintara-rent-crm/mockup.webp') center / cover no-repeat,
+    url('/projects/sintara-rent-crm/mockup.avif') center / cover no-repeat,
     #d8853a;
   color: #fff;
   overflow: hidden;
@@ -52,7 +52,7 @@ const Hero = styled.header`
         rgba(10, 10, 12, 0.62) 85%,
         rgba(10, 10, 12, 0.3) 100%
       ),
-      url('/projects/sintara-rent-crm/mockup.webp') center / cover no-repeat,
+      url('/projects/sintara-rent-crm/mockup.avif') center / cover no-repeat,
       #d8853a;
   }
 `;
@@ -382,7 +382,7 @@ const CtaShell = styled.section`
         rgba(0, 0, 0, 0) 100%
       ),
       linear-gradient(rgba(0, 0, 0, 0.32), rgba(0, 0, 0, 0.32)),
-      url('/projects/sintara-rent-crm/cta-bg.webp') center / cover no-repeat;
+      url('/projects/sintara-rent-crm/cta-bg.avif') center / cover no-repeat;
     filter: blur(6px);
     z-index: 0;
     pointer-events: none;
@@ -416,7 +416,7 @@ const CtaShell = styled.section`
           rgba(0, 0, 0, 0) 100%
         ),
         linear-gradient(rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.42)),
-        url('/projects/sintara-rent-crm/cta-bg.webp') center / cover no-repeat;
+        url('/projects/sintara-rent-crm/cta-bg.avif') center / cover no-repeat;
     }
   }
 `;
@@ -507,54 +507,54 @@ const RentCrmProduct = () => {
   const modules = isRu
     ? [
         {
-          img: '/projects/sintara-rent-crm/shot-conversations.webp',
+          img: '/projects/sintara-rent-crm/shot-conversations.avif',
           title: 'Омниканальный инбокс',
           desc: 'Telegram, WhatsApp, Instagram и Facebook в одной ленте. AI подсказывает ответы, делает саммари диалога и достаёт бронь прямо из переписки.',
         },
         {
-          img: '/projects/sintara-rent-crm/shot-rentals.webp',
+          img: '/projects/sintara-rent-crm/shot-rentals.avif',
           title: 'Аренды и депозиты',
           desc: 'Полный цикл сделки: от заявки до возврата. Депозиты с удержаниями за топливо, повреждения и штрафы, продления с проверкой пересечений, договоры и платежи.',
         },
         {
-          img: '/projects/sintara-rent-crm/shot-finances.webp',
+          img: '/projects/sintara-rent-crm/shot-finances.avif',
           title: 'Финансы по каждой машине',
           desc: 'Доходы, расходы и прибыль в разрезе каждого авто. Леджер с целостностью данных, кэшфлоу и отчёты — видно, какая машина реально зарабатывает.',
         },
         {
-          img: '/projects/sintara-rent-crm/shot-locations.webp',
+          img: '/projects/sintara-rent-crm/shot-locations.avif',
           title: 'GPS-локации без привязки к провайдеру',
           desc: 'Карта машин в реальном времени из четырёх источников: ручные пины, телефон водителя, вебхуки и Traccar — в одном потоке. История маршрутов.',
         },
         {
-          img: '/projects/sintara-rent-crm/shot-calendar.webp',
+          img: '/projects/sintara-rent-crm/shot-calendar.avif',
           title: 'Календарь и онлайн-бронь',
           desc: 'Месяц и неделя, доступность парка с одного взгляда, проверка пересечений. Публичный сайт брони с вашими ценами — заявка сразу падает в CRM.',
         },
       ]
     : [
         {
-          img: '/projects/sintara-rent-crm/shot-conversations.webp',
+          img: '/projects/sintara-rent-crm/shot-conversations.avif',
           title: 'Omnichannel inbox',
           desc: 'Telegram, WhatsApp, Instagram and Facebook in one feed. AI drafts replies, summarizes threads and pulls a booking straight out of the chat.',
         },
         {
-          img: '/projects/sintara-rent-crm/shot-rentals.webp',
+          img: '/projects/sintara-rent-crm/shot-rentals.avif',
           title: 'Rentals & deposits',
           desc: 'The full deal cycle from request to return. Deposits with deductions for fuel, damage and fines, extensions with overlap checks, contracts and payments.',
         },
         {
-          img: '/projects/sintara-rent-crm/shot-finances.webp',
+          img: '/projects/sintara-rent-crm/shot-finances.avif',
           title: 'Per-car finances',
           desc: 'Income, expenses and profit broken down by each car. A ledger with data integrity, cash flow and reports — you see which car actually earns.',
         },
         {
-          img: '/projects/sintara-rent-crm/shot-locations.webp',
+          img: '/projects/sintara-rent-crm/shot-locations.avif',
           title: 'Provider-agnostic GPS',
           desc: 'A live map of your fleet from four sources: manual pins, the driver’s phone, webhooks and Traccar — in one stream. Route history.',
         },
         {
-          img: '/projects/sintara-rent-crm/shot-calendar.webp',
+          img: '/projects/sintara-rent-crm/shot-calendar.avif',
           title: 'Calendar & online booking',
           desc: 'Month and week views, fleet availability at a glance, overlap detection. A public booking site with your prices — requests land straight in the CRM.',
         },

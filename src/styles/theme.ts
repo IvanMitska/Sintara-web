@@ -34,10 +34,13 @@ export const fonts = {
   // Display — PP Neue Montreal (Pangram Pangram). Drop the .woff2 files into
   // /public/fonts and the @font-face in GlobalStyles picks them up. Until then
   // it falls back to Schibsted Grotesk, so nothing breaks.
+  // The '* Fallback' faces are metric-adjusted local fonts (see index.css) so
+  // text laid out before the web font arrives wraps the same way — no jump on
+  // swap. They cover latin only; cyrillic falls through to the system stack.
   display:
-    "'PP Neue Montreal', 'Schibsted Grotesk', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif",
+    "'PP Neue Montreal', 'PP Neue Montreal Fallback', 'Schibsted Grotesk', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif",
   grotesk:
-    "'Schibsted Grotesk', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif",
+    "'Schibsted Grotesk', 'Schibsted Grotesk Fallback', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif",
   mono: "'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace",
 } as const;
 

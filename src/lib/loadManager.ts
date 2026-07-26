@@ -84,8 +84,13 @@ if (typeof document !== 'undefined') {
     );
 
     fonts.ready.then(() => markReady('fonts')).catch(() => markReady('fonts'));
-    // safety — never let a stalled font load block the site
-    window.setTimeout(() => markReady('fonts'), 4000);
+    // Safety — never let a stalled font load block the site. Keep this
+    // comfortably long: if it fires before the fonts actually arrive, the
+    // preloader releases early and the hero headline visibly re-renders
+    // (fallback → PP Neue) right in front of the user on slow connections.
+    // The preloader has its own 11s hard cap, so 8s here still guarantees
+    // the site never hangs on a dead font CDN.
+    window.setTimeout(() => markReady('fonts'), 8000);
   } else {
     markReady('fonts');
   }

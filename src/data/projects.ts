@@ -46,52 +46,6 @@ export interface Project {
 // the same path actually shows up for every visitor.
 const rawProjects: Project[] = [
   {
-    slug: 'sintara-crm',
-    number: '00',
-    year: '2025',
-    client: 'Sintara',
-    category: 'saas',
-    tags: [
-      'Next.js 15',
-      'React 19',
-      'TypeScript',
-      'Tailwind v4',
-      'GSAP',
-      'React Three Fiber',
-    ],
-    cover: '/projects/sintara-crm/mockup.webp',
-    screens: [
-      '/projects/sintara-crm/screen-1.webp',
-      '/projects/sintara-crm/screen-2.webp',
-      '/projects/sintara-crm/screen-3.webp',
-    ],
-    accent: '#8B5CF6',
-    dark: true,
-    url: 'https://www.sintara-crm.com',
-    own: true,
-    href: '/products/sintara-crm',
-    en: {
-      title: 'Sintara CRM — omnichannel CRM for SMB',
-      summary:
-        'Our own SaaS — an omnichannel CRM with the feel and speed of Linear or Notion, built for small and mid-sized teams in Asia.',
-      challenge:
-        'Most CRMs feel like software from the last decade — heavy, fragmented across mailbox, messengers and booking tools, and impossible to automate without a developer on call.',
-      solution:
-        'We built Sintara CRM around four pillars: an omnichannel inbox, a customizable sales pipeline, a no-code Automation Studio with AI steps, and online booking as a core module — not a plugin. 40+ integrations, 10-minute setup, releases every two weeks.',
-      role: 'Product, design, engineering, infra — end to end',
-    },
-    ru: {
-      title: 'Sintara CRM — омниканальная CRM для SMB',
-      summary:
-        'Наш собственный SaaS — омниканальная CRM с интерфейсом и скоростью уровня Linear или Notion, для малого и среднего бизнеса в Азии.',
-      challenge:
-        'Большинство CRM выглядят как софт прошлого десятилетия: тяжёлые, размазанные между почтой, мессенджерами и онлайн-записью, и почти не автоматизируются без разработчика.',
-      solution:
-        'Построили Sintara CRM вокруг четырёх опор: омниканальный инбокс, настраиваемая воронка продаж, no-code Automation Studio с AI-шагами и онлайн-запись как ядро продукта — не плагин. 40+ интеграций, запуск за 10 минут, релизы каждые две недели.',
-      role: 'Продукт, дизайн, разработка, инфраструктура — полный цикл',
-    },
-  },
-  {
     slug: 'sintara-rent-crm',
     number: '01',
     year: '2025',
@@ -106,11 +60,11 @@ const rawProjects: Project[] = [
       'Claude AI',
       'Leaflet',
     ],
-    cover: '/projects/sintara-rent-crm/mockup.webp',
+    cover: '/projects/sintara-rent-crm/mockup.avif',
     screens: [
-      '/projects/sintara-rent-crm/screen-1.webp',
-      '/projects/sintara-rent-crm/screen-2.webp',
-      '/projects/sintara-rent-crm/screen-3.webp',
+      '/projects/sintara-rent-crm/screen-1.avif',
+      '/projects/sintara-rent-crm/screen-2.avif',
+      '/projects/sintara-rent-crm/screen-3.avif',
     ],
     accent: '#D97706',
     dark: true,
@@ -146,8 +100,8 @@ const rawProjects: Project[] = [
     category: 'website',
     tags: ['React 19', 'Vite 6', 'Framer Motion', 'i18next', 'WhatsApp'],
     // No dedicated cover exists — use screen-1 as the cover image
-    cover: '/projects/kaif/screen-1.webp',
-    screens: ['/projects/kaif/screen-1.webp', '/projects/kaif/screen-2.webp'],
+    cover: '/projects/kaif/screen-1.avif',
+    screens: ['/projects/kaif/screen-1.avif', '/projects/kaif/screen-2.avif'],
     accent: '#1F2E22',
     url: undefined,
     en: {
@@ -178,13 +132,13 @@ const rawProjects: Project[] = [
     client: 'KAIF CRM',
     category: 'crm',
     tags: ['Electron', 'React', 'TypeScript', 'Tailwind', 'SQLite'],
-    cover: '/projects/kaif-crm/cover.webp',
+    cover: '/projects/kaif-crm/cover.avif',
     screens: [
-      '/projects/kaif-crm/macbook-pro-16-1.webp',
-      '/projects/kaif-crm/macbook-pro-16-2.webp',
-      '/projects/kaif-crm/studio-display-1.webp',
-      '/projects/kaif-crm/studio-display-2.webp',
-      '/projects/kaif-crm/ipad-pro.webp',
+      '/projects/kaif-crm/macbook-pro-16-1.avif',
+      '/projects/kaif-crm/macbook-pro-16-2.avif',
+      '/projects/kaif-crm/studio-display-1.avif',
+      '/projects/kaif-crm/studio-display-2.avif',
+      '/projects/kaif-crm/ipad-pro.avif',
     ],
     accent: '#2E4AFF',
     dark: true,
@@ -216,12 +170,12 @@ const rawProjects: Project[] = [
     client: 'UNICAR CRM',
     category: 'crm',
     tags: ['React', 'TypeScript', 'Tailwind CSS', 'Dashboard'],
-    cover: '/projects/unicar/cover.webp',
+    cover: '/projects/unicar/cover.avif',
     screens: [
-      '/projects/unicar/cover-1.webp',
-      '/projects/unicar/cover-2.webp',
-      '/projects/unicar/cover-3.webp',
-      '/projects/unicar/cover-4.webp',
+      '/projects/unicar/cover-1.avif',
+      '/projects/unicar/cover-2.avif',
+      '/projects/unicar/cover-3.avif',
+      '/projects/unicar/cover-4.avif',
     ],
     accent: '#1A3E8F',
     en: {
@@ -246,18 +200,144 @@ const rawProjects: Project[] = [
     },
   },
   {
-    slug: '3dlike',
+    slug: 'unicar-rent',
     number: '05',
+    year: '2025',
+    client: 'UNICAR',
+    category: 'website',
+    tags: [
+      'React 19',
+      'TypeScript',
+      'Tailwind CSS',
+      'Node.js',
+      'PostgreSQL',
+      'i18next',
+    ],
+    cover: '/projects/unicar-rent/cover.avif',
+    screens: [
+      '/projects/unicar-rent/screen-1.avif',
+      '/projects/unicar-rent/screen-2.avif',
+      '/projects/unicar-rent/screen-3.avif',
+      '/projects/unicar-rent/screen-4.avif',
+      '/projects/unicar-rent/screen-5.avif',
+      '/projects/unicar-rent/screen-6.avif',
+      '/projects/unicar-rent/screen-7.webp',
+    ],
+    accent: '#0F2E63',
+    dark: true,
+    url: 'https://unicar-rent.com',
+    en: {
+      title: 'Unicar — car & bike rental in Phuket',
+      summary:
+        'Bilingual rental platform with a 40+ vehicle catalogue, smart filters, progressive pricing and online booking wired straight into the CRM.',
+      challenge:
+        'Rental companies in Phuket take orders manually through WhatsApp: the client waits hours for a reply, managers drown in chats, and conversion depends on how fast an operator types.',
+      solution:
+        'We built a real booking funnel: a catalogue of cars and bikes with advanced filters and galleries, progressive long-term discounts computed live, user accounts with favorites, and a booking request that lands in the CRM instantly — the manager calls back with the quote already done.',
+      role: 'Design, frontend, backend, CRM integration, i18n',
+    },
+    ru: {
+      title: 'Unicar — аренда авто и байков на Пхукете',
+      summary:
+        'Двуязычная платформа аренды транспорта: каталог из 40+ авто и байков, умные фильтры, прогрессивные цены и онлайн-бронирование, завязанное на CRM.',
+      challenge:
+        'Прокаты на Пхукете принимают заказы вручную через WhatsApp: клиент часами ждёт ответа, менеджеры тонут в переписках, а конверсия зависит от скорости оператора.',
+      solution:
+        'Построили настоящую воронку бронирования: каталог авто и байков с фильтрами и галереями, прогрессивные скидки за длительную аренду с живым расчётом, личный кабинет с избранным и заявка, которая мгновенно попадает в CRM — менеджер перезванивает уже с готовым расчётом.',
+      role: 'Дизайн, фронт, backend, интеграция с CRM, локализация',
+    },
+  },
+  {
+    slug: 'logistics-kaz',
+    number: '06',
+    year: '2026',
+    client: 'Logistics.kaz',
+    category: 'website',
+    tags: [
+      'React 19',
+      'TypeScript',
+      'Framer Motion',
+      'Three.js',
+      'Telegram Mini App',
+      'i18n',
+    ],
+    cover: '/projects/logistics-kaz/cover.avif',
+    screens: [
+      '/projects/logistics-kaz/screen-1.avif',
+      '/projects/logistics-kaz/screen-2.avif',
+      '/projects/logistics-kaz/screen-3.avif',
+    ],
+    accent: '#B45309',
+    dark: true,
+    en: {
+      title: 'Logistics.kaz — freight from China',
+      summary:
+        'Immersive website for a logistics company: a live cost calculator, a cinematic scroll-driven route map and leads flowing straight into the CRM — in three languages.',
+      challenge:
+        'Logistics websites in this niche all look the same, while clients pick a partner on trust. The company needed to make fully documented customs clearance and the China — Kazakhstan — Russia route tangible enough to stand out.',
+      solution:
+        'We shipped an editorial site with an interactive calculator (weight, cargo category, route — the quote carries over into the lead form), a pinned scroll scene drawing the Yiwu — Khorgos — Almaty — Moscow rail route over real geography, and full i18n in Russian, Kazakh and English. Plus a Telegram bot with a Mini App for orders and shipment tracking.',
+      role: 'Design, frontend, calculator, Telegram bot, i18n',
+    },
+    ru: {
+      title: 'Logistics.kaz — доставка грузов из Китая',
+      summary:
+        'Иммерсивный сайт логистической компании: живой калькулятор стоимости, кинематографичная скролл-карта маршрута и заявки прямо в CRM — на трёх языках.',
+      challenge:
+        'Сайты в логистике выглядят одинаково безлико, а подрядчика клиент выбирает по доверию. Нужно было сделать «белую» растаможку и маршрут Китай — Казахстан — Россия осязаемыми, чтобы компания выделялась на фоне конкурентов.',
+      solution:
+        'Сделали редакционный сайт с интерактивным калькулятором (вес, категория груза, маршрут — расчёт сам подставляется в заявку), pinned-скролл-сценой ЖД-маршрута Иу — Хоргос — Алматы — Москва на реальной географии и локализацией на русский, казахский и английский. Плюс Telegram-бот с Mini App для заявок и трекинга грузов.',
+      role: 'Дизайн, фронт, калькулятор, Telegram-бот, локализация',
+    },
+  },
+  {
+    slug: 'zefstar',
+    number: '07',
+    year: '2026',
+    client: 'Zef Star',
+    category: 'website',
+    tags: ['Next.js', 'React 19', 'TypeScript', 'Tailwind v4', 'Figma'],
+    cover: '/projects/zefstar/cover.avif',
+    screens: [
+      '/projects/zefstar/screen-1.avif',
+      '/projects/zefstar/screen-2.avif',
+    ],
+    accent: '#A118FF',
+    dark: true,
+    en: {
+      title: 'Zef Star — outdoor advertising platform',
+      summary:
+        'Website for an outdoor advertising operator: billboards, LED screens and city formats picked on a city map, with a placement request in a couple of clicks.',
+      challenge:
+        'An outdoor advertising operator was selling through calls and PDF price lists. They needed to move sales online: let the client browse available surfaces on a map and request a placement themselves.',
+      solution:
+        'We translated the Figma design system into code one-to-one — tokens, typography, UI kit — and built the platform foundation on Next.js and Tailwind v4: a dark cinematic hero, the placement formats catalogue and the frame for an interactive map of surfaces with format filters.',
+      role: 'Design system, frontend, UI kit, architecture',
+    },
+    ru: {
+      title: 'Zef Star — платформа наружной рекламы',
+      summary:
+        'Сайт оператора наружной рекламы: билборды, LED-экраны и сити-форматы выбираются на карте города, заявка на размещение — в пару кликов.',
+      challenge:
+        'Оператор наружной рекламы продавал через звонки и PDF-прайсы. Нужно было перевести продажи в онлайн: дать клиенту самому посмотреть свободные площадки на карте и оставить заявку.',
+      solution:
+        'Перенесли дизайн-систему из Figma в код один в один — токены, типографика, UI-кит — и построили фундамент платформы на Next.js и Tailwind v4: тёмный кинематографичный hero, каталог форматов размещения и каркас интерактивной карты площадок с фильтрами.',
+      role: 'Дизайн-система, фронт, UI-кит, архитектура',
+    },
+  },
+  {
+    slug: '3dlike',
+    number: '08',
     year: '2025',
     client: '3DLike',
     category: 'website',
     tags: ['React', 'Tailwind CSS', 'Framer Motion', 'SEO'],
-    cover: '/projects/3dlike/cover.webp',
+    cover: '/projects/3dlike/cover.avif',
     screens: [
-      '/projects/3dlike/macbook-pro-16.webp',
-      '/projects/3dlike/studio.webp',
-      '/projects/3dlike/ipad-pro.webp',
-      '/projects/3dlike/iphone-16-pro.webp',
+      '/projects/3dlike/macbook-pro-16.avif',
+      '/projects/3dlike/studio.avif',
+      '/projects/3dlike/ipad-pro.avif',
+      '/projects/3dlike/iphone-16-pro.avif',
     ],
     accent: '#E53E12',
     en: {

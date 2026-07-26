@@ -24,7 +24,7 @@ const Hero = styled.header`
      the warm side of the About bookend pair (third panel of the inner
      pages triptych). Layers:
        1. dark gradient (top) — keeps the white headline readable
-       2. hero-bg.webp (middle) — copper splash with dark vignette and
+       2. hero-bg.avif (middle) — copper splash with dark vignette and
           a warm halo near the upper-third
        3. solid --ink (bottom fallback) */
   background:
@@ -34,7 +34,7 @@ const Hero = styled.header`
       rgba(0, 0, 0, 0.38) 55%,
       rgba(0, 0, 0, 0.58) 100%
     ),
-    url('/about/hero-bg.webp') center / cover no-repeat,
+    url('/about/hero-bg.avif') center / cover no-repeat,
     var(--ink);
   color: #fff;
   overflow: hidden;
@@ -54,7 +54,7 @@ const Hero = styled.header`
         rgba(0, 0, 0, 0.5) 0%,
         rgba(0, 0, 0, 0.68) 100%
       ),
-      url('/about/hero-bg.webp') center / cover no-repeat,
+      url('/about/hero-bg.avif') center / cover no-repeat,
       var(--ink);
   }
 `;
@@ -350,7 +350,7 @@ const CtaShell = styled.section`
      the page reads as a bookended pair.
        1. radial darkening (top) — crushes the corners, lifts the
           centre so the headline + pill sit in a halo
-       2. cta-bg.webp (middle) — teal splash with cool halo
+       2. cta-bg.avif (middle) — teal splash with cool halo
        3. solid --ink (bottom fallback) */
   background:
     radial-gradient(
@@ -359,7 +359,7 @@ const CtaShell = styled.section`
       rgba(0, 0, 0, 0.62) 55%,
       rgba(0, 0, 0, 0.82) 100%
     ),
-    url('/about/cta-bg.webp') center / cover no-repeat,
+    url('/about/cta-bg.avif') center / cover no-repeat,
     var(--ink);
   color: #fff;
   overflow: hidden;
@@ -399,7 +399,7 @@ const CtaShell = styled.section`
         rgba(0, 0, 0, 0.65) 0%,
         rgba(0, 0, 0, 0.82) 100%
       ),
-      url('/about/cta-bg.webp') center / cover no-repeat,
+      url('/about/cta-bg.avif') center / cover no-repeat,
       var(--ink);
   }
 `;

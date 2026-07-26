@@ -2,35 +2,12 @@ import { createGlobalStyle } from 'styled-components';
 import { colors, fonts, motion, tracking } from './theme';
 
 const GlobalStyles = createGlobalStyle`
-  /* PP Neue Montreal — display typeface (Pangram Pangram), licensed via the
-     studio's Pangram Pangram account. Keep the licence confirmation email as
-     proof of usage rights. font-display: swap keeps the Schibsted Grotesk
-     fallback visible until the faces load. woff2 first (~57% smaller than the
-     .otf); the .otf stays as a fallback for any engine without woff2. */
-  @font-face {
-    font-family: 'PP Neue Montreal';
-    src: url('/fonts/PPNeueMontreal-Regular.woff2') format('woff2'),
-         url('/fonts/PPNeueMontreal-Regular.otf') format('opentype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-  }
-  @font-face {
-    font-family: 'PP Neue Montreal';
-    src: url('/fonts/PPNeueMontreal-Semibold.woff2') format('woff2'),
-         url('/fonts/PPNeueMontreal-Semibold.otf') format('opentype');
-    font-weight: 600;
-    font-style: normal;
-    font-display: swap;
-  }
-  @font-face {
-    font-family: 'PP Neue Montreal';
-    src: url('/fonts/PPNeueMontreal-Extrabold.woff2') format('woff2'),
-         url('/fonts/PPNeueMontreal-Extrabold.otf') format('opentype');
-    font-weight: 800;
-    font-style: normal;
-    font-display: swap;
-  }
+  /* NOTE: the PP Neue Montreal @font-face rules live in src/index.css, not
+     here. styled-components rewrites this sheet whenever a lazy route's
+     styles get injected, and re-parsing @font-face tears down + re-creates
+     the font faces — with font-display: swap that flashed every headline to
+     the fallback font on each navigation. Keep @font-face out of any
+     styled-components-managed sheet. */
 
   :root {
     --bone: ${colors.bone};
