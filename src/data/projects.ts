@@ -290,6 +290,10 @@ const rawProjects: Project[] = [
       role: 'Дизайн, фронт, калькулятор, Telegram-бот, локализация',
     },
   },
+  // Zef Star — hidden until the real mockups are ready (assets in
+  // /public/projects/zefstar are placeholders). To bring it back: uncomment
+  // and bump 3dlike's number back to '08'.
+  /*
   {
     slug: 'zefstar',
     number: '07',
@@ -325,9 +329,10 @@ const rawProjects: Project[] = [
       role: 'Дизайн-система, фронт, UI-кит, архитектура',
     },
   },
+  */
   {
     slug: '3dlike',
-    number: '08',
+    number: '07',
     year: '2025',
     client: '3DLike',
     category: 'website',
