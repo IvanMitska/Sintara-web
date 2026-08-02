@@ -5,6 +5,30 @@
 [build.environment]
   NODE_VERSION = "18"
 
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# Brief submissions. MUST stay above the SPA catch-all below — redirects are
+# evaluated in order, and the catch-all would otherwise answer /api/* with
+# index.html and the form would silently "succeed" against an HTML page.
+[[redirects]]
+  from = "/api/brief"
+  to = "/.netlify/functions/brief"
+  status = 200
+
+# Legacy case URLs. /project/<slug> predates /work/<slug> and still has inbound
+# links. Without this they fall through to the SPA shell, which now means the
+# prerendered HOMEPAGE — homepage content, homepage canonical — so any authority
+# those links carry lands on the wrong page. A 301 passes it to the real case.
+# The client route stays in App.tsx as a safety net for anything that reaches
+# React without passing through the CDN.
+[[redirects]]
+  from = "/project/*"
+  to = "/work/:splat"
+  status = 301
+  force = true
+
 # SPA redirect rules
 [[redirects]]
   from = "/*"
@@ -50,8 +74,22 @@
 # 3D models — large GLBs, served once per session via the preloader path
 # then reused by drei's useGLTF on the footer scene. Strong cache coalesces
 # the preload fetch and drei's later request into a single network hit.
+# Immutable, so a changed model must ship under a new filename (astronaut-v2).
 [[headers]]
   for = "/models/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Env map + Draco decoder for the footer scene. Previously pulled from
+# raw.githack.com and gstatic.com; self-hosted now, so give them the same
+# strong cache as the models.
+[[headers]]
+  for = "/hdr/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/draco/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 

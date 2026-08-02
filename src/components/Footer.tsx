@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from './ui/Link';
 import styled, { css, keyframes } from 'styled-components';
 import { useLanguage } from '../context/LanguageContext';
 

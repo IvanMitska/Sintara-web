@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, memo } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { withLanguage } from '../lib/i18n';
 import {
   FaArrowLeft, FaArrowRight, FaPaperPlane, FaCheck,
   FaBuilding, FaUsers, FaBullseye, FaSitemap, FaPalette,
@@ -9,6 +10,7 @@ import {
 } from 'react-icons/fa';
 import { useLanguage } from '../context/LanguageContext';
 import NavBar from '../components/NavBar';
+import { track } from '../lib/analytics';
 
 // ============ STYLED COMPONENTS ============
 
@@ -1660,6 +1662,14 @@ const Brief: React.FC = memo(() => {
 
   const nextStep = () => {
     if (currentStep < steps.length - 1) {
+      // Step-by-step funnel: the interesting number is where people stop, not
+      // how many finished. Sent on forward moves only, so going back and forth
+      // doesn't inflate the later steps.
+      track('brief_step', {
+        step_index: currentStep + 1,
+        step_name: steps[currentStep].label,
+        step_total: steps.length,
+      });
       setCurrentStep(prev => prev + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -1702,43 +1712,9 @@ const Brief: React.FC = memo(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep]);
 
-  // Split text into chunks respecting Telegram's 4096 char limit
-  const splitIntoChunks = (text: string, maxLength: number = 4000): string[] => {
-    if (text.length <= maxLength) return [text];
-
-    const chunks: string[] = [];
-    const lines = text.split('\n');
-    let currentChunk = '';
-
-    for (const line of lines) {
-      // If single line exceeds max, split it by characters
-      if (line.length > maxLength) {
-        if (currentChunk) {
-          chunks.push(currentChunk.trim());
-          currentChunk = '';
-        }
-        // Split long line into smaller pieces
-        for (let i = 0; i < line.length; i += maxLength - 50) {
-          chunks.push(line.substring(i, i + maxLength - 50));
-        }
-        continue;
-      }
-
-      if ((currentChunk + '\n' + line).length > maxLength) {
-        chunks.push(currentChunk.trim());
-        currentChunk = line;
-      } else {
-        currentChunk = currentChunk ? currentChunk + '\n' + line : line;
-      }
-    }
-
-    if (currentChunk.trim()) {
-      chunks.push(currentChunk.trim());
-    }
-
-    return chunks;
-  };
-
+  // NOTE: chunking to Telegram's 4096-char limit now happens server-side, in
+  // netlify/functions/brief.mjs — it's a detail of talking to Telegram, and
+  // the browser no longer talks to Telegram at all.
   const formatBriefForTelegram = (): string => {
     const sections = [];
 
@@ -1809,81 +1785,37 @@ const Brief: React.FC = memo(() => {
     setIsSubmitting(true);
     setSubmitError(null);
 
-    // Helper to send a single message with retry on rate limit
-    const sendTelegramMessage = async (
-      token: string,
-      chatId: string,
-      text: string,
-      retries = 3
-    ): Promise<void> => {
-      for (let attempt = 0; attempt < retries; attempt++) {
-        const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chatId,
-            text: text,
-            parse_mode: 'Markdown'
-          })
-        });
-
-        if (response.ok) return;
-
-        const errorData = await response.json().catch(() => ({}));
-
-        // Handle rate limiting (429 Too Many Requests)
-        if (response.status === 429) {
-          const retryAfter = errorData.parameters?.retry_after || 5;
-          console.log(`Rate limited, waiting ${retryAfter}s...`);
-          await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
-          continue;
-        }
-
-        throw new Error(errorData.description || 'Failed to send to Telegram');
-      }
-      throw new Error('Max retries exceeded');
-    };
-
+    // The bot token used to live here, read from import.meta.env.VITE_* — which
+    // Vite inlines into the public bundle, so it shipped to every visitor. The
+    // browser now only posts the formatted brief to our own endpoint; the
+    // credentials, the Telegram call, the chunking and the rate-limit retries
+    // all live in netlify/functions/brief.mjs.
     try {
-      const message = formatBriefForTelegram();
-      let chunks = splitIntoChunks(message);
+      const response = await fetch('/api/brief', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: formatBriefForTelegram() }),
+      });
 
-      // Limit to max 10 parts to avoid extreme cases
-      const MAX_PARTS = 10;
-      if (chunks.length > MAX_PARTS) {
-        chunks = chunks.slice(0, MAX_PARTS);
-        chunks[MAX_PARTS - 1] += '\n\n⚠️ _Сообщение было сокращено из-за большого объёма_';
+      if (!response.ok) {
+        // Server-side detail stays server-side; the visitor gets one message.
+        throw new Error(`brief endpoint returned ${response.status}`);
       }
 
-      // Send to Telegram
-      const TELEGRAM_BOT_TOKEN = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || '';
-      const TELEGRAM_CHAT_ID = import.meta.env.VITE_TELEGRAM_CHAT_ID || '';
+      setIsSuccess(true);
 
-      if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
-        // Send all chunks sequentially
-        for (let i = 0; i < chunks.length; i++) {
-          const chunkText = chunks.length > 1
-            ? `${i === 0 ? '' : `📋 *БРИФ (часть ${i + 1}/${chunks.length})*\n\n`}${chunks[i]}`
-            : chunks[i];
-
-          await sendTelegramMessage(TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, chunkText);
-
-          // Delay between messages to avoid rate limiting (500ms)
-          if (i < chunks.length - 1) {
-            await new Promise(resolve => setTimeout(resolve, 500));
-          }
-        }
-
-        setIsSuccess(true);
-      } else {
-        // No Telegram config - show error
-        console.error('Telegram credentials not configured');
-        setSubmitError(language === 'ru'
-          ? 'Ошибка конфигурации. Пожалуйста, свяжитесь с нами напрямую.'
-          : 'Configuration error. Please contact us directly.');
-      }
+      // GA4's recommended lead event — this is the site's actual goal, so mark
+      // it as a key event in Admin → Events. Only non-personal answers travel
+      // with it; name, email and comments stay out of analytics.
+      track('generate_lead', {
+        product_type: formData.productType || 'unspecified',
+        budget: formData.budget || 'unspecified',
+        launch_date: formData.launchDate || 'unspecified',
+        language,
+      });
     } catch (error) {
       console.error('Error submitting brief:', error);
+      track('brief_error', { language });
       setSubmitError(language === 'ru'
         ? 'Произошла ошибка при отправке. Пожалуйста, попробуйте ещё раз или свяжитесь с нами напрямую.'
         : 'An error occurred while sending. Please try again or contact us directly.');
@@ -2541,7 +2473,7 @@ const Brief: React.FC = memo(() => {
               </SuccessIcon>
               <SuccessTitle>{t.successTitle}</SuccessTitle>
               <SuccessText>{t.successText}</SuccessText>
-              <NavButton $primary onClick={() => navigate('/')}>
+              <NavButton $primary onClick={() => navigate(withLanguage('/', language))}>
                 {t.backToHome}
               </NavButton>
             </SuccessScreen>
@@ -2578,7 +2510,7 @@ const Brief: React.FC = memo(() => {
       <BriefHero>
         <BriefHeroInner>
           <BackButton
-            onClick={() => navigate('/')}
+            onClick={() => navigate(withLanguage('/', language))}
             whileHover={{ x: -4 }}
             whileTap={{ scale: 0.98 }}
           >

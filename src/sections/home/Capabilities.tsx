@@ -1,5 +1,7 @@
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { Link } from '../../components/ui/Link';
+import { motion } from 'framer-motion';
+import useSeam from '../../hooks/useSeam';
 import { useLanguage } from '../../context/LanguageContext';
 import Reveal from '../../components/ui/Reveal';
 import Crosshair from '../../components/ui/Crosshair';
@@ -7,14 +9,33 @@ import Crosshair from '../../components/ui/Crosshair';
 /**
  * Capabilities — a dark cinematic break in the page rhythm. A numbered
  * list of what Sintara builds, each row shifting toward cyan on hover.
+ *
+ * It is also the page's sharpest seam: the light run above ends here. The
+ * panel is pulled up over the preceding section with a rounded lip that
+ * flattens as it takes the screen, so the dark block reads as sliding *over*
+ * the light one rather than following it in a stack.
+ *
+ * The scroll-linked part is strictly cosmetic — corner radius only. If it
+ * never runs, the section still sits exactly where it belongs with a rounded
+ * top, which is a perfectly good static design. Nothing here can hide content.
  */
 
-const Shell = styled.section`
+const Shell = styled(motion.section)`
   position: relative;
+  z-index: 1;
   background: var(--ink);
   color: #fff;
   padding: clamp(90px, 13vh, 180px) clamp(20px, 5vw, 80px);
   overflow: hidden;
+
+  /* Rides up over the light section above. The shadow does the depth work on
+     its own, so the overlap still reads with no JS at all. */
+  margin-top: -72px;
+  box-shadow: 0 -30px 70px rgba(20, 16, 40, 0.16);
+
+  @media (max-width: 768px) {
+    margin-top: -48px;
+  }
 `;
 
 const Inner = styled.div`
@@ -129,6 +150,7 @@ const Row = styled(Link)`
 const Capabilities = () => {
   const { language } = useLanguage();
   const isRu = language === 'ru';
+  const seam = useSeam<HTMLElement>(56);
 
   const items = isRu
     ? [
@@ -177,7 +199,12 @@ const Capabilities = () => {
       ];
 
   return (
-    <Shell data-surface="dark" data-nav-theme="dark">
+    <Shell
+      ref={seam.ref}
+      data-surface="dark"
+      data-nav-theme="dark"
+      style={seam.style}
+    >
       <Crosshair
         style={{ top: '10%', right: '8%' }}
         $size={16}

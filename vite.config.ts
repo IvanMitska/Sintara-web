@@ -4,6 +4,14 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  // Only affects the build-time prerender bundle (vite build --ssr), never the
+  // client build. Vite leaves dependencies external in SSR builds, which loads
+  // them through Node's CJS interop — and styled-components then arrives as a
+  // namespace object where `styled.button` is undefined. Bundling these two in
+  // keeps their ESM builds intact.
+  ssr: {
+    noExternal: ['styled-components', 'framer-motion'],
+  },
   build: {
     target: 'esnext',
     minify: 'esbuild',

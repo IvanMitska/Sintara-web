@@ -1,11 +1,12 @@
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { Link } from '../../components/ui/Link';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
 import { projects } from '../../data/projects';
 import Reveal from '../../components/ui/Reveal';
 import PillLink from '../../components/ui/PillLink';
 import CoverImage from '../../components/ui/CoverImage';
+import FlowFrame from '../../components/ui/FlowFrame';
 
 /**
  * Featured work — an editorial project grid. Tag row, full-bleed cover,
@@ -276,14 +277,14 @@ const FeaturedWork = () => {
                       <span key={tag}>{tag}</span>
                     ))}
                   </div>
-                  <div className="frame">
+                  <FlowFrame>
                     {p.own && (
                       <span className="badge">
                         {isRu ? 'Собственный продукт' : 'Own product'}
                       </span>
                     )}
                     <CoverImage src={p.cover} alt={loc.title} />
-                  </div>
+                  </FlowFrame>
                   <div className="meta">
                     <span className="title">
                       <span className="title-mask">

@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { Link } from '../../components/ui/Link';
 import { useLanguage } from '../../context/LanguageContext';
 import Reveal from '../../components/ui/Reveal';
 import PillLink from '../../components/ui/PillLink';

@@ -1,4 +1,5 @@
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { Link } from '../components/ui/Link';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import NavBar from '../components/NavBar';

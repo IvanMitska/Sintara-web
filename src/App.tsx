@@ -7,6 +7,9 @@ import { LanguageProvider } from './context/LanguageContext';
 import { AmbientAudioProvider } from './components/audio/AmbientAudio';
 import SmoothScroll from './components/SmoothScroll';
 import RouteMount from './components/RouteMount';
+import RouteSeo from './components/RouteSeo';
+import { enPath, type PageRoute } from './routes';
+import Analytics from './components/Analytics';
 import Cursor from './components/Cursor';
 
 // GlobalCanvas (Three.js) was the host for the WebGL hero. Now that the
@@ -67,6 +70,23 @@ const LoaderShell = styled.div`
 
 const PageLoader = () => <LoaderShell aria-label="Loading" />;
 
+/**
+ * Every page, in language-neutral form. Rendered twice below (Russian at the
+ * bare path, English under /en) and walked again by the build's prerender, so
+ * a page added here is reachable, crawlable and prerendered in both languages
+ * without touching anything else.
+ */
+const PAGES: PageRoute[] = [
+  { path: '/', element: <Home /> },
+  { path: '/work', element: <Work /> },
+  { path: '/work/:slug', element: <ProjectDetail /> },
+  { path: '/services', element: <Services /> },
+  { path: '/about', element: <About /> },
+  { path: '/contact', element: <Contact /> },
+  { path: '/brief', element: <Brief /> },
+  { path: '/products/sintara-rent-crm', element: <RentCrmProduct /> },
+];
+
 const App = () => {
   useEffect(() => {
     // Low-end device hint → reduce motion class
@@ -119,10 +139,15 @@ const App = () => {
   }, []);
 
   return (
-    <LanguageProvider>
-      <AmbientAudioProvider>
-        <BrowserRouter>
+    // LanguageProvider now sits INSIDE the router: the language is read from
+    // the URL (/work vs /en/work), so the provider needs a location to read.
+    <BrowserRouter>
+      <LanguageProvider>
+        <AmbientAudioProvider>
           <GlobalStyles />
+          <RouteSeo />
+          {/* Must stay after RouteSeo — it reads the title RouteSeo sets. */}
+          <Analytics />
           <SmoothScroll />
           <Cursor />
           <ErrorBoundary>
@@ -133,23 +158,35 @@ const App = () => {
                   (same component, same position) and our mount-only scroll
                   reset never refires on the new route. */}
               <Routes>
-              <Route path="/" element={<><RouteMount key="r:/" /><Home /></>} />
-              <Route path="/work" element={<><RouteMount key="r:/work" /><Work /></>} />
-              <Route path="/work/:slug" element={<><RouteMount key="r:/work/:slug" /><ProjectDetail /></>} />
-              {/* Keep legacy /project/:slug for backward compat */}
-              <Route path="/project/:slug" element={<><RouteMount key="r:/project/:slug" /><ProjectDetail /></>} />
-              <Route path="/services" element={<><RouteMount key="r:/services" /><Services /></>} />
-              <Route path="/about" element={<><RouteMount key="r:/about" /><About /></>} />
-              <Route path="/contact" element={<><RouteMount key="r:/contact" /><Contact /></>} />
-              <Route path="/brief" element={<><RouteMount key="r:/brief" /><Brief /></>} />
-              <Route path="/products/sintara-rent-crm" element={<><RouteMount key="r:/products/sintara-rent-crm" /><RentCrmProduct /></>} />
-              <Route path="*" element={<><RouteMount key="r:404" /><NotFound /></>} />
+                {/* Every page is registered twice, from one list: bare paths
+                    for Russian, /en-prefixed for English. */}
+                {PAGES.flatMap(({ path, element }) =>
+                  [path, enPath(path)].map((routePath) => (
+                    <Route
+                      key={routePath}
+                      path={routePath}
+                      element={
+                        <>
+                          <RouteMount key={`r:${routePath}`} />
+                          {element}
+                        </>
+                      }
+                    />
+                  )),
+                )}
+                {/* Legacy case URLs. Netlify 301s these before they ever reach
+                    React; the route stays as a safety net for direct hits. */}
+                <Route
+                  path="/project/:slug"
+                  element={<><RouteMount key="r:/project/:slug" /><ProjectDetail /></>}
+                />
+                <Route path="*" element={<><RouteMount key="r:404" /><NotFound /></>} />
               </Routes>
             </Suspense>
           </ErrorBoundary>
-        </BrowserRouter>
-      </AmbientAudioProvider>
-    </LanguageProvider>
+        </AmbientAudioProvider>
+      </LanguageProvider>
+    </BrowserRouter>
   );
 };
 

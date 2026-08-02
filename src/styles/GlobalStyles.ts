@@ -85,7 +85,13 @@ const GlobalStyles = createGlobalStyle`
     line-height: 1.5;
     color: var(--ink);
     background: var(--paper);
-    overflow-x: hidden;
+    /* clip, not hidden. Both stop sideways scrolling from wide decorative
+       elements (marquees, oversized display type), but hidden silently makes
+       <body> a scroll container — and since the page actually scrolls on the
+       viewport, every position:sticky inside resolved against a container that
+       never moves and quietly did nothing. clip doesn't create a scroll
+       container, so sticky works and the horizontal clamp is unchanged. */
+    overflow-x: clip;
     min-height: 100vh;
     letter-spacing: ${tracking.normal};
   }

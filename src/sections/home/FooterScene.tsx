@@ -1,10 +1,33 @@
-import { Suspense, useEffect, useMemo, useRef } from 'react';
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Environment, useGLTF, useAnimations } from '@react-three/drei';
 import * as THREE from 'three';
 import ErrorBoundary from '../../components/ErrorBoundary';
-const ASTRONAUT_URL = '/models/astronaut.glb';
+// astronaut-v2: same mesh, re-packed. TANGENT dropped (three derives the
+// tangent frame in-shader) which let 114.5k vertices weld down to 36.7k
+// bitwise-identical ones, then EXT_meshopt_compression instead of Draco —
+// 4.48 MB -> 1.20 MB with no change to silhouette, skinning, clips or maps.
+// Meshopt also decodes several times faster and its decoder ships inside
+// three-stdlib, so the astronaut no longer needs Draco at all.
+const ASTRONAUT_URL = '/models/astronaut-v2.glb';
 const ICONS_URL = '/models/icons.glb';
+// icons.glb stays Draco (meshopt makes that particular file ~2.5x bigger), so
+// we still need a decoder — served from our own origin instead of drei's
+// gstatic.com default, which cost an extra DNS + TLS handshake mid-scroll.
+const DRACO_PATH = '/draco/';
+// Self-hosted 512x256 cut of the "city" preset. drei's preset= pulls a 1.47 MB
+// 1k HDR from raw.githack.com — a third-party origin on the critical path that
+// the idle prefetch below couldn't warm. Reflections here land on small, mostly
+// rough objects, so half resolution is visually indistinguishable (mean
+// luminance 0.6805 vs 0.6824) at a quarter of the bytes.
+const ENV_URL = '/hdr/city-512.hdr';
 
 // NOTE: this scene no longer registers a loadManager task. It's lazy-mounted
 // near the footer (well after the preloader) and pre-warmed in the background
@@ -17,7 +40,7 @@ const ICONS_URL = '/models/icons.glb';
  * astronaut holds the centre while a cloud of iridescent Spline primitives
  * drifts around it and scatters away from the cursor.
  *
- * Models live in /public/models — `astronaut.glb` (Draco + WebP, ~4.7 MB,
+ * Models live in /public/models — `astronaut-v2.glb` (meshopt + WebP, ~1.2 MB,
  * skinned, 4 clips) and `icons.glb` (Draco, ~0.45 MB, 9 named groups).
  *
  * Astronaut model: "Animated Astronaut Character in Space Suit Loop" by
@@ -227,7 +250,7 @@ function IconCloud({
   pointer: React.MutableRefObject<PointerState>;
   reduced: boolean;
 }) {
-  const { scene } = useGLTF(ICONS_URL);
+  const { scene } = useGLTF(ICONS_URL, DRACO_PATH);
   const camera = useThree((s) => s.camera);
 
   // Resolve the icon groups by walking the scene graph. GLTFLoader
@@ -336,7 +359,9 @@ function Astronaut({
   reduced: boolean;
 }) {
   const group = useRef<THREE.Group>(null);
-  const { scene, animations } = useGLTF(ASTRONAUT_URL);
+  // useDraco=false: the v2 model is meshopt-only, so skip instantiating a
+  // DRACOLoader (and its decoder fetch) for this file entirely.
+  const { scene, animations } = useGLTF(ASTRONAUT_URL, false);
   const { actions } = useAnimations(animations, group);
 
   // centre + scale the model to a fixed on-screen height
@@ -409,8 +434,8 @@ function Astronaut({
 // we force-compile every material in the tree (so the heavy iridescent /
 // chrome / clearcoat shaders are GPU-ready) — scrolling to the footer then
 // reveals an already-warm scene with no shader-compile hitch.
-function ReadySignal() {
-  const { gl, scene, camera } = useThree();
+function ReadySignal({ onReady }: { onReady: () => void }) {
+  const { gl, scene, camera, invalidate } = useThree();
   useEffect(() => {
     try {
       gl.compile(scene, camera);
@@ -418,16 +443,23 @@ function ReadySignal() {
       // compile failures aren't fatal — the scene compiles lazily on its
       // first real render frame instead.
     }
-  }, [gl, scene, camera]);
+    // frameloop is 'demand' until the footer is in view, so ask for one frame
+    // explicitly — the fade below must reveal a drawn scene, not a blank canvas.
+    invalidate();
+    const raf = requestAnimationFrame(onReady);
+    return () => cancelAnimationFrame(raf);
+  }, [gl, scene, camera, invalidate, onReady]);
   return null;
 }
 
 function Scene({
   pointer,
   reduced,
+  onReady,
 }: {
   pointer: React.MutableRefObject<PointerState>;
   reduced: boolean;
+  onReady: () => void;
 }) {
   // lighter cloud on small / lower-power devices
   const count = useMemo(() => {
@@ -451,16 +483,16 @@ function Scene({
       <Astronaut pointer={pointer} reduced={reduced} />
       <IconCloud count={count} pointer={pointer} reduced={reduced} />
 
-      {/* The "city" preset fetches an HDR from drei's CDN — on a flaky mobile
-          network that fetch can fail intermittently. Isolate it: a failure
+      {/* Own-origin env map now, but keep the isolation: a failed/aborted fetch
           drops only the reflections (materials look slightly flatter), never
-          the whole scene or the page. */}
+          the whole scene or the page. Its own Suspense also keeps the astronaut
+          from waiting on the HDR. */}
       <ErrorBoundary fallback={null}>
         <Suspense fallback={null}>
-          <Environment preset="city" />
+          <Environment files={ENV_URL} />
         </Suspense>
       </ErrorBoundary>
-      <ReadySignal />
+      <ReadySignal onReady={onReady} />
     </Suspense>
   );
 }
@@ -473,6 +505,12 @@ const FooterScene = ({ active }: { active: boolean }) => {
     world: new THREE.Vector3(),
     inside: false,
   });
+  // Even fully cached, decoding + shader compilation take a beat. Popping the
+  // finished scene in reads as "it was broken, now it isn't"; fading it up over
+  // the section's own gradient reads as a reveal. Nothing renders until
+  // ReadySignal fires, so the fade always starts from a drawn frame.
+  const [ready, setReady] = useState(false);
+  const handleReady = useCallback(() => setReady(true), []);
 
   const reduced = useMemo(
     () =>
@@ -528,6 +566,8 @@ const FooterScene = ({ active }: { active: boolean }) => {
         inset: 0,
         zIndex: 0,
         pointerEvents: 'none',
+        opacity: ready ? 1 : 0,
+        transition: 'opacity 900ms cubic-bezier(0.22, 1, 0.36, 1)',
       }}
     >
       <Canvas
@@ -544,7 +584,7 @@ const FooterScene = ({ active }: { active: boolean }) => {
           powerPreference: 'high-performance',
         }}
       >
-        <Scene pointer={pointer} reduced={reduced} />
+        <Scene pointer={pointer} reduced={reduced} onReady={handleReady} />
       </Canvas>
     </div>
   );

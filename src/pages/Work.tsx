@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from '../components/ui/Link';
 import styled from 'styled-components';
 import { motion, useReducedMotion } from 'framer-motion';
 import NavBar from '../components/NavBar';

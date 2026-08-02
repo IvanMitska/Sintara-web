@@ -1,5 +1,6 @@
-import { Link } from 'react-router-dom';
+import { Link } from './Link';
 import styled, { css } from 'styled-components';
+import useMagnetic from '../../hooks/useMagnetic';
 
 /**
  * Lusion-style pill button — a rounded capsule with a leading dot.
@@ -26,11 +27,16 @@ const base = css`
   /* A comfortable, stable hit area. The pill deliberately does NOT lift on
      hover — a transform moves the element's hit box, so the pointer fell just
      outside it at the bottom edge and rapidly toggled hover, making the button
-     (and its text roll) jitter. With no lift the hover stays rock-steady. */
+     (and its text roll) jitter. With no lift the hover stays rock-steady.
+
+     The magnetic pull below is a different case and safe: it moves the pill
+     *toward* the pointer, which can only deepen the overlap, never break it —
+     the opposite of a lift, which retreats from the cursor. The taller hit
+     area covers the pull's few px of travel on the way in. */
   &::after {
     content: '';
     position: absolute;
-    inset: -8px 0;
+    inset: -12px -6px;
   }
 
   .dot {
@@ -131,6 +137,16 @@ const PillLink = ({
   arrow = false,
   className,
 }: PillLinkProps) => {
+  // The label trails the capsule slightly, so the type appears to settle a
+  // beat after the shape — the button reads as having weight rather than
+  // being a rectangle that slides.
+  const magnetRef = useMagnetic<HTMLAnchorElement>({
+    strength: 0.24,
+    radius: 80,
+    childSelector: '.label',
+    childStrength: -0.35,
+  });
+
   const inner = (
     <>
       {!arrow && <span className="dot" aria-hidden />}
@@ -151,6 +167,7 @@ const PillLink = ({
   if (href) {
     return (
       <StyledA
+        ref={magnetRef}
         href={href}
         $variant={variant}
         className={className}
@@ -165,6 +182,7 @@ const PillLink = ({
 
   return (
     <StyledLink
+      ref={magnetRef}
       to={to ?? '#'}
       $variant={variant}
       className={className}

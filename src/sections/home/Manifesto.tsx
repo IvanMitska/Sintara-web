@@ -99,8 +99,8 @@ const Manifesto = () => {
   });
 
   const text = isRu
-    ? 'Sintara — независимая цифровая студия. Мы проектируем и создаём сайты, веб-приложения и Telegram-ботов — продукты, которые выглядят остро, двигаются красиво и выходят в срок.'
-    : 'Sintara is an independent digital studio. We design and build websites, web apps and Telegram bots — products that feel sharp, move beautifully and ship on time.';
+    ? 'Sintara — независимая цифровая студия. Мы проектируем и создаём сайты, веб-приложения и кастомные CRM — продукты, которые выглядят остро, работают безотказно и выходят в срок.'
+    : 'Sintara is an independent digital studio. We design and build websites, web apps and custom CRMs — products that feel sharp, run flawlessly and ship on time.';
   const words = text.split(' ');
 
   return (

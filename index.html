@@ -18,10 +18,16 @@
     <meta name="distribution" content="global" />
     <link rel="canonical" href="https://sintara.io/" />
 
-    <!-- Hreflang for multilingual SEO -->
-    <link rel="alternate" hreflang="ru" href="https://sintara.io/" />
-    <link rel="alternate" hreflang="en" href="https://sintara.io/" />
-    <link rel="alternate" hreflang="x-default" href="https://sintara.io/" />
+    <!--
+      No hreflang alternates on purpose. They used to declare a Russian and an
+      English version, both pointing at this same URL — which is not what
+      hreflang means and is ignored (at best) by search engines. Language here
+      is client-side state, so there is genuinely only one URL per page.
+
+      To claim the bilingual audience properly, the languages need their own
+      addresses (/en/... or en.sintara.io) with hreflang pairs pointing at each
+      other. That's a routing change, not a head change.
+    -->
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
@@ -66,6 +72,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    <!-- gtag.js is injected on idle by src/lib/analytics.ts; warming the
+         connection here saves the DNS + TLS round-trips at that moment. -->
+    <link rel="dns-prefetch" href="//www.googletagmanager.com" />
 
     <!-- Typography: Schibsted Grotesk (single family) + JetBrains Mono -->
     <link

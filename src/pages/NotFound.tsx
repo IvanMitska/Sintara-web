@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from '../components/ui/Link';
 import styled from 'styled-components';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';

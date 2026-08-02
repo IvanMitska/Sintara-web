@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { useLanguage } from '../../context/LanguageContext';
 import PillLink from '../../components/ui/PillLink';
 import Reveal from '../../components/ui/Reveal';
+import MaskedLines from '../../components/ui/MaskedLines';
 
 /**
  * "Bold ideas, brought to life" — a statement and a project still shown
@@ -122,11 +123,7 @@ const Approach = () => {
     <Shell data-nav-theme="light">
       <Inner>
         <Heading>
-          {lines.map((l, i) => (
-            <Reveal as="span" key={l} delay={i * 0.08} y={50}>
-              {l}
-            </Reveal>
-          ))}
+          <MaskedLines lines={lines} />
         </Heading>
 
         <Row>
@@ -151,8 +148,8 @@ const Approach = () => {
             <TextCol>
               <p>
                 {isRu
-                  ? 'Мы соединяем стратегию, дизайн и инженерию, чтобы создавать сайты, веб-приложения и Telegram-ботов — выразительные внешне и безупречные внутри.'
-                  : 'We combine strategy, design and engineering to build websites, web apps and Telegram bots that look sharp and run flawlessly — from launch to scale.'}
+                  ? 'Начинаем с задачи бизнеса, а не с макета: сперва — как продукт работает и на чём зарабатывает, потом — как он выглядит. Поэтому то, что мы делаем, выразительно снаружи и безупречно внутри.'
+                  : 'We start with the business problem, not the mockup — first how the product works and where it makes money, then how it looks. That’s why our work is expressive outside and flawless under the hood.'}
               </p>
               <PillLink to="/about" variant="dark">
                 {isRu ? 'Наш подход' : 'Our approach'}

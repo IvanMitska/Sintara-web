@@ -3,13 +3,14 @@ import styled from 'styled-components';
 import { useLanguage } from '../../context/LanguageContext';
 import PillLink from '../../components/ui/PillLink';
 import Reveal from '../../components/ui/Reveal';
+import MaskedLines from '../../components/ui/MaskedLines';
 import Crosshair from '../../components/ui/Crosshair';
 import ErrorBoundary from '../../components/ErrorBoundary';
-// Lazy so the ~1.1 MB three.js chunk + ~4.5 MB astronaut.glb leave the eager
+// Lazy so the ~1.1 MB three.js chunk + the astronaut model leave the eager
 // home graph (they were `modulepreload`-ed and gated the preloader). The scene
 // is mounted ahead of the viewport (see `shouldMount` below) so it has loaded +
 // compiled by the time the user scrolls down — no pop-in — but first paint of
-// the page no longer waits on ~5.6 MB of footer assets.
+// the page no longer waits on the footer assets (~2.1 MB, all same-origin).
 const FooterScene = lazy(() => import('./FooterScene'));
 
 // Touch devices: skip the DotField sparkle canvas — it draws hundreds of arcs
@@ -164,7 +165,7 @@ const DotField = ({ active }: { active: boolean }) => {
   return <Field ref={ref} aria-hidden />;
 };
 
-const CtaFinale = () => {
+const CtaFinale = ({ booted = false }: { booted?: boolean }) => {
   const { language } = useLanguage();
   const isRu = language === 'ru';
   const shellRef = useRef<HTMLElement>(null);
@@ -187,8 +188,9 @@ const CtaFinale = () => {
       { rootMargin: '200px' },
     );
     io.observe(el);
-    // Mount gate — wide lead margin, fires once. ~1.5 screens of runway gives
-    // the assets time to load before the footer paints.
+    // Mount gate — wide lead margin, fires once. ~2.5 screens of runway: the
+    // download is only half the wait, the rest is meshopt decode + PMREM +
+    // shader compilation, so the scene needs to start well before it paints.
     const mountIo = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -196,7 +198,7 @@ const CtaFinale = () => {
           mountIo.disconnect();
         }
       },
-      { rootMargin: '1200px' },
+      { rootMargin: '2200px' },
     );
     mountIo.observe(el);
     return () => {
@@ -205,20 +207,63 @@ const CtaFinale = () => {
     };
   }, []);
 
-  // Warm the footer 3D in the background as soon as the page goes idle — long
-  // before the mount gate above fires. Downloads the chunk (three.js) and the
-  // GLB models into cache WITHOUT rendering anything, so a fast scroll to the
-  // footer finds ~5.6 MB already cached instead of waiting on it mid-scroll
-  // (the "scroll to the bottom, then it loads" pop-in). Render still happens
-  // only at the 1200px mount gate. The /models/* immutable cache header makes
-  // drei's later useGLTF fetch reuse these warmed responses (one network hit).
+  // Mount as soon as the site has booted, instead of waiting for the scroll
+  // gate above. Downloading the assets is only half the wait — meshopt decode,
+  // PMREM and shader compilation can only happen once the scene is actually in
+  // a WebGL context, so the mount has to come early too. Doing it while the
+  // visitor is still on the hero means even an immediate scroll to the bottom
+  // finds a compiled scene. frameloop stays 'demand' until the section is in
+  // view, so this costs one compile pass, not a running render loop.
+  //
+  // Deliberately NOT a preloader gate: the preloader only waits on fonts today
+  // (~1s), and making it wait on ~2.3 MB of footer assets would delay first
+  // paint for every visitor — including the ones who never scroll this far —
+  // while competing with the hero video for bandwidth. It also used to hang the
+  // counter at 94% until the 11s safety timeout (see loadManager's note).
+  useEffect(() => {
+    if (!booted) return;
+    const win = window as typeof window & {
+      requestIdleCallback?: (cb: () => void, o?: { timeout?: number }) => number;
+      cancelIdleCallback?: (h: number) => void;
+    };
+    // Let the hero's entrance animation finish first — a shader compile spike
+    // landing on it would be far more visible than one during a quiet moment.
+    const mount = () => setShouldMount(true);
+    let idle = 0;
+    let timer = 0;
+    if (win.requestIdleCallback) {
+      idle = win.requestIdleCallback(mount, { timeout: 2000 });
+    } else {
+      timer = window.setTimeout(mount, 1800);
+    }
+    return () => {
+      if (idle && win.cancelIdleCallback) win.cancelIdleCallback(idle);
+      if (timer) window.clearTimeout(timer);
+    };
+  }, [booted]);
+
+  // Warm the footer 3D in the background as soon as the page goes idle — this
+  // runs while the preloader is still on screen, so the bytes land during the
+  // counter rather than mid-scroll. Downloads the chunk (three.js), the models,
+  // the env map and the Draco decoder into cache WITHOUT rendering anything.
+  // The /models/*, /hdr/*, /draco/* immutable cache headers make drei's later
+  // fetches reuse these warmed responses (one network hit each).
   useEffect(() => {
     let warmed = false;
     const warm = () => {
       if (warmed) return;
       warmed = true;
       void import('./FooterScene');
-      ['/models/astronaut.glb', '/models/icons.glb'].forEach((url) => {
+      [
+        '/models/astronaut-v2.glb',
+        '/models/icons.glb',
+        // The env map and the Draco decoder used to be fetched from
+        // raw.githack.com / gstatic.com at mount time — outside this warm-up
+        // and off our own origin. Now they're local, so warm them too.
+        '/hdr/city-512.hdr',
+        '/draco/draco_wasm_wrapper.js',
+        '/draco/draco_decoder.wasm',
+      ].forEach((url) => {
         fetch(url, { priority: 'low' } as RequestInit).catch(() => {});
       });
     };
@@ -229,9 +274,9 @@ const CtaFinale = () => {
     let idle = 0;
     let timer = 0;
     if (win.requestIdleCallback) {
-      idle = win.requestIdleCallback(warm, { timeout: 2500 });
+      idle = win.requestIdleCallback(warm, { timeout: 1200 });
     } else {
-      timer = window.setTimeout(warm, 800);
+      timer = window.setTimeout(warm, 600);
     }
     return () => {
       if (idle && win.cancelIdleCallback) win.cancelIdleCallback(idle);
@@ -266,13 +311,16 @@ const CtaFinale = () => {
             {isRu ? 'Есть идея, которая ждёт?' : 'Got a big idea waiting?'}
           </Eyebrow>
         </Reveal>
-        <Reveal delay={0.06}>
-          <Title>
-            {isRu ? 'Давайте' : "Let's work"}
-            <br />
-            {isRu ? 'поработаем!' : 'together!'}
-          </Title>
-        </Reveal>
+        <Title>
+          <MaskedLines
+            lines={
+              isRu
+                ? ['Давайте', 'поработаем!']
+                : ["Let's work", 'together!']
+            }
+            delay={0.06}
+          />
+        </Title>
         <Reveal delay={0.14}>
           <PillLink to="/brief" variant="light" arrow>
             {isRu ? 'Начать проект' : 'Start a project'}

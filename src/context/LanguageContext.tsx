@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
-
-type Language = 'en' | 'ru';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { parsePath, withLanguage, otherLanguage } from '../lib/i18n';
+import type { Language } from '../lib/i18n';
 
 interface LanguageContextType {
   language: Language;
@@ -879,23 +880,33 @@ const translations: Record<Language, Record<string, string>> = {
   }
 };
 
-export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>(() => {
-    // Check localStorage for saved preference
-    const saved = localStorage.getItem('language');
-    if (saved === 'en' || saved === 'ru') return saved;
-    // Default to browser language or Russian
-    const browserLang = navigator.language.slice(0, 2);
-    return browserLang === 'ru' ? 'ru' : 'en';
-  });
+/**
+ * Language now comes from the URL (see lib/i18n): Russian at the bare path,
+ * English under /en. It used to be React state seeded from localStorage and
+ * navigator.language, which meant both languages lived at the same address —
+ * so only one of them could ever be crawled, indexed or linked to.
+ *
+ * Consequences of the move, both deliberate:
+ *  - No stored preference. The URL always wins, so a shared link opens in the
+ *    language the sender was reading, and a search result opens in the
+ *    language it was written in.
+ *  - No automatic redirect by browser language. Sending a visitor somewhere
+ *    they didn't ask for hides the canonical URL from them and muddies what
+ *    crawlers see; the toggle in the menu is one click away.
+ */
+export const LanguageProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { language, path } = parsePath(location.pathname);
 
   const toggleLanguage = useCallback(() => {
-    setLanguage(prev => {
-      const newLang = prev === 'en' ? 'ru' : 'en';
-      localStorage.setItem('language', newLang);
-      return newLang;
-    });
-  }, []);
+    // Same page, other language — never a jump back to the home page.
+    navigate(
+      `${withLanguage(path, otherLanguage(language))}${location.search}${location.hash}`,
+    );
+  }, [navigate, path, language, location.search, location.hash]);
 
   const t = useCallback((key: string): string => {
     return translations[language][key] || key;
