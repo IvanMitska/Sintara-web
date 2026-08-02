@@ -3,7 +3,11 @@
   command = "npm run build"
 
 [build.environment]
-  NODE_VERSION = "18"
+  # 22, not 18: scripts/prerender.mjs reads import.meta.dirname, which lands in
+  # Node 20.11. On 18 it is undefined, resolve() throws, and the whole build
+  # fails after vite has already succeeded — so the site keeps serving the
+  # previous deploy and nothing looks broken until you check the URL.
+  NODE_VERSION = "22"
 
 [functions]
   directory = "netlify/functions"
