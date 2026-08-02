@@ -205,8 +205,15 @@ for (const path of PRERENDER_PATHS) {
     `<div id="root">${html}</div>`,
   );
 
+  // Flat "work.html", not "work/index.html". Netlify serves a directory only
+  // at its trailing-slash address: with work/index.html on disk, /work answers
+  // 301 → /work/. That would have put every existing URL — the ones already in
+  // Google's index and in this build's own sitemap and canonicals — behind a
+  // redirect, and left each page declaring a canonical that redirects to the
+  // page itself. A sibling .html file is served at the bare path with 200, so
+  // the addresses stay exactly what they were before prerendering existed.
   const file =
-    url === '/' ? join(DIST, 'index.html') : join(DIST, url, 'index.html');
+    url === '/' ? join(DIST, 'index.html') : join(DIST, `${url}.html`);
   mkdirSync(dirname(file), { recursive: true });
   writeFileSync(file, page, 'utf8');
 
