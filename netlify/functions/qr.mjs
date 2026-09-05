@@ -61,14 +61,33 @@ const sanitize = (raw) =>
     .replace(/[^a-z0-9-]/g, '')
     .slice(0, 32);
 
+/** decodeURIComponent throws on a malformed escape like %zz, which a probe will
+ *  eventually send. An undecodable segment is not a code — treat it as absent. */
+const decode = (value) => {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return '';
+  }
+};
+
 export default async (req, context) => {
   const url = new URL(req.url);
 
-  // The rule passes the code explicitly (?code=qr1). The wildcard rule that
-  // catches unregistered codes builds it from Netlify's :splat placeholder, so
-  // guard against the placeholder arriving unsubstituted — that would silently
-  // file every unknown scan under the literal string "qrsplat".
-  const raw = url.searchParams.get('code') ?? '';
+  // The code arrives as the last path segment: /qr1 is rewritten to
+  // /.netlify/functions/qr/qr1. It cannot travel in a query parameter — on a
+  // rewrite Netlify replaces the destination's query string with the incoming
+  // request's, so `?code=qr1` written into the rule never arrives, and worse,
+  // `/qr1?code=qr3` from a visitor would arrive in its place and file the scan
+  // under someone else's card. Verified against production, not assumed.
+  //
+  // Reading the last segment works whether req.url is the address the visitor
+  // typed or the internal function path, since both end in the code.
+  //
+  // The wildcard rule that catches unregistered codes builds the segment from
+  // Netlify's :splat placeholder, so guard against the placeholder arriving
+  // unsubstituted — that would file every unknown scan under "qrsplat".
+  const raw = decode(url.pathname.replace(/\/+$/, '').split('/').pop() ?? '');
   const code = raw.includes(':') ? '' : sanitize(raw);
   const entry = code ? BY_CODE.get(code) : undefined;
 

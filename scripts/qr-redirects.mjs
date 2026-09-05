@@ -39,8 +39,12 @@ validate();
 
 const width = Math.max(...QR_CODES.map((entry) => entry.code.length)) + 1;
 
+// The code travels as a path segment, never as a query parameter: on a rewrite
+// Netlify discards the destination's query string and substitutes the incoming
+// request's, so `?code=qr1` here would arrive empty — and `/qr1?code=qr3` from a
+// visitor would arrive in its place, filing the scan under another card.
 const rules = QR_CODES.map(
-  (entry) => `/${entry.code.padEnd(width)} ${FUNCTION}?code=${entry.code}  200`,
+  (entry) => `/${entry.code.padEnd(width)} ${FUNCTION}/${entry.code}  200`,
 );
 
 // Anything matching /qr* that is not in the registry — a decommissioned code, a
@@ -51,7 +55,7 @@ const rules = QR_CODES.map(
 //
 // This also means no future page may start with "qr" — it would be swallowed
 // here. The stats endpoint lives at /api/qr-stats for exactly that reason.
-const fallback = `/qr*${' '.repeat(Math.max(1, width - 2))} ${FUNCTION}?code=qr:splat  200`;
+const fallback = `/qr*${' '.repeat(Math.max(1, width - 2))} ${FUNCTION}/qr:splat  200`;
 
 const block = [
   START,
