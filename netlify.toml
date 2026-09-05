@@ -16,9 +16,27 @@
 # Brief submissions. MUST stay above the SPA catch-all below — redirects are
 # evaluated in order, and the catch-all would otherwise answer /api/* with
 # index.html and the form would silently "succeed" against an HTML page.
+#
+# Which is exactly what happened for as long as public/_redirects existed:
+# Netlify evaluates every rule from _redirects BEFORE the ones here, and that
+# file held nothing but `/*  /index.html  200`. So this rule was unreachable,
+# GET /api/brief returned the 72 KB homepage and POST returned 404 — the brief
+# form could not submit at all. public/_redirects is gone now; the only
+# _redirects that ships is generated into dist/ by scripts/qr-redirects.mjs and
+# contains QR short links only. Do not put a catch-all back into it.
 [[redirects]]
   from = "/api/brief"
   to = "/.netlify/functions/brief"
+  status = 200
+
+# The QR scan report. Not under /qr*, which is generated into dist/_redirects
+# and routes everything starting with "qr" into the counting function — this
+# page would be swallowed by it and filed as a scan of a code called "qr-stats".
+# Access is a token checked inside the function; without QR_STATS_TOKEN set in
+# the site environment it answers 404.
+[[redirects]]
+  from = "/api/qr-stats"
+  to = "/.netlify/functions/qr-stats"
   status = 200
 
 # Legacy case URLs. /project/<slug> predates /work/<slug> and still has inbound

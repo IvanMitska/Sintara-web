@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { initAnalytics, trackPageView } from '../lib/analytics';
+import { initAnalytics, trackPageView, trackQrScan } from '../lib/analytics';
 
 /**
  * Sends one GA4 page_view per route.
@@ -35,6 +35,16 @@ const Analytics = () => {
     lastSent.current = url;
     trackPageView(url, document.title);
   }, [pathname, search]);
+
+  // Declared after the page_view effect on purpose: effects run in declaration
+  // order, so the landing page_view — the hit GA4 derives session source and
+  // campaign from — is queued before the qr_scan event that annotates it.
+  // Mount-only, because a QR arrival is by definition the first URL of the
+  // session; a later navigation keeps the query string in `search` and would
+  // otherwise re-fire the event on every route change.
+  useEffect(() => {
+    trackQrScan();
+  }, []);
 
   return null;
 };

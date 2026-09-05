@@ -138,6 +138,43 @@ export const track = (name: string, params: GtagParams = {}) => {
 };
 
 /**
+ * One `qr_scan` event when a visit arrives from a printed QR short link.
+ *
+ * The UTM parameters that scripts/qr-redirects.mjs attaches are already enough
+ * for GA4's acquisition reports — session source/medium/campaign are read off
+ * the landing URL automatically. This adds a named event on top for two things
+ * those reports can't do: it can be promoted to a key event (conversion), and
+ * it carries the code as a plain event parameter, which is what makes a report
+ * like "scans per code, per day" a two-click Exploration instead of a funnel
+ * through channel groupings.
+ *
+ * Deduped in memory rather than in sessionStorage: this site deliberately
+ * stores nothing on the device (see lib/consent — that is what keeps it
+ * cookie-banner-free), and the only duplicate worth defending against is
+ * StrictMode running the effect twice. A genuine reload counting again is a far
+ * smaller error than a storage write that would put the site in scope for a
+ * consent prompt.
+ */
+let qrScanTracked = false;
+
+export const trackQrScan = () => {
+  if (qrScanTracked || !analyticsEnabled()) return;
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('utm_source') !== 'qr') return;
+  qrScanTracked = true;
+
+  track('qr_scan', {
+    // utm_campaign is the printed code itself — qr1, qr2 — so this parameter
+    // maps a session straight back to a specific piece of paper.
+    qr_code: params.get('utm_campaign') ?? 'unknown',
+    qr_medium: params.get('utm_medium') ?? 'unknown',
+    qr_placement: params.get('utm_content') ?? 'unknown',
+    page_path: window.location.pathname,
+  });
+};
+
+/**
  * Raises analytics storage mid-session — the hook a consent UI would call.
  *
  * Nothing calls it today: there is no banner, and lib/consent decides storage
